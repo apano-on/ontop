@@ -47,6 +47,11 @@ public class OntopValidate extends OntopMappingOntologyRelatedCommand {
                     .build();
         }
 
+        if (!Files.exists(Paths.get(viewsFile))) {
+            System.out.format("ERROR: The Views file %s does not exist\n", viewsFile);
+            System.exit(1);
+        }
+
         OWLOntology ontology = null;
         try {
             ontology = config.loadProvidedInputOntology();

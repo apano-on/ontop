@@ -31,6 +31,11 @@ abstract class OntopMappingOntologyRelatedCommand implements OntopCommand {
     @BashCompletion(behaviour = CompletionBehaviour.FILENAMES)
     String constraintFile;
 
+    @Option(type = OptionType.COMMAND, name = {"-v", "--views"}, title = "views file",
+        description = "user supplied views file")
+    @BashCompletion(behaviour = CompletionBehaviour.FILENAMES)
+    String viewsFile;
+
     protected boolean isR2rmlFile(String mappingFile) {
         return !mappingFile.endsWith(".obda");
     }

@@ -22,6 +22,7 @@ public class OntopEndpointTest {
         String[] argv = {"endpoint", "-m", "src/test/resources/books/exampleBooks.obda",
                 "-p", "src/test/resources/books/exampleBooks.properties",
                 "-t", "src/test/resources/books/exampleBooks.owl",
+                "-v", "src/test/resources/output/exampleBooks-metadata.json",
                 "--port=" + PORT};
         Ontop.main(argv);
     }
