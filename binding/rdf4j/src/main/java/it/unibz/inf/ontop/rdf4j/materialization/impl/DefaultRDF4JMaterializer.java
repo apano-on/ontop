@@ -48,6 +48,7 @@ import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.RDFHandlerException;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 
 public class DefaultRDF4JMaterializer implements RDF4JMaterializer {
 

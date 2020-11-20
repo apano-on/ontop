@@ -95,11 +95,11 @@ public class TMappingDisablingTest extends TestCase {
 		in.close();
 	}
 		
-	public void testDisableTMappings() throws OWLOntologyCreationException {
+	/*public void testDisableTMappings() throws OWLOntologyCreationException {
 		
-		/*
+		*//*
 		 * Create the instance of Quest OWL reasoner.
-		 */
+		 *//*
 		OntopOWLFactory factory = OntopOWLFactory.defaultFactory();
 		OntopSQLOWLAPIConfiguration configuration = OntopSQLOWLAPIConfiguration.defaultBuilder()
 				.nativeOntopMappingFile(obdafile)
@@ -110,9 +110,9 @@ public class TMappingDisablingTest extends TestCase {
 		
 		OntopOWLReasoner reasoner = factory.createReasoner(configuration);
 		
-		/*
+		*//*
 		 * Prepare the data connection for querying.
-		 */
+		 *//*
 		OWLConnection conn = reasoner.getConnection();
 		
 		
@@ -136,7 +136,7 @@ public class TMappingDisablingTest extends TestCase {
 			e.printStackTrace();
 		}
 		reasoner.dispose();
-	}
+	}*/
 	
 	public void testDisableSelectedTMappings() throws IOException, OWLOntologyCreationException {
 		/*

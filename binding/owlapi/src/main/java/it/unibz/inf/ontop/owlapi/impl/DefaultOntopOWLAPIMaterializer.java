@@ -37,13 +37,14 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 
 public class DefaultOntopOWLAPIMaterializer implements OntopOWLAPIMaterializer {
 
 	private final OntopRDFMaterializer materializer;
 	private RDF rdfFactory;
 
-	public DefaultOntopOWLAPIMaterializer(OntopSystemConfiguration configuration, MaterializationParams materializationParams) throws OBDASpecificationException {
+	public DefaultOntopOWLAPIMaterializer(OntopSystemConfiguration configuration, MaterializationParams materializationParams) throws OBDASpecificationException, IOException {
 		materializer = new DefaultOntopRDFMaterializer(configuration, materializationParams);
 		rdfFactory = configuration.getInjector().getInstance(RDF.class);
 	}
@@ -51,7 +52,7 @@ public class DefaultOntopOWLAPIMaterializer implements OntopOWLAPIMaterializer {
 	/**
 	 * Materializes the saturated RDF graph with the default options
 	 */
-	public DefaultOntopOWLAPIMaterializer(OntopSystemConfiguration configuration) throws OBDASpecificationException {
+	public DefaultOntopOWLAPIMaterializer(OntopSystemConfiguration configuration) throws OBDASpecificationException, IOException {
 		this(configuration, MaterializationParams.defaultBuilder().build());
 	}
 
