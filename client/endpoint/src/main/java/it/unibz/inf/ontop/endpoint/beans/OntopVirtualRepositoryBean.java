@@ -17,6 +17,7 @@ public class OntopVirtualRepositoryBean {
                                                           @Value("${xml-catalog:#{null}}") String xmlCatalog,
                                                           @Value("${properties}") String properties,
                                                           @Value("${constraint:#{null}}") String constraint,
+                                                          @Value("${db-metadata:#{null}}") String dbMetadata,
                                                           @Value("${lazy:false}") boolean lazy) throws RepositoryException {
         OntopSQLOWLAPIConfiguration.Builder<? extends OntopSQLOWLAPIConfiguration.Builder> builder = OntopSQLOWLAPIConfiguration.defaultBuilder()
                 .propertyFile(properties);
@@ -34,6 +35,9 @@ public class OntopVirtualRepositoryBean {
 
         if (constraint !=null && !constraint.isEmpty())
             builder.basicImplicitConstraintFile(constraint);
+
+        if (dbMetadata !=null && !dbMetadata.isEmpty())
+            builder.basicDBMetadataFile(dbMetadata);
 
         OntopSQLOWLAPIConfiguration configuration = builder.build();
         OntopVirtualRepository repository = OntopRepository.defaultRepository(configuration);

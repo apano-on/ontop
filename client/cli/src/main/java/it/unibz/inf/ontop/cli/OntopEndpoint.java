@@ -42,7 +42,8 @@ public class OntopEndpoint extends OntopReasoningCommandBase {
         ArrayList<String> argList = Lists.newArrayList(
                 "--mapping=" + this.mappingFile,
                 "--properties=" + this.propertiesFile,
-                "--views=" + this.viewsFile,
+                //"--db-metadata=" + this.dbMetadataFile,
+                //"--views=" + this.viewsFile,
                 "--port=" + this.port,
                 "--lazy=" + this.lazy,
                 "--dev=" + this.dev);
@@ -61,6 +62,9 @@ public class OntopEndpoint extends OntopReasoningCommandBase {
 
         if (this.portalFile != null)
             argList.add("--portal=" + this.portalFile);
+
+        if (this.dbMetadataFile != null)
+            argList.add("--db-metadata=" + this.dbMetadataFile);
 
         if (this.viewsFile != null)
             argList.add("--views=" + this.viewsFile);
