@@ -39,6 +39,11 @@ public class DefaultSelectFromWhereSerializer implements SelectFromWhereSerializ
                 new DefaultRelationVisitingSerializer(dbParameters.getQuotedIDFactory()));
     }
 
+    @Override
+    public SQLTermSerializer getTermSerializer() {
+        return sqlTermSerializer;
+    }
+
     /**
      * Mutable: one instance per SQL query to generate
      */
@@ -90,7 +95,7 @@ public class DefaultSelectFromWhereSerializer implements SelectFromWhereSerializ
         }
 
         protected RelationID generateFreshViewAlias() {
-            return idFactory.createRelationID(null, VIEW_PREFIX + viewCounter.incrementAndGet());
+            return idFactory.createRelationID(VIEW_PREFIX + viewCounter.incrementAndGet());
         }
 
         private ImmutableMap<Variable, QualifiedAttributeID> attachRelationAlias(RelationID alias, ImmutableMap<Variable, QuotedID> variableAliases) {

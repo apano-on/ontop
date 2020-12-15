@@ -37,10 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.*;
@@ -523,7 +520,7 @@ public class OBDAModelManager implements Disposable {
 				File implicitDBConstraintFile = new File(URI.create(implicitDBConstraintFilePath));
                 File dbMetadataFile = new File(URI.create(dbMetadataFilePath));
 
-				if(implicitDBConstraintFile.exists())
+				if (implicitDBConstraintFile.exists())
 					configurationManager.setImplicitDBConstraintFile(implicitDBConstraintFile);
 
                 if(dbMetadataFile.exists())
@@ -537,19 +534,14 @@ public class OBDAModelManager implements Disposable {
 				}
 
 				if (obdaFile.exists()) {
-					try {
-						//convert old syntax OBDA file
-						Reader mappingReader = new FileReader(obdaFile);
-						OldSyntaxMappingConverter converter =  new OldSyntaxMappingConverter(new FileReader(obdaFile), obdaFile.getName());
+					try (Reader mappingReader = new FileReader(obdaFile)) {
+						OldSyntaxMappingConverter converter = new OldSyntaxMappingConverter(mappingReader, obdaFile.getName());
 						java.util.Optional<Properties> optionalDataSourceProperties = converter.getOBDADataSourceProperties();
 
 						if (optionalDataSourceProperties.isPresent()) {
 							configurationManager.loadProperties(optionalDataSourceProperties.get());
-							mappingReader = converter.getOutputReader();
 						}
-						// Load the OBDA model
-						obdaModel.parseMapping(mappingReader, configurationManager.snapshotProperties());
-
+						obdaModel.parseMapping(new StringReader(converter.getRestOfFile()), configurationManager.snapshotProperties());
 					}
 					catch (Exception ex) {
 						throw new Exception("Exception occurred while loading OBDA document: " + obdaFile + "\n\n" + ex.getMessage());
@@ -573,15 +565,14 @@ public class OBDAModelManager implements Disposable {
 					ImmutableList<TargetAtom> tq = mapping.getTargetAtoms();
 					final ImmutableList<org.apache.commons.rdf.api.IRI> invalidIRIs = TargetQueryValidator.validate(tq, obdaModel.getCurrentVocabulary());
 					if (!invalidIRIs.isEmpty()) {
-						final StringBuilder stringBuilder = new StringBuilder();
+						StringBuilder stringBuilder = new StringBuilder();
 						stringBuilder.append("Found an invalid target query: \n  ");
 						stringBuilder.append("mappingId:\t").append(mapping.getId());
 						if (mapping.getOptionalTargetString().isPresent()) {
 							stringBuilder.append("\n  target:\t").append(mapping.getOptionalTargetString().get());
 						}
 						stringBuilder.append("\n  predicates not declared in the ontology: ").append(invalidIRIs);
-						final String message = stringBuilder.toString();
-						throw new Exception(message);
+						throw new Exception(stringBuilder.toString());
 					}
 				}
 			}
@@ -617,8 +608,8 @@ public class OBDAModelManager implements Disposable {
 				File obdaFile = new File(URI.create(obdaDocumentIri));
 				if(obdaModel.hasTripleMaps()) {
 					SQLPPMapping ppMapping = obdaModel.generatePPMapping();
-					OntopNativeMappingSerializer writer = new OntopNativeMappingSerializer(ppMapping);
-					writer.save(obdaFile);
+					OntopNativeMappingSerializer writer = new OntopNativeMappingSerializer();
+					writer.write(obdaFile, ppMapping);
 					log.info("mapping file saved to {}", obdaFile);
 				} else {
 					Files.deleteIfExists(obdaFile.toPath());
