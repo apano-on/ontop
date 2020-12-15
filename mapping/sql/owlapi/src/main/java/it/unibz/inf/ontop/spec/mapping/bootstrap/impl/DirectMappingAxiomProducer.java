@@ -22,6 +22,8 @@ package it.unibz.inf.ontop.spec.mapping.bootstrap.impl;
 
 import com.google.common.collect.ImmutableList;
 import it.unibz.inf.ontop.dbschema.*;
+import it.unibz.inf.ontop.model.template.Template;
+import it.unibz.inf.ontop.model.template.TemplateComponent;
 import it.unibz.inf.ontop.spec.mapping.TargetAtom;
 import it.unibz.inf.ontop.spec.mapping.TargetAtomFactory;
 import it.unibz.inf.ontop.model.term.*;
@@ -104,8 +106,11 @@ public class DirectMappingAxiomProducer {
 
 	// TODO: use quotation marks here and for variables names too
 
+	private static String getTableName(DatabaseRelationDefinition relation) {
+		return relation.getID().getComponents().get(RelationID.TABLE_INDEX).getName();
+	}
 	private static String getColumnAlias(Attribute attr) {
-		 return ((DatabaseRelationDefinition)attr.getRelation()).getID().getTableID().getName() + "_" + attr.getID().getName();
+		 return getTableName((DatabaseRelationDefinition)attr.getRelation()) + "_" + attr.getID().getName();
 	}
 	
 	private static String getQualifiedColumnName(Attribute attr) {
@@ -154,9 +159,9 @@ public class DirectMappingAxiomProducer {
 											  Map<DatabaseRelationDefinition, BnodeStringTemplateFunctionSymbol> bnodeTemplateMap) {
 
 		ImmutableTerm sub = generateTerm(fk.getRelation(),
-				fk.getRelation().getID().getTableID().getName() + "_", bnodeTemplateMap);
+				getTableName(fk.getRelation()) + "_", bnodeTemplateMap);
 		ImmutableTerm obj = generateTerm(fk.getReferencedRelation(),
-				fk.getReferencedRelation().getID().getTableID().getName() + "_", bnodeTemplateMap);
+				getTableName(fk.getReferencedRelation()) + "_", bnodeTemplateMap);
 
 		TargetAtom atom = getAtom(getReferencePropertyIRI(fk), sub, obj);
 		return ImmutableList.of(atom);
@@ -171,7 +176,7 @@ public class DirectMappingAxiomProducer {
      * @return table IRI
      */
 	private String getTableIRIString(DatabaseRelationDefinition table) {
-		return baseIRI + R2RMLIRISafeEncoder.encode(table.getID().getTableID().getName());
+		return baseIRI + R2RMLIRISafeEncoder.encode(getTableName(table));
 	}
 
     /**
@@ -231,16 +236,25 @@ public class DirectMappingAxiomProducer {
 		Optional<UniqueConstraint> pko = td.getPrimaryKey();
 		if (pko.isPresent()) {
 			UniqueConstraint pk = pko.get();
-			String template = getTableIRIString(td) + "/"
-					+ pk.getAttributes().stream()
-						.map(a -> R2RMLIRISafeEncoder.encode(a.getID().getName()) + "={}")
-						.collect(Collectors.joining(";"));
+
+			Template.Builder builder = Template.builder();
+
+			// TODO: IMPROVE
+			builder.addSeparator(getTableIRIString(td) + "/" +
+							R2RMLIRISafeEncoder.encode(pk.getAttributes().get(0).getID().getName()) + "=");
+			builder.addColumn();
+
+			for (int i = 1; i < pk.getAttributes().size(); i++) {
+				builder.addSeparator(
+						";" + R2RMLIRISafeEncoder.encode(pk.getAttributes().get(i).getID().getName()) + "=");
+				builder.addColumn();
+			}
 
 			ImmutableList<Variable> arguments = pk.getAttributes().stream()
 					.map(a -> termFactory.getVariable(varNamePrefix + a.getID().getName()))
 					.collect(ImmutableCollectors.toList());
 
-			return termFactory.getIRIFunctionalTerm(template, arguments);
+			return termFactory.getIRIFunctionalTerm(builder.build(), arguments);
 		}
 		else {
 			ImmutableList<ImmutableTerm> vars = td.getAttributes().stream()
