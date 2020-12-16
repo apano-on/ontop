@@ -21,11 +21,11 @@ public class OntopEndpointTest {
 
         //change -v to metadatafile
         String[] argv = {"endpoint", "-m", "src/test/resources/books/exampleBooks.obda",
-                "-p", "src/test/resources/books/exampleBooks.properties",
-                "-t", "src/test/resources/books/exampleBooks.owl",
-                "-d", "src/test/resources/output/exampleBooks-metadata.json",
-                //"-v", "src/test/resources/output/exampleBooks-metadata.json",
-                "--port=" + PORT};
+            "-p", "src/test/resources/books/exampleBooks.properties",
+            "-t", "src/test/resources/books/exampleBooks.owl",
+            "-d", "src/test/resources/output/exampleBooks-metadata.json",
+            //"-v", "src/test/resources/output/exampleBooks-metadata.json",
+            "--port=" + PORT};
         Ontop.main(argv);
     }
 
@@ -39,11 +39,11 @@ public class OntopEndpointTest {
 
         try (RepositoryConnection conn = repo.getConnection()) {
             String queryString = "PREFIX : <http://meraka/moss/exampleBooks.owl#>\n" +
-                    "SELECT DISTINCT ?x ?title ?author ?genre ?edition\n" +
-                    "WHERE { ?x a :Book; :title ?title; :genre ?genre; :writtenBy ?y; :hasEdition ?z.\n" +
-                    "\t\t ?y a :Author; :name ?author.\n" +
-                    "\t\t ?z a :Edition; :editionNumber ?edition\n" +
-                    "}";
+                "SELECT DISTINCT ?x ?title ?author ?genre ?edition\n" +
+                "WHERE { ?x a :Book; :title ?title; :genre ?genre; :writtenBy ?y; :hasEdition ?z.\n" +
+                "\t\t ?y a :Author; :name ?author.\n" +
+                "\t\t ?z a :Edition; :editionNumber ?edition\n" +
+                "}";
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
             //TupleQueryResult result = tupleQuery.evaluate();
             try (TupleQueryResult result = tupleQuery.evaluate()) {

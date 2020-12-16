@@ -42,6 +42,9 @@ public class OntopVirtualRepositoryBean {
         if (constraint != null && !constraint.isEmpty())
             builder.basicImplicitConstraintFile(constraint);
 
+        if (dbMetadata !=null && !dbMetadata.isEmpty())
+            builder.basicDBMetadataFile(dbMetadata);
+
         if (dbUser != null && !dbUser.isEmpty())
             builder.jdbcUser(dbUser);
 
