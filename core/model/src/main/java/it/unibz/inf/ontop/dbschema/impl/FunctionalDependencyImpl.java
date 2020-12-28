@@ -25,7 +25,7 @@ public class FunctionalDependencyImpl implements FunctionalDependency {
         return dependents;
     }
 
-    public static Builder builder(DatabaseRelationDefinition relation) {
+    public static Builder builder(NamedRelationDefinition relation) {
         return new BuilderImpl(relation);
     }
 
@@ -36,9 +36,9 @@ public class FunctionalDependencyImpl implements FunctionalDependency {
                 determinants = ImmutableSet.builder(),
                 dependents = ImmutableSet.builder();
 
-        private final DatabaseRelationDefinition relation;
+        private final NamedRelationDefinition relation;
 
-        private BuilderImpl(DatabaseRelationDefinition relation) {
+        private BuilderImpl(NamedRelationDefinition relation) {
             this.relation = relation;
         }
 

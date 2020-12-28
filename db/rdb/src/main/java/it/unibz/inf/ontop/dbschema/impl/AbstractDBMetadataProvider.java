@@ -9,10 +9,7 @@ import it.unibz.inf.ontop.model.type.TypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +18,6 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
     protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractDBMetadataProvider.class);
 
     protected final Connection connection;
-    protected final DBTypeFactory dbTypeFactory;
     protected final DBParameters dbParameters;
     protected final DatabaseMetaData metadata;
 
@@ -32,9 +28,8 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
     }
 
     AbstractDBMetadataProvider(Connection connection, QuotedIDFactoryFactory idFactoryProvider, TypeFactory typeFactory) throws MetadataExtractionException {
-        this.connection = connection;
-        this.dbTypeFactory = typeFactory.getDBTypeFactory();
         try {
+            this.connection = connection;
             this.metadata = connection.getMetaData();
             QuotedIDFactory idFactory = idFactoryProvider.create(metadata);
             this.rawIdFactory = new RawQuotedIDFactory(idFactory);
@@ -43,7 +38,7 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
                     metadata.getDatabaseProductName(),
                     metadata.getDatabaseProductVersion(),
                     idFactory,
-                    dbTypeFactory);
+                    typeFactory.getDBTypeFactory());
         }
         catch (SQLException e) {
             throw new MetadataExtractionException(e);
@@ -89,7 +84,8 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
     }
 
     @Override
-    public DatabaseRelationDefinition getRelation(RelationID id0) throws MetadataExtractionException {
+    public NamedRelationDefinition getRelation(RelationID id0) throws MetadataExtractionException {
+        DBTypeFactory dbTypeFactory = dbParameters.getDBTypeFactory();
         RelationID id = getCanonicalRelationId(id0);
         try (ResultSet rs = metadata.getColumns(getRelationCatalog(id), getRelationSchema(id), getRelationName(id), null)) {
             Map<RelationID, RelationDefinition.AttributeListBuilder> relations = new HashMap<>();
@@ -108,7 +104,27 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
                 int columnSize = rs.getInt("COLUMN_SIZE");
                 DBTermType termType = dbTypeFactory.getDBTermType(typeName, columnSize);
 
-                builder.addAttribute(attributeId, termType, typeName, isNullable);
+                String sqlTypeName;
+                switch (rs.getInt("DATA_TYPE")) {
+                    case Types.CHAR:
+                    case Types.VARCHAR:
+                    case Types.NVARCHAR:
+                        sqlTypeName = (columnSize != 0) ? typeName + "(" + columnSize + ")" : typeName;
+                        break;
+                    case Types.DECIMAL:
+                    case Types.NUMERIC:
+                        int decimalDigits = rs.getInt("DECIMAL_DIGITS");
+                        if (columnSize == 0)
+                            sqlTypeName = typeName;
+                        else if (decimalDigits == 0)
+                            sqlTypeName = typeName + "(" + columnSize + ")";
+                        else
+                            sqlTypeName = typeName + "(" + columnSize + ", " + decimalDigits + ")";
+                        break;
+                    default:
+                        sqlTypeName = typeName;
+                }
+                builder.addAttribute(attributeId, termType, sqlTypeName, isNullable);
             }
 
             if (relations.entrySet().size() == 1) {
@@ -126,7 +142,7 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
 
 
     @Override
-    public void insertIntegrityConstraints(DatabaseRelationDefinition relation, MetadataLookup metadataLookup) throws MetadataExtractionException {
+    public void insertIntegrityConstraints(NamedRelationDefinition relation, MetadataLookup metadataLookup) throws MetadataExtractionException {
         try {
             insertPrimaryKey(relation);
             insertUniqueAttributes(relation);
@@ -137,7 +153,7 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
         }
     }
 
-    private void insertPrimaryKey(DatabaseRelationDefinition relation) throws MetadataExtractionException, SQLException {
+    private void insertPrimaryKey(NamedRelationDefinition relation) throws MetadataExtractionException, SQLException {
         RelationID id = getCanonicalRelationId(relation.getID());
         // Retrieves a description of the given table's primary key columns. They are ordered by COLUMN_NAME (sic!)
         try (ResultSet rs = metadata.getPrimaryKeys(getRelationCatalog(id), getRelationSchema(id), getRelationName(id))) {
@@ -167,7 +183,7 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
         }
     }
 
-    private void insertUniqueAttributes(DatabaseRelationDefinition relation) throws MetadataExtractionException, SQLException {
+    private void insertUniqueAttributes(NamedRelationDefinition relation) throws MetadataExtractionException, SQLException {
         RelationID id = getCanonicalRelationId(relation.getID());
         // extracting unique
         try (ResultSet rs = metadata.getIndexInfo(getRelationCatalog(id), getRelationSchema(id), getRelationName(id), true, true)) {
@@ -228,7 +244,7 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
         }
     }
 
-    private void insertForeignKeys(DatabaseRelationDefinition relation, MetadataLookup dbMetadata) throws MetadataExtractionException, SQLException {
+    private void insertForeignKeys(NamedRelationDefinition relation, MetadataLookup dbMetadata) throws MetadataExtractionException, SQLException {
         RelationID id = getCanonicalRelationId(relation.getID());
         try (ResultSet rs = metadata.getImportedKeys(getRelationCatalog(id), getRelationSchema(id), getRelationName(id))) {
             ForeignKeyConstraint.Builder builder = null;
@@ -245,7 +261,7 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
 
                         String name = rs.getString("FK_NAME"); // String => foreign key name (may be null)
 
-                        DatabaseRelationDefinition ref = dbMetadata.getRelation(pkId);
+                        NamedRelationDefinition ref = dbMetadata.getRelation(pkId);
 
                         builder = ForeignKeyConstraint.builder(name, relation, ref);
                     }

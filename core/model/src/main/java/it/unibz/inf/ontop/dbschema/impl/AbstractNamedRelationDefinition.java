@@ -1,8 +1,5 @@
 package it.unibz.inf.ontop.dbschema.impl;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import it.unibz.inf.ontop.dbschema.*;
@@ -12,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class AbstractDatabaseRelationDefinition extends AbstractRelationDefinition implements DatabaseRelationDefinition {
+public abstract class AbstractNamedRelationDefinition extends AbstractRelationDefinition implements NamedRelationDefinition {
 
     private final RelationID id;
     private final ImmutableSet<RelationID> allIds;
@@ -22,21 +19,18 @@ public abstract class AbstractDatabaseRelationDefinition extends AbstractRelatio
     private final List<FunctionalDependency> otherFunctionalDependencies = new ArrayList<>();
     private final List<ForeignKeyConstraint> foreignKeys = new ArrayList<>();
 
-    AbstractDatabaseRelationDefinition(ImmutableList<RelationID> allIds, AttributeListBuilder builder) {
+    AbstractNamedRelationDefinition(ImmutableList<RelationID> allIds, AttributeListBuilder builder) {
         super(allIds.get(0).getSQLRendering(), builder);
         this.id = allIds.get(0);
         this.allIds =  ImmutableSet.copyOf(allIds);
     }
 
 
-    @JsonProperty("name")
-    @JsonSerialize(using = RelationIDImpl.RelationIDSerializer.class)
     @Override
     public RelationID getID() {
         return id;
     }
 
-    @JsonIgnore
     @Override
     public ImmutableSet<RelationID> getAllIDs() {
         return allIds;
@@ -76,7 +70,6 @@ public abstract class AbstractDatabaseRelationDefinition extends AbstractRelatio
     /**
      * @return primary key
      */
-    @JsonIgnore
     @Override
     public Optional<UniqueConstraint> getPrimaryKey() {
         return Optional.ofNullable(primaryKey);
@@ -99,7 +92,6 @@ public abstract class AbstractDatabaseRelationDefinition extends AbstractRelatio
      *
      * @return list of foreign keys
      */
-    @JsonSerialize(contentUsing = ForeignKeyConstraintImpl.ForeignKeyConstraintSerializer.class)
     @Override
     public ImmutableList<ForeignKeyConstraint> getForeignKeys() {
         return ImmutableList.copyOf(foreignKeys);
