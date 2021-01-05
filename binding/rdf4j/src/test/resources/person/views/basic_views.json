@@ -1,0 +1,30 @@
+{
+  "relations": [
+    {
+      "name": "\"views\".\"hr\".\"persons\"",
+      "baseRelation": "\"hr\".\"persons\"",
+      "columns": {
+        "added": [
+          {
+            "name": "\"fullName\"",
+            "expression": "CONCAT(UPPER(\"firstName\"),' ',\"lastName\")"
+          }
+        ],
+        "hidden": [
+          "\"firstName\"",
+          "\"lastName\""
+        ]
+      },
+      "uniqueConstraints": {
+        "added": []
+      },
+      "otherFunctionalDependencies": {
+        "added": []
+      },
+      "foreignKeys": {
+        "added": []
+      },
+      "type": "BasicViewDefinition"
+    }
+  ]
+}

@@ -66,7 +66,10 @@ public class ExpressionParser {
     }
 
 
-
+    public ImmutableFunctionalTerm parseFunctionalTerm(Expression expression, RAExpressionAttributes attributes) {
+        TermVisitor visitor = new TermVisitor(attributes);
+        return visitor.getFunctionalTerm(expression);
+    }
 
 
 
@@ -178,6 +181,11 @@ public class ExpressionParser {
         ImmutableTerm getTerm(Expression expression) {
             expression.accept(this);
             return this.result;
+        }
+
+        ImmutableFunctionalTerm getFunctionalTerm(Expression expression) {
+            expression.accept(this);
+            return (ImmutableFunctionalTerm) this.result;
         }
 
 
