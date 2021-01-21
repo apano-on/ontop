@@ -1,0 +1,44 @@
+{
+  "name": ["\"views\"","\"persons\""],
+  "baseRelation": ["\"person\""],
+  "flattenedColumn": "\"tags\"",
+  "columns": {
+    "kept": [
+      {
+        "name": "\"id\"",
+        "datatype": "integer",
+        "isNullable": false
+      },
+      {
+        "name": "\"ssn\"",
+        "datatype": "text",
+        "isNullable": false
+      }
+    ],
+    "position": {
+      "name": "\"pos\"",
+      "datatype": "integer",
+      "isNullable": false
+    },
+    "extracted": [
+      {
+        "name": "\"tag_str\"",
+        "datatype": "text"
+      },
+      {
+        "name": "\"tag_int\"",
+        "datatype": "integer"
+      }
+    ]
+  },
+  "uniqueConstraints": {
+    "added": []
+  },
+  "otherFunctionalDependencies": {
+    "added": []
+  },
+  "foreignKeys": {
+    "added": []
+  },
+  "type": "FlattenedViewDefinition"
+}
