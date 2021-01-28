@@ -345,24 +345,22 @@ public class JsonBasicView extends JsonView {
 
     /**
      * Infer functional dependencies from the parent
-     * TODO: Determinant col must not appear in added or hidden columns. Same for dependents.
      */
     private List<AddFunctionalDependency> extractOtherFunctionalDependencies(List<AddFunctionalDependency> addFunctionalDependencies,
                                                                 ImmutableList<NamedRelationDefinition> baseRelations){
 
 
-        ImmutableList<AbstractMap.SimpleEntry<List<String>, List<String>>> addedFunctionalDependenciesTuples = otherFunctionalDependencies.added.stream()
-                .map(f -> new AbstractMap.SimpleEntry<>(f.determinants, f.dependents))
+        ImmutableList<String> addedNewColumns = columns.added.stream()
+                .map(a -> a.name)
                 .collect(ImmutableCollectors.toList());
 
         ImmutableList<FunctionalDependency> inheritedFunctionalDependencies = baseRelations.stream()
                 .map(b -> b.getOtherFunctionalDependencies())
                 .flatMap(Collection::stream)
-                .filter(n -> !addedFunctionalDependenciesTuples.contains(
-                      new AbstractMap.SimpleEntry<>(
-                               n.getDeterminants().stream().map(d -> d.getID().toString()).collect(Collectors.toList()),
-                               n.getDependents().stream().map(d -> d.getID().toString()).collect(Collectors.toList())
-                      )))
+                .filter(n -> !addedNewColumns.contains(n.getDeterminants().stream().map(d -> d.getID().toString()).collect(Collectors.toList())))
+                .filter(n -> !addedNewColumns.contains(n.getDependents().stream().map(d -> d.getID().toString()).collect(Collectors.toList())))
+                .filter(n -> !columns.hidden.contains(n.getDeterminants().stream().map(d -> d.getID().toString()).collect(Collectors.toList())))
+                .filter(n -> !columns.hidden.contains(n.getDependents().stream().map(d -> d.getID().toString()).collect(Collectors.toList())))
                 .collect(ImmutableCollectors.toList());
 
         List<AddFunctionalDependency> existingFunctionalDependenciesList = inheritedFunctionalDependencies.stream()
