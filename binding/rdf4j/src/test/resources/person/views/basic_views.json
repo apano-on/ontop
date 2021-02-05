@@ -16,6 +16,18 @@
           {
             "name": "\"nullifItaly\"",
             "expression": "NULLIF(\"country\",'it')"
+          },
+          {
+            "name": "\"stringStatus\"",
+            "expression": "CAST(\"status\" AS TEXT)"
+          },
+          {
+            "name": "\"stringStatus\"",
+            "expression": "CAST(\"status\" AS TEXT)"
+          },
+          {
+            "name": "\"region\"",
+            "expression": "IF \"locality\"=='Botzen' THEN 'Sudtirol' ELSE 'Non-Sudtirol')"
           }
         ],
         "hidden": [

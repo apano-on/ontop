@@ -22,7 +22,10 @@ public class BasicViewPersonTest extends AbstractRDF4JTest {
         release();
     }
 
-    @Test // Concatenation function
+    /**
+     * CONCAT + UPPER functions
+     */
+    @Test
     public void testPersonConcat() throws Exception {
         String query = "PREFIX : <http://person.example.org/>\n" +
                 "PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
@@ -34,7 +37,10 @@ public class BasicViewPersonTest extends AbstractRDF4JTest {
         runQueryAndCompare(query, ImmutableList.of("ROGER SMITH Botzen"));
     }
 
-    @Test // Replace function
+    /**
+     * REPLACE function
+     */
+    @Test
     public void testPersonReplace() throws Exception {
         String query = "PREFIX : <http://person.example.org/>\n" +
                 "PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
@@ -46,7 +52,10 @@ public class BasicViewPersonTest extends AbstractRDF4JTest {
         runQueryAndCompare(query, ImmutableList.of("Bz"));
     }
 
-    @Test // Nullif function
+    /**
+     * NULLIF function
+     */
+    @Test
     public void testPersonNullif() throws Exception {
         String query = "PREFIX : <http://person.example.org/>\n" +
                 "PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
@@ -56,5 +65,38 @@ public class BasicViewPersonTest extends AbstractRDF4JTest {
                 " ?x :nullifItaly ?v . \n" +
                 "}";
         runQueryAndCompare(query, ImmutableList.of());
+    }
+
+    /**
+     * Cast function
+     */
+    @Test
+    public void testPersonCast() throws Exception {
+        String query = "PREFIX : <http://person.example.org/>\n" +
+                "PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+                "SELECT  ?v \n" +
+                "WHERE {\n" +
+                " ?x a :Person . \n" +
+                " ?x :stringStatus ?v . \n" +
+                "}";
+        /*ArrayList<Integer> list = new ArrayList<>();
+        list.add(1);
+        ImmutableList<Integer> textResult = ImmutableList.copyOf(list);*/
+        runQueryAndCompare(query, ImmutableList.of("1"));
+    }
+
+    /**
+     * IF THEN ELSE function
+     */
+    @Test
+    public void testPersonIfThenElse() throws Exception {
+        String query = "PREFIX : <http://person.example.org/>\n" +
+                "PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+                "SELECT  ?v \n" +
+                "WHERE {\n" +
+                " ?x a :Person . \n" +
+                " ?x :region ?v . \n" +
+                "}";
+        runQueryAndCompare(query, ImmutableList.of("Sudtirol"));
     }
 }
