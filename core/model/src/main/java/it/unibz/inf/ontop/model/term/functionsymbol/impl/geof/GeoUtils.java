@@ -118,7 +118,12 @@ public class GeoUtils {
         DBConstant newEPSG = (sridProj4j.equals("CRS:84"))
                 ? termFactory.getDBStringConstant("4326")
                 : termFactory.getDBStringConstant(sridProj4j.substring(EPSG_PREFIX.length()));
-        DBConstant sedonaEPSG = termFactory.getDBStringConstant("epsg:4326");
+
+        // Apache Sedona - Assume default previous SRID is 4326???
+        DBConstant newSedonaEPSG = (sridProj4j.equals("CRS:84"))
+                ? termFactory.getDBStringConstant("EPSG:4326")
+                : termFactory.getDBStringConstant(sridProj4j);
+        DBConstant defaultSedonaEPSG = termFactory.getDBStringConstant("epsg:4326");
 
         // If PostGIS or H2GIS, use ST_SETSRID. If Spark, use ST_TRANSFORM
         boolean supportsSetSrid = termFactory.getTypeFactory().getDBTypeFactory().supportsDBSetSRID();
@@ -134,7 +139,7 @@ public class GeoUtils {
                 // Set SRID
                 .map(v -> supportsSetSrid
                         ? termFactory.getDBSTSetSRID(v, newEPSG)
-                        : termFactory.getDBSTSTransform(v, sedonaEPSG, sedonaEPSG))
+                        : termFactory.getDBSTSTransform(v, defaultSedonaEPSG, newSedonaEPSG))
                 // Convert to text
                 .map(termFactory::getDBAsText);
     }
