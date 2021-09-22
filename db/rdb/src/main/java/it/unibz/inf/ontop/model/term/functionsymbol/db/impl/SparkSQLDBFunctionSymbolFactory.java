@@ -128,6 +128,10 @@ public class SparkSQLDBFunctionSymbolFactory extends AbstractSQLDBFunctionSymbol
     protected DBFunctionSymbol createEncodeURLorIRI(boolean preserveInternationalChars) {
         return new SparkSQLEncodeURLorIRIFunctionSymbolImpl(dbStringType, preserveInternationalChars);
     }
+
+    @Override
+    public DBFunctionSymbol getDBSTGeomFromText() { return getRegularDBFunctionSymbol(ST_GEOMFROMWKT, 1); }
+
 }
 
 

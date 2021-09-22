@@ -87,6 +87,11 @@ public class MockupDBTypeFactory implements DBTypeFactory {
     }
 
     @Override
+    public boolean supportsDBSetSRID() {
+        return false;
+    }
+
+    @Override
     public DBTermType getDBHexBinaryType() {
         return getDBTermType("HEXBINARY");
     }

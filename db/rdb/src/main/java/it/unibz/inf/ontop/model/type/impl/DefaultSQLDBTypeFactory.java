@@ -301,6 +301,9 @@ public class DefaultSQLDBTypeFactory implements SQLDBTypeFactory {
     }
 
     @Override
+    public boolean supportsDBSetSRID() { return true;  }
+
+    @Override
     public DBTermType getDBHexBinaryType() {
         return sqlTypeMap.get(defaultTypeCodeMap.get(DefaultTypeCode.HEXBINARY));
     }

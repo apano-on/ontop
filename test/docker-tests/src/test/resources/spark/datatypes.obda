@@ -15,6 +15,6 @@ terms:		http://purl.org/dc/terms/
 [MappingDeclaration] @collection [[
 mappingId	pointraw
 target		:{id} a :TestObject ; geo:asWKT {pointshape}^^geo:wktLiteral .
-source		SELECT id, ST_Point(cast(pointraw._c0 as Decimal(24,20)), cast(pointraw._c1 as Decimal(24,20))) AS pointshape FROM testdb.pointraw;
+source		SELECT id, ST_GEOMFROMWKT(CAST(ST_Point(cast(pointraw._c0 as Decimal(24,20)), cast(pointraw._c1 as Decimal(24,20))) AS STRING)) AS pointshape FROM testdb.pointraw;
 ]]
 

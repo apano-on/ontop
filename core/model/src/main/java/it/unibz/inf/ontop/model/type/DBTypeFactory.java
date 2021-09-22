@@ -33,6 +33,8 @@ public interface DBTypeFactory {
 
     boolean supportsDBDistanceSphere();
 
+    boolean supportsDBSetSRID();
+
     DBTermType getDBHexBinaryType();
 
 

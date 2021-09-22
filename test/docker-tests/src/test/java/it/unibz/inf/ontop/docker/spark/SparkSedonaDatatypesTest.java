@@ -15,11 +15,11 @@ import java.util.List;
 
 public class SparkSedonaDatatypesTest extends AbstractVirtualModeTest {
 
-    static final String owlfile = "/pgsql/identifiers/identifiers.owl";
-    static final String obdafile = "/pgsql/identifiers/identifiers-postgres.obda";
-    static final String propertiesfile = "/pgsql/identifiers/identifiers-postgres.properties";
-    //	static final String viewsfile = "/pgsql/identifiers/identifiers.json";
-    static final String viewsfile = "/home/albulen/IdeaProjects/ontopgitlab/test/docker-tests/src/test/resources/pgsql/identifiers/identifiers.json";
+    static final String owlfile = "/spark/datatypes.owl";
+    static final String obdafile = "/spark/datatypes.obda";
+    static final String propertiesfile = "/spark/datatypes.properties";
+    //static final String viewsfile = "/spark/datatypes.json";
+    static final String viewsfile = "/home/albulen/IdeaProjects/ontop/test/docker-tests/src/test/resources/spark/datatypes.json";
 
     private static OntopOWLReasoner REASONER;
     private static OntopOWLConnection CONNECTION;

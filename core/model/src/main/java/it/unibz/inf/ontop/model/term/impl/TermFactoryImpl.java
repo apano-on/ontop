@@ -625,8 +625,8 @@ public class TermFactoryImpl implements TermFactory {
 
 	// Non-topological and common form functions
     @Override
-    public ImmutableTerm getDBSTSTransform(ImmutableTerm arg1, ImmutableTerm srid) {
-        return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTTransform(), arg1, srid);
+    public ImmutableTerm getDBSTSTransform(ImmutableTerm arg1, ImmutableTerm srid0, ImmutableTerm srid1) {
+        return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTTransform(), arg1, srid0, srid1);
     }
 
 	@Override

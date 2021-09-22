@@ -579,7 +579,7 @@ public interface TermFactory {
 	ImmutableTerm getDBSTContainsProperly(ImmutableTerm arg1, ImmutableTerm arg2);
 
 	// Non-topological and common form functions
-	ImmutableTerm getDBSTSTransform(ImmutableTerm arg1, ImmutableTerm srid);
+	ImmutableTerm getDBSTSTransform(ImmutableTerm arg1, ImmutableTerm srid0, ImmutableTerm srid1);
 	ImmutableTerm getDBSTSetSRID(ImmutableTerm arg1, ImmutableTerm arg2);
 	ImmutableTerm getDBSTGeomFromText(ImmutableTerm arg1);
 	ImmutableTerm getDBSTMakePoint(ImmutableTerm arg1, ImmutableTerm arg2);

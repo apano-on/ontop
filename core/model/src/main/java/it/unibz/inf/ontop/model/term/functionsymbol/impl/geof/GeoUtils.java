@@ -2,6 +2,7 @@ package it.unibz.inf.ontop.model.term.functionsymbol.impl.geof;
 
 import it.unibz.inf.ontop.model.term.*;
 import it.unibz.inf.ontop.model.term.functionsymbol.db.DBConcatFunctionSymbol;
+import it.unibz.inf.ontop.model.type.DBTypeFactory;
 import it.unibz.inf.ontop.utils.ImmutableCollectors;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.RDF;
@@ -17,6 +18,7 @@ public class GeoUtils {
     static final double EARTH_MEAN_RADIUS_METER = 6370986;
 
     private static final RDF rdfFactory = new SimpleRDF();
+    private DBTypeFactory dbTypeFactory;
 
     /**
      * The default GeoSPARQL SRID - CRS84
@@ -116,6 +118,10 @@ public class GeoUtils {
         DBConstant newEPSG = (sridProj4j.equals("CRS:84"))
                 ? termFactory.getDBStringConstant("4326")
                 : termFactory.getDBStringConstant(sridProj4j.substring(EPSG_PREFIX.length()));
+        DBConstant sedonaEPSG = termFactory.getDBStringConstant("epsg:4326");
+
+        // If PostGIS or H2GIS, use ST_SETSRID. If Spark, use ST_TRANSFORM
+        boolean supportsSetSrid = termFactory.getTypeFactory().getDBTypeFactory().supportsDBSetSRID();
 
         return Optional.of(immutableTerm)
                 // template is NOT a NonGroundFunctionalTerm, but a string user input
@@ -126,7 +132,9 @@ public class GeoUtils {
                 // Use GeomFromText with one argument to convert text into geometry
                 .map(termFactory::getDBSTGeomFromText)
                 // Set SRID
-                .map(v -> termFactory.getDBSTSetSRID(v, newEPSG))
+                .map(v -> supportsSetSrid
+                        ? termFactory.getDBSTSetSRID(v, newEPSG)
+                        : termFactory.getDBSTSTransform(v, sedonaEPSG, sedonaEPSG))
                 // Convert to text
                 .map(termFactory::getDBAsText);
     }
