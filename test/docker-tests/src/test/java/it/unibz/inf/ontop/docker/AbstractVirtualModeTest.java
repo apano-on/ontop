@@ -50,6 +50,16 @@ public abstract class AbstractVirtualModeTest {
         return factory.createReasoner(config);
     }
 
+    protected static OntopOWLReasoner createReasoner(String owlFile, String obdaFile, String propertiesFile, Optional<String> optionalImplicitConstraintsFile, String viewsfile) throws OWLOntologyCreationException {
+        owlFile = AbstractVirtualModeTest.class.getResource(owlFile).toString();
+        obdaFile =  AbstractVirtualModeTest.class.getResource(obdaFile).toString();
+        propertiesFile =  AbstractVirtualModeTest.class.getResource(propertiesFile).toString();
+
+        OntopOWLFactory factory = OntopOWLFactory.defaultFactory();
+        OntopSQLOWLAPIConfiguration config = createConfig(owlFile, obdaFile, propertiesFile, optionalImplicitConstraintsFile, viewsfile);
+        return factory.createReasoner(config);
+    }
+
     private static OntopSQLOWLAPIConfiguration createConfig(String owlFile, String obdaFile, String propertiesFile, Optional<String> optionalImplicitConstraintsFile) {
 
         if(optionalImplicitConstraintsFile.isPresent()) {
@@ -67,6 +77,17 @@ public abstract class AbstractVirtualModeTest {
                 .nativeOntopMappingFile(obdaFile)
                 .ontologyFile(owlFile)
                 .propertyFile(propertiesFile)
+                .enableTestMode()
+                .build();
+    }
+
+    private static OntopSQLOWLAPIConfiguration createConfig(String owlFile, String obdaFile, String propertiesFile, Optional<String> optionalImplicitConstraintsFile, String viewsfile) {
+
+        return OntopSQLOWLAPIConfiguration.defaultBuilder()
+                .nativeOntopMappingFile(obdaFile)
+                .ontologyFile(owlFile)
+                .propertyFile(propertiesFile)
+                .ontopViewFile(viewsfile)
                 .enableTestMode()
                 .build();
     }
