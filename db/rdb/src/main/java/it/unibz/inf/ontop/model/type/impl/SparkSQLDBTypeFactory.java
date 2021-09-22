@@ -71,4 +71,7 @@ public class SparkSQLDBTypeFactory extends DefaultSQLDBTypeFactory {
         return ImmutableMap.copyOf(map);
     }
 
+    @Override
+    public boolean supportsDBSetSRID() { return false; }
+
 }
