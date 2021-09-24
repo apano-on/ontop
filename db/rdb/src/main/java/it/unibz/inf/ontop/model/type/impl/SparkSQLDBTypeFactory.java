@@ -25,6 +25,8 @@ public class SparkSQLDBTypeFactory extends DefaultSQLDBTypeFactory {
     protected static final String STRING_STR = "STRING";
     protected static final String DEC_STR = "DEC";
 
+    protected static final String GEOMETRY_STR = "GEOMETRY";
+
     @AssistedInject
     protected SparkSQLDBTypeFactory(@Assisted TermType rootTermType, @Assisted TypeFactory typeFactory) {
         super(createSparkSQLTypeMap(rootTermType, typeFactory), createSparkSQLCodeMap());
@@ -61,6 +63,13 @@ public class SparkSQLDBTypeFactory extends DefaultSQLDBTypeFactory {
         map.put(FLOAT_STR,floatType);
         map.put(REAL_STR,floatType);
         map.put(DEC_STR, map.get(DECIMAL_STR));
+
+        /*
+         * Apache Sedona types
+         */
+        RDFDatatype xsdString = typeFactory.getXsdStringDatatype();
+        map.put(GEOMETRY_STR, new NonStringNonNumberNonBooleanNonDatetimeDBTermType(GEOMETRY_STR, rootAncestry, xsdString));
+
         return map;
     }
 
@@ -68,10 +77,16 @@ public class SparkSQLDBTypeFactory extends DefaultSQLDBTypeFactory {
         Map<DefaultTypeCode, String> map = createDefaultSQLCodeMap();
         map.put(DefaultTypeCode.STRING, STRING_STR);
         map.put(DefaultTypeCode.HEXBINARY,BINARY_STR);
+        /*
+         * Apache Sedona types
+         */
+        map.put(DefaultTypeCode.GEOMETRY, GEOMETRY_STR);
         return ImmutableMap.copyOf(map);
     }
 
     @Override
     public boolean supportsDBSetSRID() { return false; }
 
+    @Override
+    public boolean supportsDBGeometryType() { return true; }
 }

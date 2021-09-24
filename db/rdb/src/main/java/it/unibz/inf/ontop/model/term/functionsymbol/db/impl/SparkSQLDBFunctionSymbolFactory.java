@@ -11,10 +11,15 @@ import it.unibz.inf.ontop.model.term.functionsymbol.db.DBConcatFunctionSymbol;
 import it.unibz.inf.ontop.model.term.functionsymbol.db.DBFunctionSymbol;
 import it.unibz.inf.ontop.model.term.functionsymbol.db.DBTypeConversionFunctionSymbol;
 import it.unibz.inf.ontop.model.type.DBTermType;
+import it.unibz.inf.ontop.model.type.RDFDatatype;
 import it.unibz.inf.ontop.model.type.TypeFactory;
+import it.unibz.inf.ontop.model.vocabulary.XSD;
 
 
 import java.util.function.Function;
+
+import static it.unibz.inf.ontop.model.type.impl.DefaultSQLDBTypeFactory.TIMESTAMP_STR;
+import static it.unibz.inf.ontop.model.type.impl.PostgreSQLDBTypeFactory.TIMETZ_STR;
 
 /**
  *  SPARK-SQL 3.0.1 functions description available at : https://spark.apache.org/docs/3.0.1/api/sql/
@@ -36,6 +41,19 @@ public class SparkSQLDBFunctionSymbolFactory extends AbstractSQLDBFunctionSymbol
 
         return ImmutableTable.copyOf(table);
     }
+
+    /*@Override
+    protected ImmutableTable<DBTermType, RDFDatatype, DBTypeConversionFunctionSymbol> createNormalizationTable() {
+        ImmutableTable.Builder<DBTermType, RDFDatatype, DBTypeConversionFunctionSymbol> builder = ImmutableTable.builder();
+        builder.putAll(super.createNormalizationTable());
+
+        //GEOMETRY
+        DBTermType defaultDBGeometryType = dbTypeFactory.getDBGeometryType();
+        DBTypeConversionFunctionSymbol geometryNormFunctionSymbol = createGeometryNormFunctionSymbol(defaultDBGeometryType);
+        builder.put(defaultDBGeometryType,typeFactory.getWktLiteralDatatype(), geometryNormFunctionSymbol);
+
+        return builder.build();
+    }*/
 
     @Override
     protected DBConcatFunctionSymbol createNullRejectingDBConcat(int arity) {

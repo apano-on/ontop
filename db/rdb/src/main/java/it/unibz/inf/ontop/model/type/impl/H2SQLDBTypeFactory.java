@@ -51,4 +51,9 @@ public class H2SQLDBTypeFactory extends DefaultSQLDBTypeFactory {
     public boolean supportsDBGeometryType() {
         return true;
     }
+
+    @Override
+    public boolean supportsPartiallyDBDistanceSphere() {
+        return true;
+    }
 }

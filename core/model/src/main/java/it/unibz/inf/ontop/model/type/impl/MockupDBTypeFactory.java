@@ -87,6 +87,11 @@ public class MockupDBTypeFactory implements DBTypeFactory {
     }
 
     @Override
+    public boolean supportsPartiallyDBDistanceSphere() {
+        return false;
+    }
+
+    @Override
     public boolean supportsDBSetSRID() {
         return false;
     }

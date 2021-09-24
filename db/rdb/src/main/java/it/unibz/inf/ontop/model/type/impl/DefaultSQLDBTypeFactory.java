@@ -301,6 +301,11 @@ public class DefaultSQLDBTypeFactory implements SQLDBTypeFactory {
     }
 
     @Override
+    public boolean supportsPartiallyDBDistanceSphere() {
+        return false;
+    }
+
+    @Override
     public boolean supportsDBSetSRID() { return true;  }
 
     @Override

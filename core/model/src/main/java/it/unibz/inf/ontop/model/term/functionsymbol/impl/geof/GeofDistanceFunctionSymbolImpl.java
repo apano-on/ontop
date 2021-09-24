@@ -75,26 +75,32 @@ public class GeofDistanceFunctionSymbolImpl extends AbstractGeofDoubleFunctionSy
             // NOTE: supportsDBDistanceSphere() refers to official support i.e. PostGIS and not experimental i.e. H2GIS
             ImmutableTerm distanceInMetre = dbTypeFactory.supportsDBDistanceSphere()
                     ? termFactory.getDBSTDistanceSphere(geom0, geom1).simplify()
-                    : termFactory.getDBSTDistanceSphere(
-                    removeSetSRID(geom0, termFactory, subLexicalTerms.get(0)),
-                    removeSetSRID(geom1, termFactory, subLexicalTerms.get(1))).simplify();
+                    : (dbTypeFactory.supportsPartiallyDBDistanceSphere())
+                        ? termFactory.getDBSTDistanceSphere(
+                         removeSetSRID(geom0, termFactory, subLexicalTerms.get(0)),
+                         removeSetSRID(geom1, termFactory, subLexicalTerms.get(1))).simplify()
+                        : termFactory.getDBSTDistance(geom0, geom1).simplify();
             DBConstant ratioConstant = termFactory.getDBConstant(String.valueOf(EARTH_MEAN_RADIUS_METER / 180 * Math.PI), dbTypeFactory.getDBDoubleType());
             return termFactory.getImmutableFunctionalTerm(divides, distanceInMetre, ratioConstant);
         } else if (inputUnit == DEGREE && outputUnit == RADIAN) {
             ImmutableTerm distanceInMetre = dbTypeFactory.supportsDBDistanceSphere()
                     ? termFactory.getDBSTDistanceSphere(geom0, geom1).simplify()
-                    : termFactory.getDBSTDistanceSphere(
+                    : (dbTypeFactory.supportsPartiallyDBDistanceSphere())
+                    ? termFactory.getDBSTDistanceSphere(
                     removeSetSRID(geom0, termFactory, subLexicalTerms.get(0)),
-                    removeSetSRID(geom1, termFactory, subLexicalTerms.get(1))).simplify();
+                    removeSetSRID(geom1, termFactory, subLexicalTerms.get(1))).simplify()
+                    : termFactory.getDBSTDistance(geom0, geom1).simplify();
             DBConstant ratioConstant = termFactory.getDBConstant(String.valueOf(EARTH_MEAN_RADIUS_METER), dbTypeFactory.getDBDoubleType());
             return termFactory.getImmutableFunctionalTerm(divides, distanceInMetre, ratioConstant);
         } else if (inputUnit == DEGREE && outputUnit == METRE) {
             // TODO: consider using getDBSTDistanceSpheroid to get more accurate results
             return dbTypeFactory.supportsDBDistanceSphere()
                     ? termFactory.getDBSTDistanceSphere(geom0, geom1).simplify()
-                    : termFactory.getDBSTDistanceSphere(
-                    removeSetSRID(geom0, termFactory, subLexicalTerms.get(0)),
-                    removeSetSRID(geom1, termFactory, subLexicalTerms.get(1))).simplify();
+                    : (dbTypeFactory.supportsPartiallyDBDistanceSphere())
+                        ? termFactory.getDBSTDistanceSphere(
+                        removeSetSRID(geom0, termFactory, subLexicalTerms.get(0)),
+                        removeSetSRID(geom1, termFactory, subLexicalTerms.get(1))).simplify()
+                        : termFactory.getDBSTDistance(geom0, geom1).simplify();
         } else {
             throw new IllegalArgumentException(String.format("Unsupported combination of units for distance. input: %s, output: %s", inputUnit, outputUnit));
         }
