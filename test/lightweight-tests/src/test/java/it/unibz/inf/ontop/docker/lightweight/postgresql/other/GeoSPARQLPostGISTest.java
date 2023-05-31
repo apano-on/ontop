@@ -28,17 +28,55 @@ public class GeoSPARQLPostGISTest extends AbstractDockerRDF4JTest {
      * (GEOGRAPHY, GEOGRAPHY)
      */
     @Test // polygons
-    public void testAskIntersects() throws Exception {
+    public void testAskIntersectsGeomGeom() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "ASK WHERE {\n" +
-                ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                ":5 a :Geom; geo:asWKT ?yWkt.\n" +
+                "?x a :Geom; geo:asWKT ?xWkt.\n" +
+                "?y a :Geom2; geo:asWKT ?yWkt.\n" +
                 "FILTER (geof:sfIntersects(?xWkt, ?yWkt))\n" +
                 "}\n";
         boolean val = executeAskQuery(query);
         Assertions.assertTrue(val);
+        String ontopSQLtranslation = reformulateIntoNativeQuery(query);
+        Assertions.assertFalse(ontopSQLtranslation.toLowerCase().contains("ST_INTERSECTS(CAST"));
+    }
+
+    @Test // polygons
+    public void testAskIntersectsGeomGeog() {
+        String query = "PREFIX : <http://ex.org/> \n" +
+                "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
+                "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
+                "SELECT ?v WHERE {\n" +
+                "?x a :Geom; geo:asWKT ?xWkt .\n" +
+                "?y a :Geog; geo:asWKT ?yWkt .\n" +
+                "BIND (geof:sfIntersects(?xWkt, ?yWkt) AS ?v)\n" +
+                "}\n";
+        //boolean val = executeAskQuery(query);
+        //Assertions.assertTrue(val);
+        executeAndCompareValues(query, ImmutableList.of());
+        String ontopSQLtranslation = reformulateIntoNativeQuery(query);
+        Assertions.assertFalse(ontopSQLtranslation.toLowerCase().contains("ST_INTERSECTS(CAST"));
+    }
+
+    @Test
+    public void testSelectIntersection() throws Exception {
+        String query = "PREFIX : <http://ex.org/> \n" +
+                "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
+                "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
+                "\n" +
+                "SELECT ?v WHERE {\n" +
+                "?x a :Geom; geo:asWKT ?xWkt .\n" +
+                "?y a :Geom2; geo:asWKT ?yWkt .\n" +
+                "?x rdfs:label ?n ." +
+                "FILTER(?n = \"small rectangle\"^^xsd:string) .\n" +
+                "BIND(geof:intersection(?xWkt, ?yWkt) as ?v) .\n" +
+                "}\n";
+        executeAndCompareValues(query, ImmutableList.of( "POLYGON((2 5,7 5,7 2,2 2,2 5))\"^^geo:wktLiteral",
+                "LINESTRING(2 2,7 2)\"^^geo:wktLiteral",
+                "LINESTRING(7 2,2 2)\"^^geo:wktLiteral",
+                "POLYGON((1 2,7 2,7 1,1 1,1 2))\"^^geo:wktLiteral"));
     }
 
     @Test // test intersect with 3d geometries
@@ -72,6 +110,22 @@ public class GeoSPARQLPostGISTest extends AbstractDockerRDF4JTest {
 
     @Test
     public void testAskIntersect() throws Exception {
+        String query = "PREFIX : <http://ex.org/> \n" +
+                "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
+                "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
+                "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
+                "ASK WHERE {\n" +
+                "<http://ex.org/feature/1> a :Feature; geo:hasGeometry/geo:asWKT ?xWkt.\n" +
+                "<http://ex.org/feature/2> a :Feature; geo:hasGeometry/geo:asWKT ?yWkt.\n" +
+                "BIND(geof:buffer(?yWkt, 350000, uom:metre) AS ?bWkt) .\n" +
+                "FILTER (geof:sfIntersects(?xWkt, ?bWkt))\n" +
+                "}\n";
+        boolean val = executeAskQuery(query);
+        Assertions.assertTrue(val);
+    }
+
+    @Test
+    public void testAskIntersect2() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -229,6 +283,25 @@ public class GeoSPARQLPostGISTest extends AbstractDockerRDF4JTest {
                 "}\n";
         boolean val = executeAskQuery(query);
         Assertions.assertTrue(val);
+    }
+
+
+
+    @Test
+    public void testSelectIntersection2() throws Exception {
+        String query = "PREFIX : <http://ex.org/> \n" +
+                "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
+                "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
+                "\n" +
+                "SELECT ?v WHERE {\n" +
+                "?x a :OSM1; geo:asWKT ?xWkt.\n" +
+                "?x rdfs:label ?xname .\n" +
+                "?y a :OSM2; geo:asWKT ?yWkt.\n" +
+                "?y rdfs:label ?yname .\n" +
+                "FILTER(?xname = ?yname) .\n" +
+                "BIND(geof:intersection(?xWkt, ?yWkt) as ?v) .\n" +
+                "}\n";
+        executeAndCompareValues(query, ImmutableList.of( "POLYGON ((2 2, 2 5, 7 5, 7 2, 2 2))"));
     }
 
 }

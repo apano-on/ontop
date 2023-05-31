@@ -23,6 +23,8 @@
     <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
     <Declaration>
         <Class IRI="#Geom"/>
+        <Class IRI="#Geom2"/>
+        <Class IRI="#Geog"/>
         <Class IRI="#Feature"/>
     </Declaration>
 </Ontology>

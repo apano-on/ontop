@@ -36,7 +36,7 @@ public class GeofSfIntersectsFunctionSymbolImpl extends AbstractGeofBooleanFunct
          * @see https://postgis.net/docs/ST_Intersects.html
          */
 
-        if (dbTypeFactory.supportsDBGeographyType()) {
+        /*if (dbTypeFactory.supportsDBGeographyType()) {
             boolean bufferCondition = (!v0.getGeometry().isGround() && v0.getGeometry().toString().contains("ST_BUFFER"));
             ImmutableTerm term0 = bufferCondition
                     ? v0.getGeometry()
@@ -46,7 +46,7 @@ public class GeofSfIntersectsFunctionSymbolImpl extends AbstractGeofBooleanFunct
                     : termFactory.getDBCastFunctionalTerm(dbTypeFactory.getDBGeographyType(), v1.getGeometry());
             return getDBFunction(termFactory).apply(term0, term1).simplify();
 
-        }
+        }*/
 
         return getDBFunction(termFactory).apply(v0.getGeometry(), v1.getGeometry()).simplify();
     }

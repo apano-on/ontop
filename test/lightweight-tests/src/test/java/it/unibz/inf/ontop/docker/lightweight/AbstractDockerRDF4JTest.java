@@ -222,4 +222,8 @@ public class AbstractDockerRDF4JTest {
         BooleanQuery query = REPO_CONNECTION.prepareBooleanQuery(QueryLanguage.SPARQL, queryString);
         return query.evaluate();
     }
+
+    protected String reformulateIntoNativeQuery(String queryString) {
+        return REPO_CONNECTION.reformulateIntoNativeQuery(queryString);
+    }
 }
