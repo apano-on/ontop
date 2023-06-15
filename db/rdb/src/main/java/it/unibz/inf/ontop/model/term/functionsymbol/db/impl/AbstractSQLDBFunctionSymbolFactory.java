@@ -72,6 +72,7 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
 
     protected static final String ST_TRANSFORM = "ST_TRANSFORM";
     protected static final String ST_GEOMFROMTEXT = "ST_GEOMFROMTEXT";
+    protected static final String ST_GEOGFROMTEXT = "ST_GEOGFROMTEXT";
     protected static final String ST_MAKEPOINT = "ST_MAKEPOINT";
     protected static final String ST_SETSRID = "ST_SETSRID";
 
@@ -363,9 +364,17 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
                 abstractRootDBType);
         builder.put(ST_SETSRID, 2, setsridSymbol);
 
+        DBFunctionSymbol transformSymbol = new GeoDBTypedFunctionSymbol(ST_TRANSFORM, 2, dbStringType, false,
+                abstractRootDBType);
+        builder.put(ST_TRANSFORM, 2, transformSymbol);
+
         DBFunctionSymbol geomfromtextSymbol = new GeoDBTypedFunctionSymbol(ST_GEOMFROMTEXT, 1, dbStringType, false,
                 abstractRootDBType);
         builder.put(ST_GEOMFROMTEXT, 1, geomfromtextSymbol);
+
+        DBFunctionSymbol geogfromtextSymbol = new GeoDBTypedFunctionSymbol(ST_GEOGFROMTEXT, 1, dbStringType, false,
+                abstractRootDBType);
+        builder.put(ST_GEOGFROMTEXT, 1, geogfromtextSymbol);
 
         DBFunctionSymbol makepointSymbol = new GeoDBTypedFunctionSymbol(ST_MAKEPOINT, 2, dbStringType, false,
                 abstractRootDBType);
@@ -1143,6 +1152,9 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
 
     @Override
     public DBFunctionSymbol getDBSTGeomFromText() { return getRegularDBFunctionSymbol(ST_GEOMFROMTEXT, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTGeogFromText() { return getRegularDBFunctionSymbol(ST_GEOGFROMTEXT, 1); }
 
     @Override
     public DBFunctionSymbol getDBSTMakePoint() { return getRegularDBFunctionSymbol(ST_MAKEPOINT, 2); }

@@ -21,7 +21,7 @@ INSERT INTO "GEOGS" VALUES (1, 'POLYGON((2 2, 7 2, 7 5, 2 5, 2 2))', 'small rect
     (6, 'LINESTRING(1 2, 10 2)', 'long horizontal line');
 
 CREATE TABLE "GEOMS_2" ("id" INT PRIMARY KEY, "geom" GEOMETRY, "name" TEXT);
-INSERT INTO "GEOMS_2" VALUES (1, 'POLYGON((1 1, 7 1, 7 2, 1 2, 1 1))', 'small rectangle');
+INSERT INTO "GEOMS_2" VALUES (11, 'POLYGON((1 1, 7 1, 7 2, 1 2, 1 1))', 'small rectangle');
 
 -- CREATE TABLE "FEATURES" (id INT PRIMARY KEY, gid TEXT, the_geom geometry, name TEXT);
 -- INSERT INTO "FEATURES" VALUES (1, 'FRANCE1', 'POINT(2.2945 48.8584)', 'Eiffel Tower');

@@ -678,6 +678,11 @@ public class TermFactoryImpl implements TermFactory {
 	}
 
 	@Override
+	public ImmutableTerm getDBSTGeogFromText(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTGeogFromText(), ImmutableList.of(arg1));
+	}
+
+	@Override
 	public ImmutableTerm getDBSTMakePoint(ImmutableTerm arg1, ImmutableTerm arg2) {
 		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTMakePoint(), ImmutableList.of(arg1, arg2));
 	}

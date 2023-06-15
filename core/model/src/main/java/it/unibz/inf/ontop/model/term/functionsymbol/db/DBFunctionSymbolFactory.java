@@ -335,6 +335,7 @@ public interface DBFunctionSymbolFactory {
     DBFunctionSymbol getDBSTDistanceSpheroid();
     DBFunctionSymbol getDBSTTransform();
     DBFunctionSymbol getDBSTGeomFromText();
+    DBFunctionSymbol getDBSTGeogFromText();
     DBFunctionSymbol getDBSTMakePoint();
     DBFunctionSymbol getDBSTSetSRID();
     FunctionSymbol getDBAsText();

@@ -7,15 +7,23 @@ rdfs:   http://www.w3.org/2000/01/rdf-schema#
 
 [MappingDeclaration] @collection [[
 mappingId	geoms
-target		:{"id"} a :Geom ; geo:asWKT {"geom"}^^geo:wktLiteral ; rdfs:label {"name"}^^xsd:string .
-source		SELECT * FROM "GEOMS";
-
-mappingId	geogs
-target		:{"id"} a :Geog ; geo:asWKT {"geog"}^^geo:wktLiteral ; rdfs:label {"name"}^^xsd:string .
-source		SELECT * FROM "GEOGS";
+target		:geom/{"id"} a :Geom ; geo:asWKT {"geom_wkt"}^^geo:wktLiteral ; rdfs:label {"name"}^^xsd:string .
+source		SELECT id, name, ST_ASTEXT(geom) AS geom_wkt FROM "GEOMS";
 
 mappingId	geoms_2
-target		:{"id"} a :Geom2 ; geo:asWKT {"geom"}^^geo:wktLiteral ; rdfs:label {"name"}^^xsd:string .
-source		SELECT * FROM "GEOMS_2";
+target		:geom/{"id"} a :Geom2 ; geo:asWKT {"geom_wkt"}^^geo:wktLiteral ; rdfs:label {"name"}^^xsd:string .
+source		SELECT id, name, ST_ASTEXT(geom) AS geom_wkt FROM "GEOMS_2";
+
+mappingId	geogs
+target		:geog/{"id"} a :Geog ; geo:asWKT {"geog_wkt"}^^geo:wktLiteral ; rdfs:label {"name"}^^xsd:string .
+source		SELECT id, name, ST_ASTEXT(geog) AS geog_wkt FROM "GEOGS";
+
+mappingId	geomss
+target		:transformedgeom/{"id"} a :Geoms ; geo:asWKT {"geom_wkt"}^^geo:wktLiteral ; rdfs:label {"name"}^^xsd:string .
+source		SELECT id, name, ST_ASTEXT(ST_TRANSFORM(ST_SETSRID(geom, 4326), 4326)) AS geom_wkt FROM "GEOMS";
+
+mappingId	geomss_2
+target		:transformedgeom/{"id"} a :Geoms2 ; geo:asWKT {"geom_wkt"}^^geo:wktLiteral ; rdfs:label {"name"}^^xsd:string .
+source		SELECT id, name, ST_ASTEXT(ST_TRANSFORM(ST_SETSRID(geom, 4326), 4326)) AS geom_wkt FROM "GEOMS_2";
 ]]
 
