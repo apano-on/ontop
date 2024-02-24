@@ -81,12 +81,12 @@ public class CastSnowflakeTest extends AbstractCastFunctionsTest {
 
     @Override
     protected ImmutableSet<String> getCastDateTimeFromDate1ExpectedValues() {
-        return ImmutableSet.of("\"1999-12-14 00:00:00.000\"^^xsd:dateTime");
+        return ImmutableSet.of("\"1999-12-14T00:00:00.000Z\"^^xsd:dateTime");
     }
 
     @Override
     protected ImmutableSet<String> getCastDateTimeFromStringExpectedValues() {
-        return ImmutableSet.of("\"1999-12-14 09:30:00.000\"^^xsd:dateTime");
+        return ImmutableSet.of("\"1999-12-14T09:30:00.000Z\"^^xsd:dateTime");
     }
 
     @Override

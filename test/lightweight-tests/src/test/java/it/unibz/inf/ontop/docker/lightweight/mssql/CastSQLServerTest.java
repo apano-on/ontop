@@ -95,16 +95,6 @@ public class CastSQLServerTest extends AbstractCastFunctionsTest {
     }
 
     @Override
-    protected ImmutableSet<String> getCastDateTimeFromDate1ExpectedValues() {
-        return ImmutableSet.of("\"1999-12-14 00:00:00.0\"^^xsd:dateTime");
-    }
-
-    @Override
-    protected ImmutableSet<String> getCastDateTimeFromDate2ExpectedValues() {
-        return ImmutableSet.of("\"1999-12-14 00:00:00.0\"^^xsd:dateTime");
-    }
-
-    @Override
     @Disabled("Unsupported cast format for SQL Server")
     @Test
     public void testCastDateTimeFromDate3() {
@@ -113,6 +103,6 @@ public class CastSQLServerTest extends AbstractCastFunctionsTest {
 
     @Override
     protected ImmutableSet<String> getCastDateTimeFromStringExpectedValues() {
-        return ImmutableSet.of("\"1999-12-14 09:30:00.0\"^^xsd:dateTime");
+        return ImmutableSet.of("\"1999-12-14T09:30:00\"^^xsd:dateTime");
     }
 }
