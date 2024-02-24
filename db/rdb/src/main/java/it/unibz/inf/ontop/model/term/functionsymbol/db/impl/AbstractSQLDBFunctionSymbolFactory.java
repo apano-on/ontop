@@ -1506,9 +1506,8 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     @Override
     protected String serializeCheckAndConvertDateTimeFromDate(ImmutableList<? extends ImmutableTerm> terms,
                                                               Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
-        return termConverter.apply(terms.get(0));
-        /*return termConverter.apply(
-                termFactory.getDBCastFunctionalTerm(dbTypeFactory.getDBDateTimestampType(), terms.get(0)));*/
+        return termConverter.apply(
+                termFactory.getDBCastFunctionalTerm(dbTypeFactory.getDBDateTimestampType(), terms.get(0)));
     }
 
     @Override
