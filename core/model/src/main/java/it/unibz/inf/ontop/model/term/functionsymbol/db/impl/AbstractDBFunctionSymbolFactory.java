@@ -1333,9 +1333,6 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     public DBFunctionSymbol checkAndConvertDateFromString() { return checkAndConvertDateFromStringFunctionSymbol; }
 
     @Override
-    public DBFunctionSymbol checkAndConvertDateTimeNormalizer() { return createDateTimeNormFunctionSymbol(dbDateTimestampType); }
-
-    @Override
     public DBFunctionSymbol getDBArrayAccess() {
         throw new UnsupportedOperationException("Array support unavailable for this DBMS");
     }

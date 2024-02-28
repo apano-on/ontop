@@ -409,7 +409,6 @@ public interface DBFunctionSymbolFactory {
     DBFunctionSymbol checkAndConvertDateTimeFromString();
     DBFunctionSymbol checkAndConvertDateFromDatetime();
     DBFunctionSymbol checkAndConvertDateFromString();
-    DBFunctionSymbol checkAndConvertDateTimeNormalizer();
 
 
     DBFunctionSymbol getDBWeek();

@@ -64,12 +64,11 @@ public class SPARQLCastFunctionSymbolImpl extends ReduciblePositiveAritySPARQLFu
                     ? termFactory.getImmutableFunctionalTerm(checkAndConvertFunctionSymbol.get(), subLexicalTerms.get(0))
                     : termFactory.getNullConstant();
 
-            DBFunctionSymbol dateTimeNormalizer = termFactory.getDBFunctionSymbolFactory().checkAndConvertDateTimeNormalizer();
-
-            // If dateTime cast, wrap checkAndConvertTerm in dateTimeNormalizer
-            return (returnedTypeTerm.toString().equals("xsd:dateTime"))
-                    ? termFactory.getImmutableFunctionalTerm(dateTimeNormalizer, checkAndConvertTerm)
-                    : checkAndConvertTerm;
+            // Normalize the term to the expected type
+            return termFactory.getConversion2RDFLexical(
+                    targetTypeClosestDBType,
+                    checkAndConvertTerm,
+                    targetType);
         } else {
             // CASE 2: Input is not typed or variable, use STRING as default
             return termFactory.getImmutableFunctionalTerm(
