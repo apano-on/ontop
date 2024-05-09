@@ -89,6 +89,49 @@ public class GEOF {
     // Relate with string result
     public static final IRI RELATEM;
 
+    /**
+     * GeoSPARQL 1.1
+     */
+    // Requirement 39: Non-topological Query Functions (Simple Features)
+    public static final IRI BOUNDINGCIRCLE;
+    public static final IRI METRICBUFFER;
+    public static final IRI CENTROID;
+    public static final IRI CONCAVEHULL;
+    public static final IRI COORDINATEDIMENSION;
+    public static final IRI DIMENSION;
+    public static final IRI METRICDISTANCE;
+    public static final IRI GEOMETRYTYPE;
+    public static final IRI IS3D;
+    public static final IRI ISEMPTY;
+    public static final IRI ISMEASURED;
+    public static final IRI ISSIMPLE;
+    public static final IRI SPATIALDIMENSION;
+    public static final IRI TRANSFORM;
+
+    // Requirement 40: Non-topological Query Functions (Non Simple Features)
+    public static final IRI METRICLENGTH;
+    public static final IRI LENGTH;
+    public static final IRI METRICPERIMETER;
+    public static final IRI PERIMETER;
+    public static final IRI METRICAREA;
+    public static final IRI AREA;
+    public static final IRI GEOMETRYN;
+    public static final IRI MAXX;
+    public static final IRI MAXY;
+    public static final IRI MAXZ;
+    public static final IRI MINX;
+    public static final IRI MINY;
+    public static final IRI MINZ;
+    public static final IRI NUMGEOMETRIES;
+
+    // Requirement 42: Spatial Aggregate Functions
+    public static final IRI AGGBOUNDINGBOX;
+    public static final IRI AGGBOUNDINGCIRCLE;
+    public static final IRI AGGCENTROID;
+    public static final IRI AGGCONCAVEHULL;
+    public static final IRI AGGCONVEXHULL;
+    public static final IRI AGGUNION;
+
     static {
         org.apache.commons.rdf.api.RDF factory = new SimpleRDF();
 
@@ -170,6 +213,48 @@ public class GEOF {
 
         // geof:relate --> String result
         RELATEM = factory.createIRI(PREFIX + "relate");
+
+        /**
+         * GeoSPARQL 1.1
+         */
+        BOUNDINGCIRCLE = factory.createIRI(PREFIX + "boundingCircle");
+        METRICBUFFER = factory.createIRI(PREFIX + "metricBuffer");
+        CENTROID = factory.createIRI(PREFIX + "centroid");
+        CONCAVEHULL = factory.createIRI(PREFIX + "concaveHull");
+        COORDINATEDIMENSION = factory.createIRI(PREFIX + "coordinateDimension");
+        DIMENSION = factory.createIRI(PREFIX + "dimension");
+        METRICDISTANCE = factory.createIRI(PREFIX + "metricDistance");
+        GEOMETRYTYPE = factory.createIRI(PREFIX + "geometryType");
+        IS3D = factory.createIRI(PREFIX + "is3D");
+        ISEMPTY = factory.createIRI(PREFIX + "isEmpty");
+        ISMEASURED = factory.createIRI(PREFIX + "isMeasured");
+        ISSIMPLE = factory.createIRI(PREFIX + "isSimple");
+        SPATIALDIMENSION = factory.createIRI(PREFIX + "spatialDimension");
+        TRANSFORM = factory.createIRI(PREFIX + "transform");
+
+        LENGTH = factory.createIRI(PREFIX + "length");
+        METRICLENGTH = factory.createIRI(PREFIX + "metricLength");
+        PERIMETER = factory.createIRI(PREFIX + "perimeter");
+        METRICPERIMETER = factory.createIRI(PREFIX + "metricPerimeter");
+        AREA = factory.createIRI(PREFIX + "area");
+        METRICAREA = factory.createIRI(PREFIX + "metricArea");
+        GEOMETRYN = factory.createIRI(PREFIX + "geometryN");
+        MAXX = factory.createIRI(PREFIX + "maxX");
+        MAXY = factory.createIRI(PREFIX + "maxY");
+        MAXZ = factory.createIRI(PREFIX + "maxZ");
+        MINX = factory.createIRI(PREFIX + "minX");
+        MINY = factory.createIRI(PREFIX + "minY");
+        MINZ = factory.createIRI(PREFIX + "minZ");
+        NUMGEOMETRIES = factory.createIRI(PREFIX + "numGeometries");
+
+        AGGBOUNDINGBOX = factory.createIRI(PREFIX + "aggBoundingBox");
+        AGGBOUNDINGCIRCLE = factory.createIRI(PREFIX + "aggBoundingCircle");
+        AGGCENTROID = factory.createIRI(PREFIX + "aggCentroid");
+        AGGCONCAVEHULL = factory.createIRI(PREFIX + "aggConcaveHull");
+        AGGCONVEXHULL = factory.createIRI(PREFIX + "aggConvexHull");
+        AGGUNION = factory.createIRI(PREFIX + "aggUnion");
+
+
 
     }
 }

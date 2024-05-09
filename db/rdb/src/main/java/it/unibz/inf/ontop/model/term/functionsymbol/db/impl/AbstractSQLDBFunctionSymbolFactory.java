@@ -91,6 +91,12 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     private static final String ST_RELATE = "ST_RELATE";
     private static final String ST_SRID = "ST_SRID";
 
+    /**
+     * GeoSPARQL 1.1
+     */
+    private static final String ST_PERIMETER = "ST_PERIMETER";
+
+
     protected final DBTypeFactory dbTypeFactory;
     protected final TypeFactory typeFactory;
     protected final DBTermType dbStringType;
@@ -393,6 +399,14 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
         DBFunctionSymbol makepointSymbol = new GeoDBTypedFunctionSymbol(ST_MAKEPOINT, 2, dbStringType, false,
                 abstractRootDBType);
         builder.put(ST_MAKEPOINT, 2, makepointSymbol);
+
+        /**
+         * GeoSPARQL 1.1
+         */
+        DBFunctionSymbol perimeterSymbol = new GeoDBTypedFunctionSymbol(ST_PERIMETER, 1, dbDoubleType, false,
+                abstractRootDBType);
+        builder.put(ST_PERIMETER, 1, perimeterSymbol);
+
 
         DBFunctionSymbol ontopUserSymbol = new OntopUserFunctionSymbolImpl(dbBooleanType);
         builder.put(OntopUserFunctionSymbolImpl.ONTOP_USER, 0, ontopUserSymbol);
@@ -1230,6 +1244,13 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     public DBFunctionSymbol getDBGetSRID() {
         return getRegularDBFunctionSymbol(ST_SRID, 1);
     }
+
+    /**
+     * GeoSPARQL 1.1
+     */
+    @Override
+    public DBFunctionSymbol getDBSTPerimeter() { return getRegularDBFunctionSymbol(ST_PERIMETER, 1); }
+
 
     @Override
     public DBFunctionSymbol getOntopUser() {

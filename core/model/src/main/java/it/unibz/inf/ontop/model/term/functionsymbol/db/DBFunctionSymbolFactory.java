@@ -370,6 +370,12 @@ public interface DBFunctionSymbolFactory {
     FunctionSymbol getDBRelateMatrix();
     FunctionSymbol getDBGetSRID();
 
+    /**
+     * GeoSPARQL 1.1
+     */
+    FunctionSymbol getDBSTPerimeter();
+
+
     // Time extension - duration arithmetic
     DBFunctionSymbol getDBWeeksBetweenFromDateTime();
     DBFunctionSymbol getDBWeeksBetweenFromDate();

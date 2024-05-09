@@ -326,6 +326,12 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                 new GeofRelateMFunctionSymbolImpl(GEOF.RELATEM, wktLiteral, xsdString),
 
                 /*
+                 * GeoSPARQL 1.1 Functions
+                 */
+                new GeofPerimeterFunctionSymbolImpl(GEOF.PERIMETER, wktLiteral, xsdDouble),
+
+
+                /*
                  * Time extension - duration arithmetic
                  */
                 new OfnMultitypedInputBinarySPARQLFunctionSymbolImpl("OFN_WEEKS_BETWEEN", OFN.WEEKS_BETWEEN,

@@ -839,6 +839,15 @@ public class MockupDBFunctionSymbolFactory extends AbstractDBFunctionSymbolFacto
         throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
     }
 
+    /**
+     * GeoSPARQL 1.1
+     */
+    @Override
+    public DBFunctionSymbol getDBSTPerimeter() {
+        throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
+    }
+
+
     @Override
     public NonDeterministicDBFunctionSymbol getDBRand(UUID uuid) {
         return new DefaultNonDeterministicNullaryFunctionSymbol("RAND", uuid, dbTypeFactory.getDBDoubleType());

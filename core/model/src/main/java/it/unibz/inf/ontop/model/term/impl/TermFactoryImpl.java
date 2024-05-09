@@ -791,6 +791,15 @@ public class TermFactoryImpl implements TermFactory {
     }
 
 	/**
+	 * GeoSPARQL 1.1
+	 */
+	@Override
+	public ImmutableTerm getDBSTPerimeter(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTPerimeter(), ImmutableList.of(arg1));
+	}
+
+
+	/**
 	 * Time extension - duration arithmetic
 	 */
 
