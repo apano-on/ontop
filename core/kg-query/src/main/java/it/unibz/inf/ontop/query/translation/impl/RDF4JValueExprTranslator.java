@@ -11,10 +11,7 @@ import it.unibz.inf.ontop.model.term.functionsymbol.SPARQLFunctionSymbol;
 import it.unibz.inf.ontop.model.type.RDFDatatype;
 import it.unibz.inf.ontop.model.type.TermTypeInference;
 import it.unibz.inf.ontop.model.type.TypeFactory;
-import it.unibz.inf.ontop.model.vocabulary.AGG;
-import it.unibz.inf.ontop.model.vocabulary.SPARQL;
-import it.unibz.inf.ontop.model.vocabulary.XPathFunction;
-import it.unibz.inf.ontop.model.vocabulary.XSD;
+import it.unibz.inf.ontop.model.vocabulary.*;
 import it.unibz.inf.ontop.utils.ImmutableCollectors;
 import org.apache.commons.rdf.api.RDF;
 import org.eclipse.rdf4j.model.Value;
@@ -161,7 +158,7 @@ public class RDF4JValueExprTranslator {
             }
             if (aggExpr instanceof AggregateFunctionCall) {
                 AggregateFunctionCall call = (AggregateFunctionCall) aggExpr;
-                if(call.getIRI().startsWith(AGG.PREFIX)) {
+                if(call.getIRI().startsWith(AGG.PREFIX) || call.getIRI().startsWith(GEOF.PREFIX)) {
                     return getAggregateFunctionalTerm(call.getIRI(), aggExpr.isDistinct(), term);
                 }
             }

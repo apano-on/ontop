@@ -10,7 +10,8 @@ import org.apache.commons.rdf.api.IRI;
 import javax.annotation.Nonnull;
 import java.util.function.BiFunction;
 
-public class GeofSfIntersectsFunctionSymbolImpl extends AbstractGeofBooleanFunctionSymbolDirectImpl {
+public class GeofSfIntersectsFunctionSymbolImpl
+        extends AbstractGeofBooleanFunctionSymbolDirectImpl<BiFunction<ImmutableTerm, ImmutableTerm, ImmutableTerm>> {
 
     public GeofSfIntersectsFunctionSymbolImpl(@Nonnull IRI functionIRI, RDFDatatype wktLiteralType, RDFDatatype xsdBooleanType) {
         super("GEOF_SF_INTERSECTS", functionIRI, ImmutableList.of(wktLiteralType, wktLiteralType), xsdBooleanType);

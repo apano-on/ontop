@@ -631,27 +631,21 @@ public interface TermFactory {
 	 * GeoSPARQL 1.1
 	 */
 	ImmutableTerm getDBSTBoundingCircle(ImmutableTerm arg1);
-	ImmutableTerm getDBSTMetricBuffer(ImmutableTerm arg1, ImmutableTerm arg2);
 	ImmutableTerm getDBSTConcaveHull(ImmutableTerm arg1);
 	ImmutableTerm getDBSTCentroid(ImmutableTerm arg1);
 	ImmutableTerm getDBSTCoordinateDimension(ImmutableTerm arg1);
 	ImmutableTerm getDBSTDimension(ImmutableTerm arg1);
-	ImmutableTerm getDBSTMetricDistance(ImmutableTerm arg1, ImmutableTerm arg2);
 	ImmutableTerm getDBSTGeometryType(ImmutableTerm arg1);
 	ImmutableTerm getDBSTis3D(ImmutableTerm arg1);
 	ImmutableTerm getDBSTisEmpty(ImmutableTerm arg1);
 	ImmutableTerm getDBSTisMeasured(ImmutableTerm arg1);
 	ImmutableTerm getDBSTisSimple(ImmutableTerm arg1);
-	ImmutableTerm getDBSTSpatialDimension(ImmutableTerm arg1);
-	ImmutableTerm getDBSTSTransform(ImmutableTerm arg1, ImmutableTerm srid);
+	ImmutableTerm getDBSTTransform(ImmutableTerm arg1, ImmutableTerm arg2);
 
 	ImmutableTerm getDBSTLength(ImmutableTerm arg1);
-	ImmutableTerm getDBSTMetricLength(ImmutableTerm arg1);
 	ImmutableTerm getDBSTPerimeter(ImmutableTerm arg1);
-	ImmutableTerm getDBSTMetricPerimeter(ImmutableTerm arg1);
 	ImmutableTerm getDBSTArea(ImmutableTerm arg1);
-	ImmutableTerm getDBSTMetricArea(ImmutableTerm arg1);
-	ImmutableTerm getDBSTGeometryN(ImmutableTerm arg1);
+	ImmutableTerm getDBSTGeometryN(ImmutableTerm arg1, ImmutableTerm arg2);
 	ImmutableTerm getDBSTMaxX(ImmutableTerm arg1);
 	ImmutableTerm getDBSTMaxY(ImmutableTerm arg1);
 	ImmutableTerm getDBSTMaxZ(ImmutableTerm arg1);
@@ -660,13 +654,13 @@ public interface TermFactory {
 	ImmutableTerm getDBSTMinZ(ImmutableTerm arg1);
 	ImmutableTerm getDBSTNumGeometries(ImmutableTerm arg1);
 
-	//TODO: Review implementation, aggregate version for Union, but needs group by
 	ImmutableTerm getDBSTAggBoundingBox(ImmutableTerm arg1);
 	ImmutableTerm getDBSTAggBoundingCircle(ImmutableTerm arg1);
 	ImmutableTerm getDBSTAggCentroid(ImmutableTerm arg1);
 	ImmutableTerm getDBSTAggConvexHull(ImmutableTerm arg1);
 	ImmutableTerm getDBSTAggConcaveHull(ImmutableTerm arg1);
 	ImmutableTerm getDBSTAggUnion(ImmutableTerm arg1);
+	ImmutableTerm getDBSTAccum(ImmutableTerm arg1);
 
 	/**
 	 * Time extension - duration arithmetic

@@ -10,17 +10,17 @@ import org.apache.commons.rdf.api.IRI;
 
 import javax.annotation.Nonnull;
 
-public class GeofPerimeterFunctionSymbolImpl extends AbstractGeofDoubleFunctionSymbolImpl {
+public class GeofLengthFunctionSymbolImpl extends AbstractGeofDoubleFunctionSymbolImpl {
 
     private IRI functionIRI;
 
-    public GeofPerimeterFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
-                                           RDFDatatype wktLiteralType, ObjectRDFType iriType, RDFDatatype xsdDoubleType) {
-        super(functionSymbolName, functionIRI, ImmutableList.of(wktLiteralType, iriType), xsdDoubleType);
+    public GeofLengthFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
+                                      RDFDatatype wktLiteralType, ObjectRDFType iriType, RDFDatatype xsdDoubleType) {
+        super(functionSymbolName, functionIRI, ImmutableList.of(wktLiteralType), xsdDoubleType);
     }
 
-    public GeofPerimeterFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
-                                           RDFDatatype wktLiteralType, RDFDatatype xsdDoubleType) {
+    public GeofLengthFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
+                                      RDFDatatype wktLiteralType, RDFDatatype xsdDoubleType) {
         super(functionSymbolName, functionIRI, ImmutableList.of(wktLiteralType), xsdDoubleType);
     }
 
@@ -33,12 +33,13 @@ public class GeofPerimeterFunctionSymbolImpl extends AbstractGeofDoubleFunctionS
         WKTLiteralValue v0 = GeoUtils.extractWKTLiteralValue(termFactory, subLexicalTerms.get(0));
         ImmutableTerm geom0 = v0.getGeometry();
 
-        if (this.functionIRI == GEOF.PERIMETER) {
-            return termFactory.getDBSTPerimeter(geom0).simplify();
+        if (this.functionIRI == GEOF.LENGTH) {
+            return termFactory.getDBSTLength(geom0).simplify();
         } else {
             // Convert the geometry to SRID 4326, which is the SRID used by the metric functions
+            // GEOF.METRICLENGTH
             ImmutableTerm metricGeom = termFactory.getDBSTSetSRID(geom0, termFactory.getDBIntegerConstant(4326));
-            return termFactory.getDBSTPerimeter(metricGeom).simplify();
+            return termFactory.getDBSTLength(metricGeom).simplify();
         }
     }
 }

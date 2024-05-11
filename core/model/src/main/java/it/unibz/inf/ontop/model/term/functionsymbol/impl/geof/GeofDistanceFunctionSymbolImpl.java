@@ -11,6 +11,7 @@ import it.unibz.inf.ontop.model.term.functionsymbol.impl.FunctionSymbolFactoryIm
 import it.unibz.inf.ontop.model.type.DBTypeFactory;
 import it.unibz.inf.ontop.model.type.ObjectRDFType;
 import it.unibz.inf.ontop.model.type.RDFDatatype;
+import it.unibz.inf.ontop.model.vocabulary.GEOF;
 import org.apache.commons.rdf.api.IRI;
 
 import javax.annotation.Nonnull;
@@ -23,14 +24,25 @@ import static it.unibz.inf.ontop.model.term.functionsymbol.impl.geof.GeoUtils.EA
 public class GeofDistanceFunctionSymbolImpl extends AbstractGeofDoubleFunctionSymbolImpl {
 
     protected final FunctionSymbolFactory functionSymbolFactory;
+    private final IRI functionIRI;
 
-    public GeofDistanceFunctionSymbolImpl(@Nonnull IRI functionIRI, RDFDatatype wktLiteralType, ObjectRDFType iriType, RDFDatatype xsdDoubleType, FunctionSymbolFactoryImpl functionSymbolFactory) {
-        super("GEOF_DISTANCE", functionIRI,
+    public GeofDistanceFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
+                                          RDFDatatype wktLiteralType, ObjectRDFType iriType, RDFDatatype xsdDoubleType, FunctionSymbolFactoryImpl functionSymbolFactory) {
+        super(functionSymbolName, functionIRI,
                 ImmutableList.of(wktLiteralType, wktLiteralType, iriType),
                 xsdDoubleType);
         this.functionSymbolFactory = functionSymbolFactory;
+        this.functionIRI = functionIRI;
     }
 
+    public GeofDistanceFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
+                                          RDFDatatype wktLiteralType, RDFDatatype xsdDoubleType, FunctionSymbolFactoryImpl functionSymbolFactory) {
+        super(functionSymbolName, functionIRI,
+                ImmutableList.of(wktLiteralType, wktLiteralType),
+                xsdDoubleType);
+        this.functionSymbolFactory = functionSymbolFactory;
+        this.functionIRI = functionIRI;
+    }
 
     /**
      * @param subLexicalTerms (geom1, geom2, unit)
@@ -54,11 +66,18 @@ public class GeofDistanceFunctionSymbolImpl extends AbstractGeofDoubleFunctionSy
         ImmutableTerm geom1 = wktLiteralValues.get(1).getGeometry();
 
         DistanceUnit inputUnit = GeoUtils.getUnitFromSRID(srid0.getIRIString());
-        DistanceUnit outputUnit = DistanceUnit.findByIRI(((DBConstant) subLexicalTerms.get(2)).getValue());
 
         DBFunctionSymbolFactory dbFunctionSymbolFactory = termFactory.getDBFunctionSymbolFactory();
         DBTypeFactory dbTypeFactory = termFactory.getTypeFactory().getDBTypeFactory();
         DBMathBinaryOperator divides = dbFunctionSymbolFactory.getDBMathBinaryOperator("/", dbTypeFactory.getDBDoubleType());
+
+        // METRIC DISTANCE
+        if (subLexicalTerms.size() == 2 && functionIRI.equals(GEOF.METRICDISTANCE)) {
+            return computeMetricDistance(termFactory, inputUnit, geom0, geom1);
+        }
+
+        // ANY DISTANCE OUTPUT UNIT
+        DistanceUnit outputUnit = DistanceUnit.findByIRI(((DBConstant) subLexicalTerms.get(2)).getValue());
 
 
         if (inputUnit == METRE && outputUnit == METRE) {
@@ -85,6 +104,14 @@ public class GeofDistanceFunctionSymbolImpl extends AbstractGeofDoubleFunctionSy
             return termFactory.getDBSTDistanceSphere(geom0, geom1).simplify();
         } else {
             throw new IllegalArgumentException(String.format("Unsupported combination of units for distance. input: %s, output: %s", inputUnit, outputUnit));
+        }
+    }
+
+    private ImmutableTerm computeMetricDistance(TermFactory termFactory, DistanceUnit inputUnit, ImmutableTerm geom0, ImmutableTerm geom1) {
+        if (inputUnit == DEGREE) {
+            return termFactory.getDBSTDistanceSphere(geom0, geom1).simplify();
+        } else {
+            return termFactory.getDBSTDistance(geom0, geom1).simplify();
         }
     }
 

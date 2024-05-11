@@ -689,12 +689,6 @@ public class TermFactoryImpl implements TermFactory {
         return getImmutableExpression(dbFunctionSymbolFactory.getDBSTContainsProperly(), arg1, arg2);
     }
 
-	// Non-topological and common form functions
-    @Override
-    public ImmutableTerm getDBSTSTransform(ImmutableTerm arg1, ImmutableTerm srid) {
-        return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTTransform(), arg1, srid);
-    }
-
 	@Override
 	public ImmutableTerm getDBSTGeomFromText(ImmutableTerm arg1) {
 		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTGeomFromText(), ImmutableList.of(arg1));
@@ -794,10 +788,149 @@ public class TermFactoryImpl implements TermFactory {
 	 * GeoSPARQL 1.1
 	 */
 	@Override
+	public ImmutableTerm getDBSTBoundingCircle(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTBoundingCircle(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTConcaveHull(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTConcaveHull(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTCentroid(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTCentroid(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTCoordinateDimension(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTCoordinateDimension(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTDimension(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTDimension(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTGeometryType(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTGeometryType(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTis3D(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTis3D(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTisEmpty(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTisEmpty(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTisMeasured(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTisMeasured(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTisSimple(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTisSimple(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTTransform(ImmutableTerm arg1, ImmutableTerm arg2) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTTransform(), ImmutableList.of(arg1, arg2));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTLength(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTLength(), ImmutableList.of(arg1));
+	}
+
+	@Override
 	public ImmutableTerm getDBSTPerimeter(ImmutableTerm arg1) {
 		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTPerimeter(), ImmutableList.of(arg1));
 	}
 
+	@Override
+	public ImmutableTerm getDBSTArea(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTArea(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTGeometryN(ImmutableTerm arg1, ImmutableTerm arg2) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTGeometryN(), ImmutableList.of(arg1, arg2));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTMaxX(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTMaxX(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTMaxY(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTMaxY(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTMaxZ(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTMaxZ(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTMinX(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTMinX(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTMinY(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTMinY(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTMinZ(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTMinZ(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTNumGeometries(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTNumGeometries(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTAggBoundingBox(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTAggBoundingBox(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTAggBoundingCircle(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTAggBoundingCircle(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTAggCentroid(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTAggCentroid(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTAggConvexHull(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTAggConvexHull(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTAggConcaveHull(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTAggConcaveHull(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTAggUnion(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTAggUnion(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTAccum(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTAccum(), ImmutableList.of(arg1));
+	}
 
 	/**
 	 * Time extension - duration arithmetic

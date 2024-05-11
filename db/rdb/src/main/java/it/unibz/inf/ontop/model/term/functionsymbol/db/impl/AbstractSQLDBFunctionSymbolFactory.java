@@ -9,7 +9,6 @@ import it.unibz.inf.ontop.model.term.functionsymbol.FunctionSymbol;
 import it.unibz.inf.ontop.model.term.functionsymbol.InequalityLabel;
 import it.unibz.inf.ontop.model.term.functionsymbol.db.*;
 import it.unibz.inf.ontop.model.type.*;
-import it.unibz.inf.ontop.model.type.impl.DateDBTermType;
 import it.unibz.inf.ontop.model.type.impl.DatetimeDBTermType;
 
 import java.util.Map;
@@ -88,13 +87,34 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     private static final String ST_DIFFERENCE = "ST_DIFFERENCE";
     private static final String ST_SYMDIFFERENCE = "ST_SYMDIFFERENCE";
     private static final String ST_UNION = "ST_UNION";
+    private static final String ST_ACCUM = "ST_ACCUM";
     private static final String ST_RELATE = "ST_RELATE";
     private static final String ST_SRID = "ST_SRID";
 
     /**
      * GeoSPARQL 1.1
      */
+    private static final String ST_BOUNDINGCIRCLE = "ST_BOUNDINGCIRCLE";
+    private static final String ST_CONCAVEHULL = "ST_CONCAVEHULL";
+    private static final String ST_CENTROID = "ST_CENTROID";
+    private static final String ST_COORDDIM = "ST_COORDDIM";
+    private static final String ST_DIMENSION = "ST_DIMENSION";
+    private static final String ST_GEOMETRYTYPE = "ST_GEOMETRYTYPE";
+    private static final String ST_IS3D = "ST_IS3D";
+    private static final String ST_ISEMPTY = "ST_ISEMPTY";
+    private static final String ST_ISMEASURED = "ST_HASM";
+    private static final String ST_ISSIMPLE = "ST_ISSIMPLE";
+    private static final String ST_LENGTH = "ST_LENGTH";
     private static final String ST_PERIMETER = "ST_PERIMETER";
+    private static final String ST_GEOMETRYN = "ST_GEOMETRYN";
+    private static final String ST_AREA = "ST_AREA";
+    private static final String ST_XMAX = "ST_XMAX";
+    private static final String ST_YMAX = "ST_YMAX";
+    private static final String ST_ZMAX = "ST_ZMAX";
+    private static final String ST_XMIN = "ST_XMIN";
+    private static final String ST_YMIN = "ST_YMIN";
+    private static final String ST_ZMIN = "ST_ZMIN";
+    private static final String ST_NUMGEOMETRIES = "ST_NUMGEOMETRIES";
 
 
     protected final DBTypeFactory dbTypeFactory;
@@ -388,10 +408,6 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
                 abstractRootDBType);
         builder.put(ST_SETSRID, 2, setsridSymbol);
 
-        DBFunctionSymbol transformSymbol = new GeoDBTypedFunctionSymbol(ST_TRANSFORM, 2, dbStringType, false,
-                abstractRootDBType);
-        builder.put(ST_TRANSFORM, 2, transformSymbol);
-
         DBFunctionSymbol geomfromtextSymbol = new GeoDBTypedFunctionSymbol(ST_GEOMFROMTEXT, 1, dbStringType, false,
                 abstractRootDBType);
         builder.put(ST_GEOMFROMTEXT, 1, geomfromtextSymbol);
@@ -403,10 +419,121 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
         /**
          * GeoSPARQL 1.1
          */
+        DBFunctionSymbol boundingCircleSymbol = new GeoDBTypedFunctionSymbol(ST_BOUNDINGCIRCLE, 1, dbStringType, false,
+                abstractRootDBType);
+        builder.put(ST_BOUNDINGCIRCLE, 1, boundingCircleSymbol);
+
+        DBFunctionSymbol concaveHullSymbol = new GeoDBTypedFunctionSymbol(ST_CONCAVEHULL, 1, dbStringType, false,
+                abstractRootDBType);
+        builder.put(ST_CONCAVEHULL, 1, concaveHullSymbol);
+
+        DBFunctionSymbol centroidSymbol = new GeoDBTypedFunctionSymbol(ST_CENTROID, 1, dbStringType, false,
+                abstractRootDBType);
+        builder.put(ST_CENTROID, 1, centroidSymbol);
+
+        DBFunctionSymbol coordinateDimensionSymbol = new GeoDBTypedFunctionSymbol(ST_COORDDIM, 1, dbStringType, false,
+                dbIntegerType);
+        builder.put(ST_COORDDIM, 1, coordinateDimensionSymbol);
+
+        DBFunctionSymbol dimensionSymbol = new GeoDBTypedFunctionSymbol(ST_DIMENSION, 1, dbStringType, false,
+                abstractRootDBType);
+        builder.put(ST_DIMENSION, 1, dimensionSymbol);
+
+        DBFunctionSymbol geometryTypeSymbol = new GeoDBTypedFunctionSymbol(ST_GEOMETRYTYPE, 1, dbStringType, false,
+                abstractRootDBType);
+        builder.put(ST_GEOMETRYTYPE, 1, geometryTypeSymbol);
+
+        DBFunctionSymbol is3DFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_IS3D, 1, dbBooleanType,
+                abstractRootDBType);
+        builder.put(ST_IS3D, 1, is3DFunctionSymbol);
+
+        DBFunctionSymbol isEmptyFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_ISEMPTY, 1, dbBooleanType,
+                abstractRootDBType);
+        builder.put(ST_ISEMPTY, 1, isEmptyFunctionSymbol);
+
+        DBFunctionSymbol isMeasuredFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_ISMEASURED, 1, dbBooleanType,
+                abstractRootDBType);
+        builder.put(ST_ISMEASURED, 1, isMeasuredFunctionSymbol);
+
+        DBFunctionSymbol isSimpleFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_ISSIMPLE, 1, dbBooleanType,
+                abstractRootDBType);
+        builder.put(ST_ISSIMPLE, 1, isSimpleFunctionSymbol);
+
+        DBFunctionSymbol transformSymbol = new GeoDBTypedFunctionSymbol(ST_TRANSFORM, 2, dbStringType, false,
+                abstractRootDBType);
+        builder.put(ST_TRANSFORM, 2, transformSymbol);
+
+        DBFunctionSymbol lengthSymbol = new GeoDBTypedFunctionSymbol(ST_LENGTH, 1, dbDoubleType, false,
+                abstractRootDBType);
+        builder.put(ST_LENGTH, 1, lengthSymbol);
+
         DBFunctionSymbol perimeterSymbol = new GeoDBTypedFunctionSymbol(ST_PERIMETER, 1, dbDoubleType, false,
                 abstractRootDBType);
         builder.put(ST_PERIMETER, 1, perimeterSymbol);
 
+        DBFunctionSymbol geometryNSymbol = new GeoDBTypedFunctionSymbol(ST_GEOMETRYN, 2, dbStringType, false,
+                abstractRootDBType);
+        builder.put(ST_GEOMETRYN, 2, geometryNSymbol);
+
+        DBFunctionSymbol areaSymbol = new GeoDBTypedFunctionSymbol(ST_AREA, 1, dbDoubleType, false,
+                abstractRootDBType);
+        builder.put(ST_AREA, 1, areaSymbol);
+
+        DBFunctionSymbol maxXSymbol = new GeoDBTypedFunctionSymbol(ST_XMAX, 1, dbDoubleType, false,
+                abstractRootDBType);
+        builder.put(ST_XMAX, 1, maxXSymbol);
+
+        DBFunctionSymbol maxYSymbol = new GeoDBTypedFunctionSymbol(ST_YMAX, 1, dbDoubleType, false,
+                abstractRootDBType);
+        builder.put(ST_YMAX, 1, maxYSymbol);
+
+        DBFunctionSymbol maxZSymbol = new GeoDBTypedFunctionSymbol(ST_ZMAX, 1, dbDoubleType, false,
+                abstractRootDBType);
+        builder.put(ST_ZMAX, 1, maxZSymbol);
+
+        DBFunctionSymbol minXSymbol = new GeoDBTypedFunctionSymbol(ST_XMIN, 1, dbDoubleType, false,
+                abstractRootDBType);
+        builder.put(ST_XMIN, 1, minXSymbol);
+
+        DBFunctionSymbol minYSymbol = new GeoDBTypedFunctionSymbol(ST_YMIN, 1, dbDoubleType, false,
+                abstractRootDBType);
+        builder.put(ST_YMIN, 1, minYSymbol);
+
+        DBFunctionSymbol minZSymbol = new GeoDBTypedFunctionSymbol(ST_ZMIN, 1, dbDoubleType, false,
+                abstractRootDBType);
+        builder.put(ST_ZMIN, 1, minZSymbol);
+
+        DBFunctionSymbol numGeometriesSymbol = new GeoDBTypedFunctionSymbol(ST_NUMGEOMETRIES, 1, dbIntType, false,
+                abstractRootDBType);
+        builder.put(ST_NUMGEOMETRIES, 1, numGeometriesSymbol);
+
+        DBFunctionSymbol aggBoundingBoxSymbol = new GeoAggDBTypedFunctionSymbol("ST_ENVELOPE_AGG",
+                ImmutableList.of(dbStringType), dbStringType, false);
+        builder.put("ST_ENVELOPE_AGG", 1, aggBoundingBoxSymbol);
+
+        DBFunctionSymbol aggBoundingCircleSymbol = new GeoAggDBTypedFunctionSymbol("ST_BOUNDINGCIRCLE_AGG",
+                ImmutableList.of(dbStringType), dbStringType, false);
+        builder.put("ST_BOUNDINGCIRCLE_AGG", 1, aggBoundingCircleSymbol);
+
+        DBFunctionSymbol aggCentroidSymbol = new GeoAggDBTypedFunctionSymbol("ST_CENTROID_AGG",
+                ImmutableList.of(dbStringType), dbStringType, false);
+        builder.put("ST_CENTROID_AGG", 1, aggCentroidSymbol);
+
+        DBFunctionSymbol aggConcaveHullSymbol = new GeoAggDBTypedFunctionSymbol("ST_CONCAVEHULL_AGG",
+                ImmutableList.of(dbStringType), dbStringType, false);
+        builder.put("ST_CONCAVEHULL_AGG", 1, aggConcaveHullSymbol);
+
+        DBFunctionSymbol aggConvexHullSymbol = new GeoAggDBTypedFunctionSymbol("ST_CONVEXHULL_AGG",
+                ImmutableList.of(dbStringType), dbStringType, false);
+        builder.put("ST_CONVEXHULL_AGG", 1, aggConvexHullSymbol);
+
+        DBFunctionSymbol aggUnionSymbol = new GeoAggDBTypedFunctionSymbol("ST_UNION_AGG",
+                ImmutableList.of(dbStringType), dbStringType, false);
+        builder.put("ST_UNION_AGG", 1, aggUnionSymbol);
+
+        DBFunctionSymbol accumSymbol = new GeoAggDBTypedFunctionSymbol(ST_ACCUM, ImmutableList.of(dbStringType),
+                dbStringType, false);
+        builder.put(ST_ACCUM, 1, accumSymbol);
 
         DBFunctionSymbol ontopUserSymbol = new OntopUserFunctionSymbolImpl(dbBooleanType);
         builder.put(OntopUserFunctionSymbolImpl.ONTOP_USER, 0, ontopUserSymbol);
@@ -1249,8 +1376,109 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
      * GeoSPARQL 1.1
      */
     @Override
+    public DBFunctionSymbol getDBSTBoundingCircle() {
+        return getRegularDBFunctionSymbol(ST_BOUNDINGCIRCLE, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTConcaveHull() {
+        return getRegularDBFunctionSymbol(ST_CONCAVEHULL, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTCentroid() {
+        return getRegularDBFunctionSymbol(ST_CENTROID, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTCoordinateDimension() {
+        return getRegularDBFunctionSymbol(ST_COORDDIM, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTDimension() {
+        return getRegularDBFunctionSymbol(ST_DIMENSION, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTGeometryType() {
+        return getRegularDBFunctionSymbol(ST_GEOMETRYTYPE, 1); }
+
+    @Override
+    public DBBooleanFunctionSymbol getDBSTis3D() {
+        return (DBBooleanFunctionSymbol) getRegularDBFunctionSymbol(ST_IS3D, 1); }
+
+    @Override
+    public DBBooleanFunctionSymbol getDBSTisEmpty() {
+        return (DBBooleanFunctionSymbol) getRegularDBFunctionSymbol(ST_ISEMPTY, 1); }
+
+    @Override
+    public DBBooleanFunctionSymbol getDBSTisMeasured() {
+        return (DBBooleanFunctionSymbol) getRegularDBFunctionSymbol(ST_ISMEASURED, 1); }
+
+    @Override
+    public DBBooleanFunctionSymbol getDBSTisSimple() {
+        return (DBBooleanFunctionSymbol) getRegularDBFunctionSymbol(ST_ISSIMPLE, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTTransform() {
+        return getRegularDBFunctionSymbol(ST_TRANSFORM, 2);
+    }
+
+    @Override
     public DBFunctionSymbol getDBSTPerimeter() { return getRegularDBFunctionSymbol(ST_PERIMETER, 1); }
 
+    @Override
+    public DBFunctionSymbol getDBSTLength() { return getRegularDBFunctionSymbol(ST_LENGTH, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTArea() { return getRegularDBFunctionSymbol(ST_AREA, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTGeometryN() { return getRegularDBFunctionSymbol(ST_GEOMETRYN, 2); }
+
+    @Override
+    public DBFunctionSymbol getDBSTMaxX() { return getRegularDBFunctionSymbol(ST_XMAX, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTMaxY() { return getRegularDBFunctionSymbol(ST_YMAX, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTMaxZ() { return getRegularDBFunctionSymbol(ST_ZMAX, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTMinX() { return getRegularDBFunctionSymbol(ST_XMIN, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTMinY() { return getRegularDBFunctionSymbol(ST_YMIN, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTMinZ() { return getRegularDBFunctionSymbol(ST_ZMIN, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTNumGeometries() { return getRegularDBFunctionSymbol(ST_NUMGEOMETRIES, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTAggBoundingBox() { return getRegularDBFunctionSymbol(ST_ENVELOPE, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTAggBoundingCircle() { return getRegularDBFunctionSymbol(ST_ENVELOPE, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTAggCentroid() { return getRegularDBFunctionSymbol(ST_CENTROID, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTAggConcaveHull() { return getRegularDBFunctionSymbol(ST_CONCAVEHULL, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTAggConvexHull() { return getRegularDBFunctionSymbol(ST_CONVEXHULL, 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTAggUnion() {
+
+        return getRegularDBFunctionSymbol(ST_UNION, 1);
+    }
+
+    @Override
+    public DBFunctionSymbol getDBSTAccum() {
+
+        return getRegularDBFunctionSymbol(ST_ACCUM, 1);
+    }
 
     @Override
     public DBFunctionSymbol getOntopUser() {
@@ -1273,11 +1501,6 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     public DBBooleanFunctionSymbol getOntopContainsRoleOrGroup() {
         return (DBBooleanFunctionSymbol)
                 getRegularDBFunctionSymbol(OntopContainsRoleOrGroupFunctionSymbol.ONTOP_CONTAINS_ROLE_OR_GROUP, 1);
-    }
-
-    @Override
-    public DBFunctionSymbol getDBSTTransform() {
-        return getRegularDBFunctionSymbol(ST_TRANSFORM, 2);
     }
 
     @Override

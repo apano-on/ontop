@@ -83,6 +83,17 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
             registry.add(new StdevSampAggregateFactory());
             registry.add(new StdevPopAggregateFactory());
             registry.add(new StdevShortAggregateFactory());
+            registry.add(new AggBoundingBoxAggregateFactory());
+            registry.add(new AggBoundingCircleAggregateFactory());
+            registry.add(new AggCentroidAggregateFactory());
+            registry.add(new AggConcaveHullAggregateFactory());
+            registry.add(new AggConvexHullAggregateFactory());
+            registry.add(new AggUnionAggregateFactory());
+            registry.add(new AggBoundingBoxAggregateFactory());
+            registry.add(new AggBoundingCircleAggregateFactory());
+            registry.add(new AggCentroidAggregateFactory());
+            registry.add(new AggConcaveHullAggregateFactory());
+            registry.add(new AggConvexHullAggregateFactory());
         }
     }
 

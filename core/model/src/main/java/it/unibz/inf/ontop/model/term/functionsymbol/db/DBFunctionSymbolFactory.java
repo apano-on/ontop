@@ -352,7 +352,6 @@ public interface DBFunctionSymbolFactory {
     DBFunctionSymbol getDBSTDistance();
     DBFunctionSymbol getDBSTDistanceSphere();
     DBFunctionSymbol getDBSTDistanceSpheroid();
-    DBFunctionSymbol getDBSTTransform();
     DBFunctionSymbol getDBSTGeomFromText();
     DBFunctionSymbol getDBSTMakePoint();
     DBFunctionSymbol getDBSTSetSRID();
@@ -373,8 +372,36 @@ public interface DBFunctionSymbolFactory {
     /**
      * GeoSPARQL 1.1
      */
-    FunctionSymbol getDBSTPerimeter();
+    DBFunctionSymbol getDBSTBoundingCircle();
+    DBFunctionSymbol getDBSTConcaveHull();
+    DBFunctionSymbol getDBSTCentroid();
+    DBFunctionSymbol getDBSTCoordinateDimension();
+    DBFunctionSymbol getDBSTDimension();
+    DBFunctionSymbol getDBSTGeometryType();
+    DBBooleanFunctionSymbol getDBSTis3D();
+    DBBooleanFunctionSymbol getDBSTisEmpty();
+    DBBooleanFunctionSymbol getDBSTisMeasured();
+    DBBooleanFunctionSymbol getDBSTisSimple();
+    DBFunctionSymbol getDBSTTransform();
+    DBFunctionSymbol getDBSTLength();
+    DBFunctionSymbol getDBSTPerimeter();
+    DBFunctionSymbol getDBSTArea();
+    DBFunctionSymbol getDBSTGeometryN();
+    DBFunctionSymbol getDBSTMaxX();
+    DBFunctionSymbol getDBSTMaxY();
+    DBFunctionSymbol getDBSTMaxZ();
+    DBFunctionSymbol getDBSTMinX();
+    DBFunctionSymbol getDBSTMinY();
+    DBFunctionSymbol getDBSTMinZ();
+    DBFunctionSymbol getDBSTNumGeometries();
 
+    DBFunctionSymbol getDBSTAggBoundingBox();
+    DBFunctionSymbol getDBSTAggBoundingCircle();
+    DBFunctionSymbol getDBSTAggCentroid();
+    DBFunctionSymbol getDBSTAggConvexHull();
+    DBFunctionSymbol getDBSTAggConcaveHull();
+    DBFunctionSymbol getDBSTAggUnion();
+    DBFunctionSymbol getDBSTAccum();
 
     // Time extension - duration arithmetic
     DBFunctionSymbol getDBWeeksBetweenFromDateTime();
