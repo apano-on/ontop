@@ -11,8 +11,8 @@ import javax.annotation.Nonnull;
 
 public class GeofGeometryTypeFunctionSymbolImpl extends AbstractGeofStringFunctionSymbolImpl {
 
-    public GeofGeometryTypeFunctionSymbolImpl(@Nonnull IRI functionIRI, RDFDatatype wktLiteralType, RDFDatatype xsdStringType) {
-        super("GEOF_GEOMETRYTYPE", functionIRI, ImmutableList.of(wktLiteralType), xsdStringType);
+    public GeofGeometryTypeFunctionSymbolImpl(@Nonnull IRI functionIRI, RDFDatatype wktLiteralType, RDFDatatype xsdAnyUri) {
+        super("GEOF_GEOMETRYTYPE", functionIRI, ImmutableList.of(wktLiteralType), xsdAnyUri);
     }
 
     @Override

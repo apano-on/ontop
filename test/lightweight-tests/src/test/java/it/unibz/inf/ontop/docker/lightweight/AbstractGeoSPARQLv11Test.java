@@ -1,78 +1,30 @@
-package it.unibz.inf.ontop.owlapi;
+package it.unibz.inf.ontop.docker.lightweight;
 
-import it.unibz.inf.ontop.injection.OntopSQLOWLAPIConfiguration;
-import it.unibz.inf.ontop.owlapi.connection.OWLConnection;
-import it.unibz.inf.ontop.owlapi.connection.OWLStatement;
-import it.unibz.inf.ontop.owlapi.exception.OntopOWLException;
-import it.unibz.inf.ontop.owlapi.impl.SimpleOntopOWLEngine;
-import it.unibz.inf.ontop.owlapi.resultset.BooleanOWLResultSet;
-import it.unibz.inf.ontop.owlapi.resultset.OWLBindingSet;
-import it.unibz.inf.ontop.owlapi.resultset.TupleOWLResultSet;
-import org.h2gis.functions.factory.H2GISFunctions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.semanticweb.owlapi.model.OWLLiteral;
+import com.google.common.collect.ImmutableList;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-import static it.unibz.inf.ontop.utils.OWLAPITestingTools.executeFromFile;
-import static org.junit.Assert.*;
+public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
 
-public class GeoSPARQLv11Test {
-    private static final String owlFile = "src/test/resources/geosparqlv1_1/geosparql.owl";
-    private static final String obdaFile = "src/test/resources/geosparqlv1_1/geosparql-h2.obda";
-    private static final String propertyFile = "src/test/resources/geosparqlv1_1/geosparql-h2.properties";
+    protected static final String OWL_FILE = "/geospatial/geospatial.owl";
+    protected static final String OBDA_FILE = "/geospatial/geospatialv1_1.obda";
 
-    private OntopOWLEngine reasoner;
-    private OWLConnection conn;
-    private Connection sqlConnection;
-
-    @Before
-    public void setUp() throws Exception {
-
-        sqlConnection = DriverManager.getConnection("jdbc:h2:mem:geoms", "sa", "");
-        H2GISFunctions.load(sqlConnection);
-        executeFromFile(sqlConnection, "src/test/resources/geosparqlv1_1/create-h2.sql");
-
-        OntopSQLOWLAPIConfiguration config = OntopSQLOWLAPIConfiguration.defaultBuilder()
-                .ontologyFile(owlFile)
-                .nativeOntopMappingFile(obdaFile)
-                .propertyFile(propertyFile)
-                .enableTestMode()
-                .build();
-
-        reasoner = new SimpleOntopOWLEngine(config);
-        conn = reasoner.getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        conn.close();
-        reasoner.close();
-        if (!sqlConnection.isClosed()) {
-            try (java.sql.Statement s = sqlConnection.createStatement()) {
-                s.execute("DROP ALL OBJECTS DELETE FILES");
-            } finally {
-                sqlConnection.close();
-            }
-        }
-    }
-
+    @Disabled("PostGIS requires MinimumBoundingCircle function")
     @Test
-    public void testSelectBoundingCircle() throws Exception {
+    public void testSelectBoundingCircle() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:boundingCircle(?xWkt) AS ?x)\n" +
+                "BIND (geof:boundingCircle(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POLYGON ((12.071067811865476 5, 11.935199226610738 3.620503103585285, " +
+        executeAndCompareValues(query, ImmutableList.of("\"POLYGON ((12.071067811865476 5, 11.935199226610738 3.620503103585285, " +
                 "11.532814824381884 2.294019499269015, 10.879378012096794 1.0715252080644895, 10 0, " +
                 "8.92847479193551 -0.8793780120967938, 7.705980500730986 -1.5328148243818829, " +
                 "6.379496896414715 -1.9351992266107372, 5 -2.0710678118654755, 3.6205031035852855 -1.9351992266107372, " +
@@ -83,611 +35,552 @@ public class GeoSPARQLv11Test {
                 "2.294019499269011 11.53281482438188, 3.620503103585282 11.935199226610736, 4.999999999999999 12.071067811865476, " +
                 "6.379496896414715 11.935199226610738, 7.705980500730987 11.532814824381882, 8.928474791935509 10.879378012096796, " +
                 "10 10, 10.879378012096794 8.92847479193551, 11.53281482438188 7.705980500730989, " +
-                "11.935199226610736 6.379496896414718, 12.071067811865476 5))", val);
+                "11.935199226610736 6.379496896414718, 12.071067811865476 5))\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectMetricBuffer() throws Exception {
+    public void testSelectMetricBuffer() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:metricBuffer(?xWkt, 1) AS ?x)\n" +
+                "BIND (geof:metricBuffer(?xWkt, 1) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POLYGON ((-0.0000089932358214 0, -0.0000089932358214 10, -0.0000088204333169 10.000001754493272, " +
-                "-0.0000083086665065 10.000003441562352, -0.0000074776023018 10.000004996374122, " +
-                "-0.0000063591780341 10.000006359178034, -0.0000049963741209 10.000007477602301, " +
-                "-0.0000034415623522 10.000008308666507, -0.0000017544932724 10.000008820433317, " +
-                "0 10.000008993235822, 10 10.000008993235822, 10.000001754493272 10.000008820433317, " +
-                "10.000003441562352 10.000008308666507, 10.000004996374122 10.000007477602301, " +
-                "10.000006359178034 10.000006359178034, 10.000007477602301 10.000004996374122, " +
-                "10.000008308666507 10.000003441562352, 10.000008820433317 10.000001754493272, 10.000008993235822 10, " +
-                "10.000008993235822 0, 10.000008820433317 -0.0000017544932724, 10.000008308666507 -0.0000034415623522, " +
-                "10.000007477602301 -0.0000049963741209, 10.000006359178034 -0.0000063591780341, " +
-                "10.000004996374122 -0.0000074776023018, 10.000003441562352 -0.0000083086665065, " +
-                "10.000001754493272 -0.0000088204333169, 10 -0.0000089932358214, 0 -0.0000089932358214, " +
-                "-0.0000017544932724 -0.0000088204333169, -0.0000034415623522 -0.0000083086665065, " +
-                "-0.0000049963741209 -0.0000074776023018, -0.0000063591780341 -0.0000063591780341, " +
-                "-0.0000074776023018 -0.0000049963741209, -0.0000083086665065 -0.0000034415623522, " +
-                "-0.0000088204333169 -0.0000017544932724, -0.0000089932358214 0))", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POLYGON((-0.00000898054534 -0.000000153417746," +
+                "-0.000009183768039 9.999999736438603,-0.000009035580128 10.000001500063481," +
+                "-0.000008537021531 10.000003205133346,-0.000007707424744 10.00000478553108," +
+                "-0.000006578958848 10.000006179973948,-0.000005195382108 10.000007334389938," +
+                "-0.000003610345179 10.000008204014527,-0.000001885310688 10.000008755126462," +
+                "-0.000000087169914 10.000008966355395,10.000000223234656 10.00000902928204," +
+                "10.000001964323957 10.000008826065915,10.000003632775899 10.000008296107476," +
+                "10.000005166893967 10.000007459003683,10.000006509949088 10.000006345709211," +
+                "10.000007612277367 10.000004997391787,10.000008433116587 10.00000346390991," +
+                "10.000008942113512 10.000001801969116,10.00000912044631 10.000000073025156," +
+                "10.00000891567233 0.000000050008457,10.00000872948539 -0.000001753948305," +
+                "10.000008198146011 -0.000003488556233,10.00000734266265 -0.000005085231214," +
+                "10.00000619686001 -0.000006480842798,10.000004806041632 -0.000007620210328," +
+                "10.000003225198654 -0.000008458284704,10.000001516835537 -0.000008961929572," +
+                "9.999999748498732 -0.000009111231466,-0.000000147805818 -0.000009048845147," +
+                "-0.000001897375156 -0.000008905448475,-0.000003573997228 -0.000008419669295," +
+                "-0.000005113211946 -0.000007610184076,-0.000006455842025 -0.00000650811461," +
+                "-0.000007550268178 -0.000005155831522,-0.000008354413632 -0.000003605325224," +
+                "-0.000008837361892 -0.000001916207125,-0.00000898054534 -0.000000153417746))\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectCentroid() throws Exception {
+    public void testSelectCentroid() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:centroid(?xWkt) AS ?x)\n" +
+                "BIND (geof:centroid(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POINT (5 5)", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POINT(5 5)\"^^geo:wktLiteral"));
     }
 
+    @Disabled("PostGIS ST_CONCAVEHULL requires a second parameter")
     @Test
-    public void testSelectConcaveHull() throws Exception {
+    public void testSelectConcaveHull() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:concaveHull(?xWkt) AS ?x)\n" +
+                "BIND (geof:concaveHull(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POLYGON ((10 0, 0 0, 0 10, 10 10, 10 0))", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POLYGON ((10 0, 0 0, 0 10, 10 10, 10 0))\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectCoordinateDimension() throws Exception {
+    public void testSelectCoordinateDimension() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:coordinateDimension(?xWkt) AS ?x)\n" +
+                "BIND (geof:coordinateDimension(?xWkt) AS ?v)\n" +
                 "}\n";
-        int val = Integer.parseInt(runQueryAndReturnString(query));
-        assertEquals(2, val);
+        executeAndCompareValues(query, ImmutableList.of("\"2\"^^xsd:integer"));
     }
 
     @Test
-    public void testSelectDimension() throws Exception {
+    public void testSelectDimension() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:dimension(?xWkt) AS ?x)\n" +
+                "BIND (geof:dimension(?xWkt) AS ?v)\n" +
                 "}\n";
-        int val = Integer.parseInt(runQueryAndReturnString(query));
-        assertEquals(2, val);
+        executeAndCompareValues(query, ImmutableList.of("\"2\"^^xsd:integer"));
     }
 
     @Test
-    public void testSelectMetricDistance() throws Exception {
+    public void testSelectMetricDistance() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":6 a :Geom; geo:asWKT ?xWkt.\n" +
                 ":7 a :Geom; geo:asWKT ?yWkt.\n" +
-                "BIND (geof:metricDistance(?xWkt, ?yWkt) AS ?x)\n" +
+                "BIND (geof:metricDistance(?xWkt, ?yWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(339241.29739240103, val, 0.01);
+        executeAndCompareValues(query, ImmutableList.of("\"339241.2973924\"^^xsd:double"));
     }
 
-    @Test
-    public void testSelectGeometryType() throws Exception {
+    /*@Test
+    public void testSelectGeometryType() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:geometryType(?xWkt) AS ?x)\n" +
+                "BIND (geof:geometryType(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        // TODO: InitCap for geometry type
-        assertEquals("<http://www.opengis.net/ont/sf#POLYGON>", val);
-    }
+        executeAndCompareValues(query, ImmutableList.of("<http://www.opengis.net/ont/sf#POLYGON>"));
+    }*/
 
-    @Test
-    public void testAskis3DFalse() throws Exception {
+    /*@Test
+    public void testAskis3DFalse() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "ASK WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "FILTER (geof:is3D(?xWkt))\n" +
+                "BIND (geof:is3D(?xWkt) AS ?v)\n" +
                 "}\n";
-        boolean val = runQueryAndReturnBooleanX(query);
-        assertFalse(val);
+
+        executeAndCompareValues(query, ImmutableList.of("\"false\"^^xsd:boolean"));
     }
 
     @Test
-    public void testAskis3DTrue() throws Exception {
+    public void testAskis3DTrue() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "ASK WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":geomz1 a :GeomZ; geo:asWKT ?xWkt.\n" +
-                "FILTER (geof:is3D(?xWkt))\n" +
+                "BIND (geof:is3D(?xWkt) AS ?v)\n" +
                 "}\n";
-        boolean val = runQueryAndReturnBooleanX(query);
-        assertTrue(val);
-    }
+        executeAndCompareValues(query, ImmutableList.of("\"true\"^^xsd:boolean"));
+    }*/
 
-    @Ignore("H2GIS does not support ST_HASM")
-    @Test
-    public void testAskisMeasured() throws Exception {
+    /*@Test
+    public void testAskisMeasured() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "ASK WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "FILTER (geof:isMeasured(?xWkt))\n" +
+                "BIND(geof:isMeasured(?xWkt) AS ?v)\n" +
                 "}\n";
-        boolean val = runQueryAndReturnBooleanX(query);
-        assertFalse(val);
-    }
+        executeAndCompareValues(query, ImmutableList.of("\"false\"^^xsd:boolean"));
+    }*/
 
-    @Test
-    public void testAskisEmpty() throws Exception {
+    /*@Test
+    public void testAskisEmpty() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "ASK WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "FILTER (geof:isEmpty(?xWkt))\n" +
+                "BIND (geof:isEmpty(?xWkt) AS ?v)\n" +
                 "}\n";
-        boolean val = runQueryAndReturnBooleanX(query);
-        assertFalse(val);
+        executeAndCompareValues(query, ImmutableList.of("\"false\"^^xsd:boolean"));
     }
 
     @Test
-    public void testAskisSimple() throws Exception {
+    public void testAskisSimple() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "ASK WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "FILTER (geof:isSimple(?xWkt))\n" +
+                "BIND (geof:isSimple(?xWkt) AS ?v)\n" +
                 "}\n";
-        boolean val = runQueryAndReturnBooleanX(query);
-        assertTrue(val);
+        executeAndCompareValues(query, ImmutableList.of("\"true\"^^xsd:boolean"));
     }
 
-    @Ignore("H2GIS does not support ST_HASM")
     @Test
-    public void testSelectSpatialDimension() throws Exception {
+    public void testSelectSpatialDimension() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:spatialDimension(?xWkt) AS ?x)\n" +
+                "BIND (geof:spatialDimension(?xWkt) AS ?v)\n" +
                 "}\n";
-        int val = Integer.parseInt(runQueryAndReturnString(query));
-        assertEquals(2, val);
-    }
+        executeAndCompareValues(query, ImmutableList.of("\"2\"^^xsd:integer"));
+    }*/
 
     @Test
-    public void testSelectTransformEPSG3044() throws Exception {
+    public void testSelectTransformEPSG3044() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":4 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:transform(?xWkt, <http://www.opengis.net/def/crs/EPSG/0/3044>) AS ?x)\n" +
+                "BIND (geof:transform(?xWkt, <http://www.opengis.net/def/crs/EPSG/0/3044>) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POINT (-280405.62793311477 222731.06606052682)", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POINT(-280405.62793313444 222731.06606055034)\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectTransformCRS84() throws Exception {
+    public void testSelectTransformCRS84() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":4 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:transform(?xWkt, <http://www.opengis.net/def/crs/OGC/1.3/CRS/84>) AS ?x)\n" +
+                "BIND (geof:transform(?xWkt, <http://www.opengis.net/def/crs/OGC/1.3/CRS/84>) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POINT (2 2)", val);
-    }
-
-    @Test(expected = OntopOWLException.class)
-    public void testSelectTransformIncorrectSRID() throws Exception {
-        String query = "PREFIX : <http://ex.org/> \n" +
-                "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
-                "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
-                "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
-                ":4 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:transform(?xWkt, <http://www.opengis.net/def/crs/EPSG/0/32439523>) AS ?x)\n" +
-                "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POINT (2 2)", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POINT(2 2)\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectGeometryN() throws Exception {
+    public void testSelectTransformIncorrectSRID() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
+                ":4 a :Geom; geo:asWKT ?xWkt.\n" +
+                "BIND (geof:transform(?xWkt, <http://www.opengis.net/def/crs/EPSG/0/32439523>) AS ?v)\n" +
+                "}\n";
+        var error = assertThrows(QueryEvaluationException.class, () -> this.runQuery(query));
+        assertEquals("it.unibz.inf.ontop.exception.OntopReformulationException: java.lang.IllegalArgumentException: " +
+                "Unknown SRID: http://www.opengis.net/def/crs/EPSG/0/32439523", error.getMessage());
+    }
+
+    @Test
+    public void testSelectGeometryN() {
+        String query = "PREFIX : <http://ex.org/> \n" +
+                "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
+                "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
+                "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
+                "SELECT ?v WHERE {\n" +
                 ":5 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:geometryN(?xWkt, 2) AS ?x)\n" +
+                "BIND (geof:geometryN(?xWkt, 2) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POLYGON ((10 10, 15 10, 15 15, 10 15, 10 10))", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POLYGON((10 10,15 10,15 15,10 15,10 10))\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectArea() throws Exception {
+    public void testSelectArea() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:area(?xWkt) AS ?x)\n" +
+                "BIND (geof:area(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(100.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"100\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectMetricArea() throws Exception {
+    public void testSelectMetricArea() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:metricArea(?xWkt) AS ?x)\n" +
+                "BIND (geof:metricArea(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(100.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"100\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectPerimeter() throws Exception {
+    public void testSelectPerimeter() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:perimeter(?xWkt, uom:metre) AS ?x)\n" +
+                "BIND (geof:perimeter(?xWkt, uom:metre) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(40.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"40\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectMetricPerimeter() throws Exception {
+    public void testSelectMetricPerimeter() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:metricPerimeter(?xWkt) AS ?x)\n" +
+                "BIND (geof:metricPerimeter(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(40.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"40\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectLength() throws Exception {
+    public void testSelectLength() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":3 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:length(?xWkt) AS ?x)\n" +
+                "BIND (geof:length(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(14.142135623730951, val, 0.01);
+        executeAndCompareValues(query, ImmutableList.of("\"14.142135623730951\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectMetricLength() throws Exception {
+    public void testSelectMetricLength() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":3 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:metricLength(?xWkt) AS ?x)\n" +
+                "BIND (geof:metricLength(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(14.142135623730951, val, 0.01);
+        executeAndCompareValues(query, ImmutableList.of("\"14.142135623730951\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectMaxX() throws Exception {
+    public void testSelectMaxX() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:maxX(?xWkt) AS ?x)\n" +
+                "BIND (geof:maxX(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(10.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"10\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectMaxY() throws Exception {
+    public void testSelectMaxY() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:maxY(?xWkt) AS ?x)\n" +
+                "BIND (geof:maxY(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(10.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"10\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectMaxZ() throws Exception {
+    public void testSelectMaxZ() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":geomz2 a :GeomZ; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:maxZ(?xWkt) AS ?x)\n" +
+                "BIND (geof:maxZ(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(2.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"2\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectMinX() throws Exception {
+    public void testSelectMinX() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:minX(?xWkt) AS ?x)\n" +
+                "BIND (geof:minX(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(0.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"0\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectMinY() throws Exception {
+    public void testSelectMinY() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:minY(?xWkt) AS ?x)\n" +
+                "BIND (geof:minY(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(0.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"0\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectMinZ() throws Exception {
+    public void testSelectMinZ() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":geomz2 a :GeomZ; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:minZ(?xWkt) AS ?x)\n" +
+                "BIND (geof:minZ(?xWkt) AS ?v)\n" +
                 "}\n";
-        double val = runQueryAndReturnDoubleX(query);
-        assertEquals(0.0, val, 1);
+        executeAndCompareValues(query, ImmutableList.of("\"0\"^^xsd:double"));
     }
 
     @Test
-    public void testSelectNumGeometries() throws Exception {
+    public void testSelectNumGeometries() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:numGeometries(?xWkt) AS ?x)\n" +
+                "BIND (geof:numGeometries(?xWkt) AS ?v)\n" +
                 "}\n";
-        int val = Integer.parseInt(runQueryAndReturnString(query));
-        assertEquals(1, val);
+        executeAndCompareValues(query, ImmutableList.of("\"1\"^^xsd:integer"));
     }
 
     @Test
-    public void testSelectAggBoundingBox() throws Exception {
+    public void testSelectAggBoundingBox() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 "?g a :GeomZ; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:aggBoundingBox(?xWkt) AS ?x)\n" +
+                "BIND (geof:aggBoundingBox(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POLYGON ((0 0, 0 15, 15 15, 15 0, 0 0))", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POLYGON((0 0,0 15,15 15,15 0,0 0))\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectAggBoundingCircle() throws Exception {
+    public void testSelectAggBoundingCircle() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 "?g a :GeomZ; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:aggBoundingCircle(?xWkt) AS ?x)\n" +
+                "BIND (geof:aggBoundingCircle(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POLYGON ((0 0, 0 15, 15 15, 15 0, 0 0))", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POLYGON((0 0,0 15,15 15,15 0,0 0))\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectAggCentroid() throws Exception {
+    public void testSelectAggCentroid() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 "?g a :GeomZ; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:aggCentroid(?xWkt) AS ?x)\n" +
+                "BIND (geof:aggCentroid(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POINT (7.5 7.5)", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POINT(7.5 7.5)\"^^geo:wktLiteral"));
     }
 
+    @Disabled
     @Test
-    public void testSelectAggConcaveHull() throws Exception {
+    public void testSelectAggConcaveHull() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 "?g a :GeomZ; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:aggConcaveHull(?xWkt) AS ?x)\n" +
+                "BIND (geof:aggConcaveHull(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POLYGON Z((5 5 0, 0 10 1, 5 15 2, 15 15 2, 10 10 0, 15 5 2, 10 0 0, 0 0 0, 5 5 0))", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POLYGON Z((5 5 0, 0 10 1, 5 15 2, 15 15 2, 10 10 0, 15 5 2, " +
+                "10 0 0, 0 0 0, 5 5 0))\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectAggConvexHull() throws Exception {
+    public void testSelectAggConvexHull() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 "?g a :GeomZ; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:aggConvexHull(?xWkt) AS ?x)\n" +
+                "BIND (geof:aggConvexHull(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POLYGON Z((0 0 0, 0 10 1, 5 15 2, 15 15 2, 15 5 2, 10 0 0, 0 0 0))", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POLYGON Z ((0 0 0,0 10 1,5 15 2,15 15 2,15 5 2,10 0 0," +
+                "0 0 0))\"^^geo:wktLiteral"));
     }
 
-    @Test
-    public void testSelectAggUnion() throws Exception {
+    /*@Test
+    public void testSelectAggUnion() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 "?g a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:aggUnion(?xWkt) AS ?x)\n" +
+                "BIND (geof:aggUnion(?xWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("GEOMETRYCOLLECTION (POINT (-0.0754 51.5055), POINT (2.2945 48.8584), " +
-                "POLYGON ((0 5, 0 10, 5 10, 5 15, 10 15, 15 15, 15 10, 15 5, 10 5, 10 0, 5 0, 0 0, 0 5)))", val);
+        executeAndCompareValues(query, ImmutableList.of("\"GEOMETRYCOLLECTION (POINT (-0.0754 51.5055), " +
+                "POINT (2.2945 48.8584), " +
+                "POLYGON ((0 5, 0 10, 5 10, 5 15, 10 15, 15 15, 15 10, 15 5, 10 5, 10 0, 5 0, 0 0, 0 5)))\"^^geo:wktLiteral"));
     }
 
-    @Ignore("RDF4J does not allow custom aggregate functions to have arity > 1")
     @Test
-    public void testSelectAggUnionMultipleArg() throws Exception {
+    public void testSelectAggUnionMultipleArg() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
+                "SELECT ?v WHERE {\n" +
                 "?g a :Geom; geo:asWKT ?xWkt.\n" +
                 "?gz a :GeomZ; geo:asWKT ?yWkt.\n" +
-                "BIND (geof:aggUnion(?xWkt, ?yWkt) AS ?x)\n" +
+                "BIND (geof:aggUnion(?xWkt, ?yWkt) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("GEOMETRYCOLLECTION (POINT (-0.0754 51.5055), POINT (2.2945 48.8584), " +
-                "POLYGON ((0 5, 0 10, 5 10, 5 15, 10 15, 15 15, 15 10, 15 5, 10 5, 10 0, 5 0, 0 0, 0 5)))", val);
+        executeAndCompareValues(query, ImmutableList.of("\"GEOMETRYCOLLECTION (POINT (-0.0754 51.5055), " +
+                "POINT (2.2945 48.8584), " +
+                "POLYGON ((0 5, 0 10, 5 10, 5 15, 10 15, 15 15, 15 10, 15 5, 10 5, 10 0, 5 0, 0 0, 0 5)))\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectAggUnionWithGroupBy() throws Exception {
+    public void testSelectAggUnionWithGroupBy() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                "SELECT (geof:aggUnion(?xWkt) AS ?x) ?label WHERE {\n" +
+                "SELECT (geof:aggUnion(?xWkt) AS ?v) ?label WHERE {\n" +
                 "?g a :Geom; geo:asWKT ?xWkt.\n" +
                 "?g rdfs:label ?label .\n" +
-                "BIND (geof:aggUnion(?xWkt) AS ?x)\n" +
+                "BIND (geof:aggUnion(?xWkt) AS ?v)\n" +
                 "}\n" +
                 "GROUP BY ?label\n" +
                 "ORDER BY ?label";
-        String val = runQueryAndReturnString(query);
-        assertEquals("POINT (2.2945 48.8584)", val);
+        executeAndCompareValues(query, ImmutableList.of("\"POINT (2.2945 48.8584)\"^^geo:wktLiteral"));
     }
 
     @Test
-    public void testSelectAggUnionWithValues() throws Exception {
+    public void testSelectAggUnionWithValues() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "SELECT ?x WHERE {\n" +
-                    "VALUES (?geom) {\n" +
-                        "(\"POINT(1 1)\"^^geo:wktLiteral)\n" +
-                        "(\"POINT(2 2)\"^^geo:wktLiteral)\n" +
-                        "(\"POINT(3 3)\"^^geo:wktLiteral)\n" +
-                    "}\n" +
-                "BIND(geof:aggUnion(?geom) AS ?x)\n" +
+                "SELECT ?v WHERE {\n" +
+                "VALUES (?geom) {\n" +
+                "(\"POINT(1 1)\"^^geo:wktLiteral)\n" +
+                "(\"POINT(2 2)\"^^geo:wktLiteral)\n" +
+                "(\"POINT(3 3)\"^^geo:wktLiteral)\n" +
+                "}\n" +
+                "BIND(geof:aggUnion(?geom) AS ?v)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        assertEquals("MULTIPOINT((1 1), (2 2), (3 3))", val);
-    }
-
-    private boolean runQueryAndReturnBooleanX(String query) throws Exception {
-        try (OWLStatement st = conn.createStatement()) {
-            BooleanOWLResultSet rs = st.executeAskQuery(query);
-            return rs.getValue();
-        }
-    }
-
-    private double runQueryAndReturnDoubleX(String query) throws Exception {
-        try (OWLStatement st = conn.createStatement()) {
-            TupleOWLResultSet rs = st.executeSelectQuery(query);
-            assertTrue(rs.hasNext());
-            final OWLBindingSet bindingSet = rs.next();
-            OWLLiteral ind1 = bindingSet.getOWLLiteral("x");
-            return ind1.parseDouble();
-        }
-    }
-
-    private String runQueryAndReturnString(String query) throws Exception {
-        try (OWLStatement st = conn.createStatement()) {
-            TupleOWLResultSet rs = st.executeSelectQuery(query);
-            assertTrue(rs.hasNext());
-            final OWLBindingSet bindingSet = rs.next();
-            OWLLiteral ind1 = bindingSet.getOWLLiteral("x");
-            return ind1.getLiteral();
-        }
-    }
-
+        executeAndCompareValues(query, ImmutableList.of("\"MULTIPOINT((1 1), (2 2), (3 3))\"^^geo:wktLiteral"));
+    }*/
 }

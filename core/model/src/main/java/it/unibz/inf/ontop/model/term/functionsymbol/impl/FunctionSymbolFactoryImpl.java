@@ -343,7 +343,7 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                         GEOF.DIMENSION, wktLiteral, xsdInteger, TermFactory::getDBSTDimension),
                 new GeofDistanceFunctionSymbolImpl("GEOF_METRICDISTANCE", GEOF.METRICDISTANCE, wktLiteral,
                         xsdDouble, this),
-                new GeofGeometryTypeFunctionSymbolImpl(GEOF.GEOMETRYTYPE, wktLiteral, xsdString),
+                new GeofGeometryTypeFunctionSymbolImpl(GEOF.GEOMETRYTYPE, wktLiteral, xsdAnyUri),
                 new Geofis3DFunctionSymbolImpl(GEOF.IS3D, wktLiteral, xsdBoolean),
                 new GeofisMeasuredFunctionSymbolImpl(GEOF.ISMEASURED, wktLiteral, xsdBoolean),
                 new GeofisEmptyFunctionSymbolImpl(GEOF.ISEMPTY, wktLiteral, xsdBoolean),

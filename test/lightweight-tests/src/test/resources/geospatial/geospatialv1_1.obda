@@ -1,0 +1,16 @@
+[PrefixDeclaration]
+:		http://ex.org/
+xsd:    http://www.w3.org/2001/XMLSchema#
+geo:    http://www.opengis.net/ont/geosparql#
+geof:   http://www.opengis.net/def/function/geosparql/
+rdfs:   http://www.w3.org/2000/01/rdf-schema#
+
+[MappingDeclaration] @collection [[
+mappingId	geoms
+target		:{ID} a :Geom ; geo:asWKT {THE_NEW_GEOM}^^geo:wktLiteral ; rdfs:label {NAME}^^xsd:string .
+source		SELECT *, ST_SETSRID(GEOM,'4326') AS THE_NEW_GEOM FROM GEOMS;
+
+mappingId	geomsz
+target		:geomz{ID} a :GeomZ ; geo:asWKT {THE_NEW_GEOM}^^geo:wktLiteral ; rdfs:label {NAME}^^xsd:string .
+source		SELECT *, ST_SETSRID(GEOMZ,'4326') AS THE_NEW_GEOM FROM GEOMSZ;
+]]
