@@ -833,6 +833,16 @@ public class TermFactoryImpl implements TermFactory {
 	}
 
 	@Override
+	public ImmutableTerm getDBSTNDims(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTNDims(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSThasZ(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSThasZ(), ImmutableList.of(arg1));
+	}
+
+	@Override
 	public ImmutableTerm getDBSTisSimple(ImmutableTerm arg1) {
 		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTisSimple(), ImmutableList.of(arg1));
 	}
@@ -930,6 +940,11 @@ public class TermFactoryImpl implements TermFactory {
 	@Override
 	public ImmutableTerm getDBSTAccum(ImmutableTerm arg1) {
 		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTAccum(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTCollect(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTCollect(), ImmutableList.of(arg1));
 	}
 
 	/**

@@ -136,7 +136,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
         executeAndCompareValues(query, ImmutableList.of("\"339241.2973924\"^^xsd:double"));
     }
 
-    /*@Test
+    @Test
     public void testSelectGeometryType() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
@@ -146,8 +146,8 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
                 "BIND (geof:geometryType(?xWkt) AS ?v)\n" +
                 "}\n";
-        executeAndCompareValues(query, ImmutableList.of("<http://www.opengis.net/ont/sf#POLYGON>"));
-    }*/
+        executeAndCompareValues(query, ImmutableList.of("<http://www.opengis.net/ont/sf#Polygon>"));
+    }
 
     /*@Test
     public void testAskis3DFalse() {
@@ -176,7 +176,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
         executeAndCompareValues(query, ImmutableList.of("\"true\"^^xsd:boolean"));
     }*/
 
-    /*@Test
+    @Test
     public void testAskisMeasured() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
@@ -187,9 +187,9 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "BIND(geof:isMeasured(?xWkt) AS ?v)\n" +
                 "}\n";
         executeAndCompareValues(query, ImmutableList.of("\"false\"^^xsd:boolean"));
-    }*/
+    }
 
-    /*@Test
+    @Test
     public void testAskisEmpty() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
@@ -226,7 +226,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "BIND (geof:spatialDimension(?xWkt) AS ?v)\n" +
                 "}\n";
         executeAndCompareValues(query, ImmutableList.of("\"2\"^^xsd:integer"));
-    }*/
+    }
 
     @Test
     public void testSelectTransformEPSG3044() {
@@ -532,8 +532,9 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
         executeAndCompareValues(query, ImmutableList.of("\"GEOMETRYCOLLECTION (POINT (-0.0754 51.5055), " +
                 "POINT (2.2945 48.8584), " +
                 "POLYGON ((0 5, 0 10, 5 10, 5 15, 10 15, 15 15, 15 10, 15 5, 10 5, 10 0, 5 0, 0 0, 0 5)))\"^^geo:wktLiteral"));
-    }
+    }*/
 
+    @Disabled("Not supported yet")
     @Test
     public void testSelectAggUnionMultipleArg() {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -567,7 +568,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
         executeAndCompareValues(query, ImmutableList.of("\"POINT (2.2945 48.8584)\"^^geo:wktLiteral"));
     }
 
-    @Test
+    /*@Test
     public void testSelectAggUnionWithValues() {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +

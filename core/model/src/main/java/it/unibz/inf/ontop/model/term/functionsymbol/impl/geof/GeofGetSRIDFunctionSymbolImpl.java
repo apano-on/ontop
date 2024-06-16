@@ -9,7 +9,7 @@ import org.apache.commons.rdf.api.IRI;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
-public class GeofGetSRIDFunctionSymbolImpl extends AbstractGeofIRIFunctionSymbolImpl {//AbstractGeofIRIFunctionSymbolImpl {
+public class GeofGetSRIDFunctionSymbolImpl extends AbstractGeofAnyURIFunctionSymbolImpl {
 
     public static final String defaultSRID = "http://www.opengis.net/def/crs/OGC/1.3/CRS84";
 

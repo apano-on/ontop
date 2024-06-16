@@ -381,6 +381,8 @@ public interface DBFunctionSymbolFactory {
     DBBooleanFunctionSymbol getDBSTis3D();
     DBBooleanFunctionSymbol getDBSTisEmpty();
     DBBooleanFunctionSymbol getDBSTisMeasured();
+    DBFunctionSymbol getDBSTNDims();
+    DBBooleanFunctionSymbol getDBSThasZ();
     DBBooleanFunctionSymbol getDBSTisSimple();
     DBFunctionSymbol getDBSTTransform();
     DBFunctionSymbol getDBSTLength();
@@ -402,6 +404,7 @@ public interface DBFunctionSymbolFactory {
     DBFunctionSymbol getDBSTAggConcaveHull();
     DBFunctionSymbol getDBSTAggUnion();
     DBFunctionSymbol getDBSTAccum();
+    DBFunctionSymbol getDBSTCollect();
 
     // Time extension - duration arithmetic
     DBFunctionSymbol getDBWeeksBetweenFromDateTime();

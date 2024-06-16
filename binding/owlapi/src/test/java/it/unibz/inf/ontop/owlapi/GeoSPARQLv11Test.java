@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 
 import java.sql.Connection;
@@ -196,8 +197,8 @@ public class GeoSPARQLv11Test {
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
                 "BIND (geof:geometryType(?xWkt) AS ?x)\n" +
                 "}\n";
-        String val = runQueryAndReturnString(query);
-        // TODO: InitCap for geometry type
+        String val = runQueryAndReturnIRI(query);
+        // NOTE: No GeoSPARQL restriction on polygon name depending on engine
         assertEquals("<http://www.opengis.net/ont/sf#POLYGON>", val);
     }
 
@@ -229,7 +230,6 @@ public class GeoSPARQLv11Test {
         assertTrue(val);
     }
 
-    @Ignore("H2GIS does not support ST_HASM")
     @Test
     public void testAskisMeasured() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -272,7 +272,6 @@ public class GeoSPARQLv11Test {
         assertTrue(val);
     }
 
-    @Ignore("H2GIS does not support ST_HASM")
     @Test
     public void testSelectSpatialDimension() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -687,6 +686,16 @@ public class GeoSPARQLv11Test {
             final OWLBindingSet bindingSet = rs.next();
             OWLLiteral ind1 = bindingSet.getOWLLiteral("x");
             return ind1.getLiteral();
+        }
+    }
+
+    private String runQueryAndReturnIRI(String query) throws Exception {
+        try (OWLStatement st = conn.createStatement()) {
+            TupleOWLResultSet rs = st.executeSelectQuery(query);
+            assertTrue(rs.hasNext());
+            final OWLBindingSet bindingSet = rs.next();
+            OWLIndividual ind1 = bindingSet.getOWLIndividual("x");
+            return ind1.toString();
         }
     }
 

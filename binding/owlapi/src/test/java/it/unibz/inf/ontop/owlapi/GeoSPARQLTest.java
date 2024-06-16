@@ -836,9 +836,7 @@ public class GeoSPARQLTest {
                 "BIND(geof:intersection(?xWkt, ?yWkt) as ?x) .\n" +
                 "}\n";
         String val = runQueryAndReturnString(query);
-        //assertFalse(val.startsWith("POLYGON ((0.9100"));
-        //assertEquals("POLYGON ((2 2, 7 2, 7 5, 2 5, 2 2))", val);
-        assertEquals("POLYGON ((2 2, 2 5, 7 5, 7 2, 2 2))", val);
+        assertEquals("POLYGON ((2 5, 7 5, 7 2, 2 2, 2 5))", val);
     }
 
     @Test // polygon vs. polygon intersection is a line
@@ -977,7 +975,7 @@ public class GeoSPARQLTest {
                 "}\n";
         String val = runQueryAndReturnString(query);
         // Output is polygon with hole
-        assertEquals("POLYGON ((1 1, 1 7, 8 7, 8 1, 1 1), (2 2, 7 2, 7 5, 2 5, 2 2))", val);
+        assertEquals("POLYGON ((1 7, 8 7, 8 1, 1 1, 1 7), (7 2, 7 5, 2 5, 2 2, 7 2))", val);
     }
 
     @Test // line vs. line difference - remainder of first line
@@ -1008,8 +1006,7 @@ public class GeoSPARQLTest {
                 "BIND(geof:difference(?xWkt, ?yWkt) as ?x) .\n" +
                 "}\n";
         String val = runQueryAndReturnString(query);
-        // In theory no effect, in practice the intersecting line adds 2 vertices
-        assertEquals("POLYGON ((8 2, 8 1, 1 1, 1 2, 1 7, 8 7, 8 2))", val);
+        assertEquals("POLYGON ((8 1, 1 1, 1 2, 1 7, 8 7, 8 2, 8 1))", val);
     }
 
     @Test // polygon vs. point difference - no effect
@@ -1025,7 +1022,7 @@ public class GeoSPARQLTest {
                 "}\n";
         String val = runQueryAndReturnString(query);
         // No effect
-        assertEquals("POLYGON ((2 2, 2 5, 7 5, 7 2, 2 2))", val);
+        assertEquals("POLYGON ((2 5, 7 5, 7 2, 2 2, 2 5))", val);
     }
 
     @Test // polygon vs. polygon difference - remainder of first polygon
@@ -1041,7 +1038,7 @@ public class GeoSPARQLTest {
                 "}\n";
         String val = runQueryAndReturnString(query);
         // No effect
-        assertEquals("POLYGON ((1 1, 1 7, 8 7, 8 1, 1 1), (2 2, 7 2, 7 5, 2 5, 2 2))", val);
+        assertEquals("POLYGON ((1 7, 8 7, 8 1, 1 1, 1 7), (7 2, 7 5, 2 5, 2 2, 7 2))", val);
     }
 
     @Test // polygon vs. polygon difference - remainder of first polygon
@@ -1057,7 +1054,7 @@ public class GeoSPARQLTest {
                 "}\n";
         String val = runQueryAndReturnString(query);
         // No effect
-        assertEquals("POLYGON ((1 1, 1 7, 8 7, 8 1, 1 1), (2 2, 7 2, 7 5, 2 5, 2 2))", val);
+        assertEquals("POLYGON ((1 7, 8 7, 8 1, 1 1, 1 7), (7 2, 7 5, 2 5, 2 2, 7 2))", val);
     }
 
     @Test // Polygon vs Polygon
@@ -1073,7 +1070,7 @@ public class GeoSPARQLTest {
                 "}\n";
         String val = runQueryAndReturnString(query);
         // Multipolygon output
-        assertEquals("MULTIPOLYGON (((7 3, 7 2, 2 2, 2 5, 3 5, 3 3, 7 3)), ((7 3, 7 5, 3 5, 3 6, 8 6, 8 3, 7 3)))", val);
+        assertEquals("MULTIPOLYGON (((7 2, 2 2, 2 5, 3 5, 3 3, 7 3, 7 2)), ((7 5, 3 5, 3 6, 8 6, 8 3, 7 3, 7 5)))", val);
     }
 
     @Test // Line vs Line
@@ -1105,7 +1102,7 @@ public class GeoSPARQLTest {
                 "}\n";
         String val = runQueryAndReturnString(query);
         // All vertices are preserved in union
-        assertEquals("POLYGON ((3 3, 3 0, 0 0, 0 3, 0 6, 3 6, 3 3))", val);
+        assertEquals("POLYGON ((3 0, 0 0, 0 3, 0 6, 3 6, 3 3, 3 0))", val);
     }
 
     @Test // line + line

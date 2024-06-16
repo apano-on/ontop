@@ -56,9 +56,9 @@ public class GeofDefaultAggFunctionSymbolImpl extends AbstractGeofAggregateFunct
 
     protected ImmutableTerm computeDBTerm(ImmutableList<ImmutableTerm> subLexicalTerms, ImmutableList<ImmutableTerm> typeTerms, TermFactory termFactory) {
         BiFunction<TermFactory, ImmutableTerm, ImmutableTerm> dbTermFctSTAsText = TermFactory::getDBAsText;
-        BiFunction<TermFactory, ImmutableTerm, ImmutableTerm> dbTermFctSTAccum = TermFactory::getDBSTAccum;
+        BiFunction<TermFactory, ImmutableTerm, ImmutableTerm> dbTermFctSTCollect = TermFactory::getDBSTCollect;
         WKTLiteralValue v0 = GeoUtils.extractWKTLiteralValue(termFactory, subLexicalTerms.get(0));
-        ImmutableTerm geoTerm = dbTermFctSTAccum.apply(termFactory, v0.getGeometry());
+        ImmutableTerm geoTerm = dbTermFctSTCollect.apply(termFactory, v0.getGeometry());
         geoTerm = dbTermFct.apply(termFactory, geoTerm);
         geoTerm = dbTermFctSTAsText.apply(termFactory, geoTerm);
         return geoTerm.simplify();

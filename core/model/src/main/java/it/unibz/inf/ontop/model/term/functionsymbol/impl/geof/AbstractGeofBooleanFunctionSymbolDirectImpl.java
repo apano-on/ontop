@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 // direct implementation by translating to a corresponding DB function
-public abstract class AbstractGeofBooleanFunctionSymbolDirectImpl<T extends Object> extends AbstractGeofBooleanFunctionSymbolImpl {
+public abstract class AbstractGeofBooleanFunctionSymbolDirectImpl<T> extends AbstractGeofBooleanFunctionSymbolImpl {
 
     protected AbstractGeofBooleanFunctionSymbolDirectImpl(String functionSymbolName, IRI functionIRI, ImmutableList<TermType> inputTypes, RDFDatatype xsdBooleanType) {
         super(functionSymbolName, functionIRI, inputTypes, xsdBooleanType);
@@ -19,7 +19,8 @@ public abstract class AbstractGeofBooleanFunctionSymbolDirectImpl<T extends Obje
 
 
     @Override
-    protected ImmutableTerm computeDBBooleanTerm(ImmutableList<ImmutableTerm> subLexicalTerms, ImmutableList<ImmutableTerm> typeTerms, TermFactory termFactory) {
+    protected ImmutableTerm computeDBBooleanTerm(ImmutableList<ImmutableTerm> subLexicalTerms,
+                                                 ImmutableList<ImmutableTerm> typeTerms, TermFactory termFactory) {
 
         Object dbFunction = getDBFunction(termFactory);
         WKTLiteralValue v0 = GeoUtils.extractWKTLiteralValue(termFactory, subLexicalTerms.get(0));
