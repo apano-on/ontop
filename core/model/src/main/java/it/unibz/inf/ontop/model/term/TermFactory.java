@@ -631,7 +631,7 @@ public interface TermFactory {
 	 * GeoSPARQL 1.1
 	 */
 	ImmutableTerm getDBSTBoundingCircle(ImmutableTerm arg1);
-	ImmutableTerm getDBSTConcaveHull(ImmutableTerm arg1);
+	ImmutableTerm getDBSTConcaveHull(ImmutableTerm arg1, ImmutableTerm arg2);
 	ImmutableTerm getDBSTCentroid(ImmutableTerm arg1);
 	ImmutableTerm getDBSTCoordinateDimension(ImmutableTerm arg1);
 	ImmutableTerm getDBSTDimension(ImmutableTerm arg1);
@@ -639,8 +639,6 @@ public interface TermFactory {
 	ImmutableTerm getDBSTis3D(ImmutableTerm arg1);
 	ImmutableTerm getDBSTisEmpty(ImmutableTerm arg1);
 	ImmutableTerm getDBSTisMeasured(ImmutableTerm arg1);
-	ImmutableTerm getDBSTNDims(ImmutableTerm arg1);
-	ImmutableTerm getDBSThasZ(ImmutableTerm arg1);
 	ImmutableTerm getDBSTisSimple(ImmutableTerm arg1);
 	ImmutableTerm getDBSTTransform(ImmutableTerm arg1, ImmutableTerm arg2);
 
@@ -662,6 +660,7 @@ public interface TermFactory {
 	ImmutableTerm getDBSTAggConvexHull(ImmutableTerm arg1);
 	ImmutableTerm getDBSTAggConcaveHull(ImmutableTerm arg1);
 	ImmutableTerm getDBSTAggUnion(ImmutableTerm arg1);
+	ImmutableTerm getDBSTUnaryUnion(ImmutableTerm arg1);
 	ImmutableTerm getDBSTAccum(ImmutableTerm arg1);
 	ImmutableTerm getDBSTCollect(ImmutableTerm arg1);
 

@@ -87,6 +87,7 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     private static final String ST_DIFFERENCE = "ST_DIFFERENCE";
     private static final String ST_SYMDIFFERENCE = "ST_SYMDIFFERENCE";
     private static final String ST_UNION = "ST_UNION";
+    private static final String ST_UNARYUNION = "ST_UNARYUNION";
     private static final String ST_ACCUM = "ST_ACCUM";
     private static final String ST_COLLECT = "ST_COLLECT";
     private static final String ST_RELATE = "ST_RELATE";
@@ -95,7 +96,7 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     /**
      * GeoSPARQL 1.1
      */
-    private static final String ST_BOUNDINGCIRCLE = "ST_BOUNDINGCIRCLE";
+    private static final String ST_BOUNDINGCIRCLE = "ST_MINIMUMBOUNDINGCIRCLE";
     private static final String ST_CONCAVEHULL = "ST_CONCAVEHULL";
     private static final String ST_CENTROID = "ST_CENTROID";
     private static final String ST_COORDDIM = "ST_COORDDIM";
@@ -426,9 +427,9 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
                 abstractRootDBType);
         builder.put(ST_BOUNDINGCIRCLE, 1, boundingCircleSymbol);
 
-        DBFunctionSymbol concaveHullSymbol = new GeoDBTypedFunctionSymbol(ST_CONCAVEHULL, 1, dbStringType, false,
+        DBFunctionSymbol concaveHullSymbol = new GeoDBTypedFunctionSymbol(ST_CONCAVEHULL, 2, dbStringType, false,
                 abstractRootDBType);
-        builder.put(ST_CONCAVEHULL, 1, concaveHullSymbol);
+        builder.put(ST_CONCAVEHULL, 2, concaveHullSymbol);
 
         DBFunctionSymbol centroidSymbol = new GeoDBTypedFunctionSymbol(ST_CENTROID, 1, dbStringType, false,
                 abstractRootDBType);
@@ -457,14 +458,6 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
         DBFunctionSymbol isMeasuredFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_ISMEASURED, 1, dbBooleanType,
                 abstractRootDBType);
         builder.put(ST_ISMEASURED, 1, isMeasuredFunctionSymbol);
-
-        DBFunctionSymbol nDimsFunctionSymbol = new GeoDBTypedFunctionSymbol(ST_NDIMS, 1, dbIntegerType, false,
-                abstractRootDBType);
-        builder.put(ST_NDIMS, 1, nDimsFunctionSymbol);
-
-        DBFunctionSymbol hasZFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_Z, 1, dbBooleanType,
-                abstractRootDBType);
-        builder.put(ST_Z, 1, hasZFunctionSymbol);
 
         DBFunctionSymbol isSimpleFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_ISSIMPLE, 1, dbBooleanType,
                 abstractRootDBType);
@@ -541,6 +534,10 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
         DBFunctionSymbol aggUnionSymbol = new GeoAggDBTypedFunctionSymbol("ST_UNION_AGG",
                 ImmutableList.of(dbStringType), dbStringType, false);
         builder.put("ST_UNION_AGG", 1, aggUnionSymbol);
+
+        DBFunctionSymbol unaryUnionSymbol = new GeoAggDBTypedFunctionSymbol(ST_UNARYUNION, ImmutableList.of(dbStringType),
+                dbStringType, false);
+        builder.put(ST_UNARYUNION, 1, unaryUnionSymbol);
 
         DBFunctionSymbol accumSymbol = new GeoAggDBTypedFunctionSymbol(ST_ACCUM, ImmutableList.of(dbStringType),
                 dbStringType, false);
@@ -1396,7 +1393,7 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
 
     @Override
     public DBFunctionSymbol getDBSTConcaveHull() {
-        return getRegularDBFunctionSymbol(ST_CONCAVEHULL, 1); }
+        return getRegularDBFunctionSymbol(ST_CONCAVEHULL, 2); }
 
     @Override
     public DBFunctionSymbol getDBSTCentroid() {
@@ -1425,14 +1422,6 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     @Override
     public DBBooleanFunctionSymbol getDBSTisMeasured() {
         return (DBBooleanFunctionSymbol) getRegularDBFunctionSymbol(ST_ISMEASURED, 1); }
-
-    @Override
-    public DBFunctionSymbol getDBSTNDims() {
-        return getRegularDBFunctionSymbol(ST_NDIMS, 1); }
-
-    @Override
-    public DBBooleanFunctionSymbol getDBSThasZ() {
-        return (DBBooleanFunctionSymbol) getRegularDBFunctionSymbol(ST_Z, 1); }
 
     @Override
     public DBBooleanFunctionSymbol getDBSTisSimple() {
@@ -1492,7 +1481,10 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     public DBFunctionSymbol getDBSTAggConvexHull() { return getRegularDBFunctionSymbol(ST_CONVEXHULL, 1); }
 
     @Override
-    public DBFunctionSymbol getDBSTAggUnion() { return getRegularDBFunctionSymbol(ST_UNION, 1); }
+    public DBFunctionSymbol getDBSTAggUnion() { return getRegularDBFunctionSymbol("ST_UNION_AGG", 1); }
+
+    @Override
+    public DBFunctionSymbol getDBSTUnaryUnion() { return getRegularDBFunctionSymbol(ST_UNARYUNION, 1); }
 
     @Override
     public DBFunctionSymbol getDBSTAccum() { return getRegularDBFunctionSymbol(ST_ACCUM, 1); }

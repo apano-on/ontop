@@ -381,8 +381,6 @@ public interface DBFunctionSymbolFactory {
     DBBooleanFunctionSymbol getDBSTis3D();
     DBBooleanFunctionSymbol getDBSTisEmpty();
     DBBooleanFunctionSymbol getDBSTisMeasured();
-    DBFunctionSymbol getDBSTNDims();
-    DBBooleanFunctionSymbol getDBSThasZ();
     DBBooleanFunctionSymbol getDBSTisSimple();
     DBFunctionSymbol getDBSTTransform();
     DBFunctionSymbol getDBSTLength();
@@ -403,6 +401,7 @@ public interface DBFunctionSymbolFactory {
     DBFunctionSymbol getDBSTAggConvexHull();
     DBFunctionSymbol getDBSTAggConcaveHull();
     DBFunctionSymbol getDBSTAggUnion();
+    DBFunctionSymbol getDBSTUnaryUnion();
     DBFunctionSymbol getDBSTAccum();
     DBFunctionSymbol getDBSTCollect();
 

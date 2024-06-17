@@ -883,16 +883,6 @@ public class MockupDBFunctionSymbolFactory extends AbstractDBFunctionSymbolFacto
     }
 
     @Override
-    public DBFunctionSymbol getDBSTNDims() {
-        throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
-    }
-
-    @Override
-    public DBBooleanFunctionSymbol getDBSThasZ() {
-        throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
-    }
-
-    @Override
     public DBBooleanFunctionSymbol getDBSTisSimple() {
         throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
     }
@@ -984,6 +974,11 @@ public class MockupDBFunctionSymbolFactory extends AbstractDBFunctionSymbolFacto
 
     @Override
     public DBFunctionSymbol getDBSTAggUnion() {
+        throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
+    }
+
+    @Override
+    public DBFunctionSymbol getDBSTUnaryUnion() {
         throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
     }
 

@@ -63,7 +63,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectBoundingCircle() throws Exception {
+    public void testBoundingCircle() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -88,7 +88,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMetricBuffer() throws Exception {
+    public void testMetricBuffer() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -117,7 +117,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectCentroid() throws Exception {
+    public void testCentroid() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -131,7 +131,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectConcaveHull() throws Exception {
+    public void testConcaveHull() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -145,7 +145,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectCoordinateDimension() throws Exception {
+    public void testCoordinateDimension() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -159,7 +159,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectDimension() throws Exception {
+    public void testDimension() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -173,7 +173,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMetricDistance() throws Exception {
+    public void testMetricDistance() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -188,7 +188,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectGeometryType() throws Exception {
+    public void testGeometryType() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -203,49 +203,49 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testAskis3DFalse() throws Exception {
+    public void testis3DFalse() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "ASK WHERE {\n" +
+                "SELECT ?x WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "FILTER (geof:is3D(?xWkt))\n" +
+                "BIND (geof:is3D(?xWkt) AS ?x)\n" +
                 "}\n";
-        boolean val = runQueryAndReturnBooleanX(query);
-        assertFalse(val);
-    }
-
-    @Test
-    public void testAskis3DTrue() throws Exception {
-        String query = "PREFIX : <http://ex.org/> \n" +
-                "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
-                "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
-                "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "ASK WHERE {\n" +
-                ":geomz1 a :GeomZ; geo:asWKT ?xWkt.\n" +
-                "FILTER (geof:is3D(?xWkt))\n" +
-                "}\n";
-        boolean val = runQueryAndReturnBooleanX(query);
+        boolean val = runQueryAndReturnString(query).equals("false");
         assertTrue(val);
     }
 
     @Test
-    public void testAskisMeasured() throws Exception {
+    public void testis3DTrue() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
-                "ASK WHERE {\n" +
-                ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "FILTER (geof:isMeasured(?xWkt))\n" +
+                "SELECT ?x WHERE {\n" +
+                ":geomz1 a :GeomZ; geo:asWKT ?xWkt.\n" +
+                "BIND (geof:is3D(?xWkt) AS ?x)\n" +
                 "}\n";
-        boolean val = runQueryAndReturnBooleanX(query);
+        boolean val = runQueryAndReturnString(query).equals("true");
+        assertTrue(val);
+    }
+
+    @Test
+    public void testisMeasured() throws Exception {
+        String query = "PREFIX : <http://ex.org/> \n" +
+                "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
+                "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
+                "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
+                "SELECT ?x WHERE {\n" +
+                ":1 a :Geom; geo:asWKT ?xWkt.\n" +
+                "BIND (geof:isMeasured(?xWkt) AS ?x)\n" +
+                "}\n";
+        boolean val = runQueryAndReturnString(query).equals("true");
         assertFalse(val);
     }
 
     @Test
-    public void testAskisEmpty() throws Exception {
+    public void testisEmpty() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -259,7 +259,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testAskisSimple() throws Exception {
+    public void testisSimple() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -273,7 +273,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectSpatialDimension() throws Exception {
+    public void testSpatialDimension() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -287,7 +287,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectTransformEPSG3044() throws Exception {
+    public void testTransformEPSG3044() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -301,7 +301,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectTransformCRS84() throws Exception {
+    public void testTransformCRS84() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -315,7 +315,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test(expected = OntopOWLException.class)
-    public void testSelectTransformIncorrectSRID() throws Exception {
+    public void testTransformIncorrectSRID() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -329,7 +329,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectGeometryN() throws Exception {
+    public void testGeometryN() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -343,7 +343,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectArea() throws Exception {
+    public void testArea() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -357,7 +357,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMetricArea() throws Exception {
+    public void testMetricArea() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -371,7 +371,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectPerimeter() throws Exception {
+    public void testPerimeter() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -385,7 +385,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMetricPerimeter() throws Exception {
+    public void testMetricPerimeter() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -399,7 +399,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectLength() throws Exception {
+    public void testLength() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -413,7 +413,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMetricLength() throws Exception {
+    public void testMetricLength() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -427,7 +427,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMaxX() throws Exception {
+    public void testMaxX() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -441,7 +441,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMaxY() throws Exception {
+    public void testMaxY() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -455,7 +455,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMaxZ() throws Exception {
+    public void testMaxZ() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -469,7 +469,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMinX() throws Exception {
+    public void testMinX() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -483,7 +483,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMinY() throws Exception {
+    public void testMinY() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -497,7 +497,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectMinZ() throws Exception {
+    public void testMinZ() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -511,7 +511,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectNumGeometries() throws Exception {
+    public void testNumGeometries() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -525,7 +525,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectAggBoundingBox() throws Exception {
+    public void testAggBoundingBox() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -539,7 +539,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectAggBoundingCircle() throws Exception {
+    public void testAggBoundingCircle() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -553,7 +553,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectAggCentroid() throws Exception {
+    public void testAggCentroid() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -567,7 +567,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectAggConcaveHull() throws Exception {
+    public void testAggConcaveHull() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -581,7 +581,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectAggConvexHull() throws Exception {
+    public void testAggConvexHull() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -595,7 +595,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectAggUnion() throws Exception {
+    public void testAggUnion() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -611,7 +611,7 @@ public class GeoSPARQLv11Test {
 
     @Ignore("RDF4J does not allow custom aggregate functions to have arity > 1")
     @Test
-    public void testSelectAggUnionMultipleArg() throws Exception {
+    public void testAggUnionMultipleArg() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -627,7 +627,7 @@ public class GeoSPARQLv11Test {
     }
 
     @Test
-    public void testSelectAggUnionWithGroupBy() throws Exception {
+    public void testAggUnionWithGroupBy() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
@@ -644,8 +644,9 @@ public class GeoSPARQLv11Test {
         assertEquals("POINT (2.2945 48.8584)", val);
     }
 
+    @Ignore("Not supported for H2GIS")
     @Test
-    public void testSelectAggUnionWithValues() throws Exception {
+    public void testAggUnionWithValues() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
                 "PREFIX geo: <http://www.opengis.net/ont/geosparql#>\n" +
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +

@@ -793,8 +793,8 @@ public class TermFactoryImpl implements TermFactory {
 	}
 
 	@Override
-	public ImmutableTerm getDBSTConcaveHull(ImmutableTerm arg1) {
-		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTConcaveHull(), ImmutableList.of(arg1));
+	public ImmutableTerm getDBSTConcaveHull(ImmutableTerm arg1, ImmutableTerm arg2) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTConcaveHull(), ImmutableList.of(arg1, arg2));
 	}
 
 	@Override
@@ -830,16 +830,6 @@ public class TermFactoryImpl implements TermFactory {
 	@Override
 	public ImmutableTerm getDBSTisMeasured(ImmutableTerm arg1) {
 		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTisMeasured(), ImmutableList.of(arg1));
-	}
-
-	@Override
-	public ImmutableTerm getDBSTNDims(ImmutableTerm arg1) {
-		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTNDims(), ImmutableList.of(arg1));
-	}
-
-	@Override
-	public ImmutableTerm getDBSThasZ(ImmutableTerm arg1) {
-		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSThasZ(), ImmutableList.of(arg1));
 	}
 
 	@Override
@@ -935,6 +925,11 @@ public class TermFactoryImpl implements TermFactory {
 	@Override
 	public ImmutableTerm getDBSTAggUnion(ImmutableTerm arg1) {
 		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTAggUnion(), ImmutableList.of(arg1));
+	}
+
+	@Override
+	public ImmutableTerm getDBSTUnaryUnion(ImmutableTerm arg1) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getDBSTUnaryUnion(), ImmutableList.of(arg1));
 	}
 
 	@Override
