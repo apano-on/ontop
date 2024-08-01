@@ -28,30 +28,9 @@ public class GeofisMeasuredFunctionSymbolImpl extends AbstractGeofBooleanFunctio
 
         WKTLiteralValue v0 = GeoUtils.extractWKTLiteralValue(termFactory, subLexicalTerms.get(0));
 
-        // If i) ST_NDIMS > 2, ii) ST_Z is FALSE, then the geometry is measured
-        // Covers most cases but not robust cases with missing x or y coordinates
-        ImmutableExpression condition = termFactory.getConjunction(
-                termFactory.getDBNumericInequality(GT,
-                        termFactory.getDBSTCoordinateDimension(v0.getGeometry()),
-                        termFactory.getDBIntegerConstant(2)),
-                termFactory.getDBIsNotNull(
-                        termFactory.getDBSTMinZ(v0.getGeometry()))
-                );
-
-        /*ImmutableExpression trueExpression = termFactory.getIsTrue(termFactory.getDBBooleanConstant(true));
-        ImmutableExpression falseExpression = termFactory.getIsTrue(termFactory.getDBBooleanConstant(false));
-
-        return termFactory.getDBBooleanCase(
-                ImmutableMap.of(condition, trueExpression).entrySet().stream(),
-                trueExpression,
-                false
-        );*/
-        return termFactory.getIfThenElse(condition,
-                termFactory.getDBBooleanConstant(true),
-                termFactory.getDBBooleanConstant(false));
+        return termFactory.getDBSTisMeasured(v0.getGeometry()).simplify();
     }
 
-    //TODO: ST_HASM will be supported in the future in PostGIS 3.5.0
     @Override
     public Function<ImmutableTerm, ImmutableTerm> getDBFunction(TermFactory termFactory) {
         return termFactory::getDBSTisMeasured;

@@ -22,19 +22,12 @@ public class Geofis3DFunctionSymbolImpl extends AbstractGeofBooleanFunctionSymbo
     protected ImmutableTerm computeDBBooleanTerm(ImmutableList<ImmutableTerm> subLexicalTerms,
                                                  ImmutableList<ImmutableTerm> typeTerms, TermFactory termFactory) {
 
-        Object dbFunction = getDBFunction(termFactory);
-        WKTLiteralValue v0 = GeoUtils.extractWKTLiteralValue(termFactory, subLexicalTerms.get(0));
-        ImmutableExpression condition = termFactory.getConjunction(
-                termFactory.getDBNumericInequality(GT,
-                        termFactory.getDBSTCoordinateDimension(v0.getGeometry()),
-                        termFactory.getDBIntegerConstant(2)),
-                termFactory.getDBIsNotNull(
-                        ((Function<ImmutableTerm, ImmutableTerm>) dbFunction).apply(v0.getGeometry()))
-        );
+        if (subLexicalTerms.size() > 1) {
+            throw new IllegalArgumentException("GEOF_IS_3D expects only one argument");
+        }
 
-        return termFactory.getIfThenElse(condition,
-                termFactory.getDBBooleanConstant(true),
-                termFactory.getDBBooleanConstant(false));
+        WKTLiteralValue v0 = GeoUtils.extractWKTLiteralValue(termFactory, subLexicalTerms.get(0));
+        return termFactory.getDBSTis3D(v0.getGeometry()).simplify();
     }
 
     @Override

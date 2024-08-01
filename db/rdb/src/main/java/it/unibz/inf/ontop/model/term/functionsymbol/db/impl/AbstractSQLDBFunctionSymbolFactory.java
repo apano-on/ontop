@@ -102,11 +102,10 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     private static final String ST_COORDDIM = "ST_COORDDIM";
     private static final String ST_DIMENSION = "ST_DIMENSION";
     private static final String ST_GEOMETRYTYPE = "ST_GEOMETRYTYPE";
-    private static final String ST_IS3D = "ST_IS3D";
+    private static final String ST_HASZ = "ST_HASZ";
     private static final String ST_ISEMPTY = "ST_ISEMPTY";
     private static final String ST_ISMEASURED = "ST_HASM";
     private static final String ST_NDIMS = "ST_NDIMS";
-    private static final String ST_Z = "ST_Z";
     private static final String ST_ISSIMPLE = "ST_ISSIMPLE";
     private static final String ST_LENGTH = "ST_LENGTH";
     private static final String ST_PERIMETER = "ST_PERIMETER";
@@ -447,9 +446,9 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
                 abstractRootDBType);
         builder.put(ST_GEOMETRYTYPE, 1, geometryTypeSymbol);
 
-        DBFunctionSymbol is3DFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_IS3D, 1, dbBooleanType,
+        DBFunctionSymbol is3DFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_HASZ, 1, dbBooleanType,
                 abstractRootDBType);
-        builder.put(ST_IS3D, 1, is3DFunctionSymbol);
+        builder.put(ST_HASZ, 1, is3DFunctionSymbol);
 
         DBFunctionSymbol isEmptyFunctionSymbol = new GeoDBBooleanFunctionSymbol(ST_ISEMPTY, 1, dbBooleanType,
                 abstractRootDBType);
@@ -1413,7 +1412,7 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
 
     @Override
     public DBBooleanFunctionSymbol getDBSTis3D() {
-        return (DBBooleanFunctionSymbol) getRegularDBFunctionSymbol(ST_IS3D, 1); }
+        return (DBBooleanFunctionSymbol) getRegularDBFunctionSymbol(ST_HASZ, 1); }
 
     @Override
     public DBBooleanFunctionSymbol getDBSTisEmpty() {

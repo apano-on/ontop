@@ -202,6 +202,7 @@ public class GeoSPARQLv11Test {
         assertEquals("<http://www.opengis.net/ont/sf#POLYGON>", val);
     }
 
+    @Ignore("We use ST_HASM which is not supported in H2GIS")
     @Test
     public void testis3DFalse() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -216,6 +217,7 @@ public class GeoSPARQLv11Test {
         assertTrue(val);
     }
 
+    @Ignore("We use ST_HASM which is not supported in H2GIS")
     @Test
     public void testis3DTrue() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -230,6 +232,7 @@ public class GeoSPARQLv11Test {
         assertTrue(val);
     }
 
+    @Ignore("We use ST_HASM which is not supported in H2GIS")
     @Test
     public void testisMeasured() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -272,6 +275,7 @@ public class GeoSPARQLv11Test {
         assertTrue(val);
     }
 
+    @Ignore("We use ST_HASM which is not supported in H2GIS")
     @Test
     public void testSpatialDimension() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
