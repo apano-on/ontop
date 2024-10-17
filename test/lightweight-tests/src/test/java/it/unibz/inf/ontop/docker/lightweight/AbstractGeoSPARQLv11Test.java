@@ -2,10 +2,10 @@ package it.unibz.inf.ontop.docker.lightweight;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
@@ -316,7 +316,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "BIND (geof:transform(?xWkt, <http://www.opengis.net/def/crs/EPSG/0/32439523>) AS ?v)\n" +
                 "}\n";
         var error = assertThrows(QueryEvaluationException.class, () -> this.runQuery(query));
-        assertEquals("it.unibz.inf.ontop.exception.OntopReformulationException: java.lang.IllegalArgumentException: " +
+        Assertions.assertEquals("it.unibz.inf.ontop.exception.OntopReformulationException: java.lang.IllegalArgumentException: " +
                 "Unknown SRID: http://www.opengis.net/def/crs/EPSG/0/32439523", error.getMessage());
     }
 
@@ -605,7 +605,6 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "POLYGON ((0 5,0 10,5 10,5 15,10 15,15 15,15 10,15 5,10 5,10 0,5 0,0 0,0 5)))\"^^geo:wktLiteral"));
     }
 
-    //@Disabled("Not supported yet")
     @Test
     public void testAggUnionWithGroupBy() {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -616,15 +615,19 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "SELECT (geof:aggUnion(?xWkt) AS ?v) ?label WHERE {\n" +
                 "?g a :Geom; geo:asWKT ?xWkt.\n" +
                 "?g rdfs:label ?label .\n" +
-                "BIND (geof:aggUnion(?xWkt) AS ?v)\n" +
                 "}\n" +
                 "GROUP BY ?label\n" +
-                "ORDER BY ?label\n" +
-                "LIMIT 1";
-        executeAndCompareValues(query, ImmutableList.of("\"POINT(2.2945 48.8584)\"^^geo:wktLiteral"));
+                "ORDER BY ?label\n";
+        executeAndCompareValues(query, ImmutableList.of("\"POINT(2.2945 48.8584)\"^^geo:wktLiteral",
+                "\"LINESTRING(0 0,5 5,10 10)\"^^geo:wktLiteral",
+                "\"MULTIPOLYGON(((0 5,5 5,5 0,0 0,0 5)),((10 15,15 15,15 10,10 10,10 15)))\"^^geo:wktLiteral",
+                "\"POINT(2 2)\"^^geo:wktLiteral",
+                "\"POLYGON((0 0,10 0,10 10,0 10,0 0))\"^^geo:wktLiteral",
+                "\"POLYGON((5 5,15 5,15 15,5 15,5 5))\"^^geo:wktLiteral",
+                "\"POINT(-0.0754 51.5055)\"^^geo:wktLiteral"));
     }
 
-
+    //@Disabled("Not supported yet")
     @Test
     public void testAggUnionWithValues() {
         String query = "PREFIX : <http://ex.org/> \n" +

@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import it.unibz.inf.ontop.iq.node.VariableNullability;
 import it.unibz.inf.ontop.model.term.*;
 import it.unibz.inf.ontop.model.term.functionsymbol.SPARQLAggregationFunctionSymbol;
+import it.unibz.inf.ontop.model.term.functionsymbol.db.impl.NullRejectingDBConcatFunctionSymbol;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.SPARQLFunctionSymbolImpl;
 import it.unibz.inf.ontop.model.type.*;
 import it.unibz.inf.ontop.model.vocabulary.GEO;
@@ -39,6 +40,9 @@ public abstract class AbstractGeofAggregateFunctionSymbolImpl extends SPARQLFunc
         ImmutableTerm newTerm = newTerms.get(0);
         if (newTerms.stream()
                 .allMatch(t -> isRDFFunctionalTerm(t) || (t instanceof Constant))) {
+                /* Disabled since DISTINCT > AGGREGATE in tree does not allow to simplify to DBFunctionSymbol
+                // Do not simplify to DBFunctionSymbol any variables
+                && isGroundTerm(newTerms, termFactory)) {*/
 
             ImmutableList<ImmutableTerm> typeTerms = newTerms.stream()
                     .map(t -> extractRDFTermTypeTerm(t, termFactory))
@@ -77,6 +81,14 @@ public abstract class AbstractGeofAggregateFunctionSymbolImpl extends SPARQLFunc
 
     @Override
     public boolean isAggregation() {
+        return true;
+    }
+
+    /**
+     * Nullable due to typing errors
+     */
+    @Override
+    public boolean isNullable(ImmutableSet<Integer> nullableIndexes) {
         return true;
     }
 
@@ -123,5 +135,27 @@ public abstract class AbstractGeofAggregateFunctionSymbolImpl extends SPARQLFunc
     @Override
     public Constant evaluateEmptyBag(TermFactory termFactory) {
         return termFactory.getRDFLiteralConstant("", wktLiteralType);
+    }
+
+    /**
+     * Check if the term or recursively check if any of its terminal subterms are not ground
+     */
+    private boolean isGroundTerm(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
+        return newTerms.stream()
+                .map(t -> extractLexicalTerm(t, termFactory))
+                .noneMatch(this::hasNonGroundTerminalSubterm);
+    }
+
+    private boolean hasNonGroundTerminalSubterm(ImmutableTerm term) {
+        if (term instanceof Variable) {
+            return true;
+        }
+        if (term instanceof NonGroundFunctionalTerm) {
+            NonGroundFunctionalTerm nonGroundTerm = (NonGroundFunctionalTerm) term;
+            if (nonGroundTerm.getFunctionSymbol() instanceof NullRejectingDBConcatFunctionSymbol) {
+                return nonGroundTerm.getTerms().stream().anyMatch(this::hasNonGroundTerminalSubterm);
+            }
+        }
+        return false;
     }
 }

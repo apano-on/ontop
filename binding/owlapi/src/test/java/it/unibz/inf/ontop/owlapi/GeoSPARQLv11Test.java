@@ -630,6 +630,9 @@ public class GeoSPARQLv11Test {
                 "POLYGON ((0 5, 0 10, 5 10, 5 15, 10 15, 15 15, 15 10, 15 5, 10 5, 10 0, 5 0, 0 0, 0 5)))", val);
     }
 
+    @Ignore("Not supported by H2GIS with given input data. H2GIS expects all geometries in a UNION operation to have " +
+            "the same dimensionality (2D or 3D). Not an issue for PostGIS where if you mix 2D (POLYGON) and " +
+            "3D (POLYGON Z) geometries in an operation, PostGIS treats them both as 2D. Test would work with just 2D data.")
     @Test
     public void testAggUnionWithGroupBy() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -637,18 +640,25 @@ public class GeoSPARQLv11Test {
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                "SELECT (geof:aggUnion(?xWkt) AS ?x) ?label WHERE {\n" +
+                "SELECT (geof:aggUnion(?xWkt) AS ?v) ?label WHERE {\n" +
                 "?g a :Geom; geo:asWKT ?xWkt.\n" +
                 "?g rdfs:label ?label .\n" +
-                "BIND (geof:aggUnion(?xWkt) AS ?x)\n" +
                 "}\n" +
                 "GROUP BY ?label\n" +
-                "ORDER BY ?label";
+                "ORDER BY ?label\n" +
+                "LIMIT 1";
         String val = runQueryAndReturnString(query);
-        assertEquals("POINT (2.2945 48.8584)", val);
+        assertEquals("\"POINT(2.2945 48.8584)\"^^geo:wktLiteral", val);
+        /* All records: "\"POINT(2.2945 48.8584)\"^^geo:wktLiteral",
+                "\"LINESTRING(0 0,5 5,10 10)\"^^geo:wktLiteral",
+                "\"MULTIPOLYGON(((0 5,5 5,5 0,0 0,0 5)),((10 15,15 15,15 10,10 10,10 15)))\"^^geo:wktLiteral",
+                "\"POINT(2 2)\"^^geo:wktLiteral",
+                "\"POLYGON((0 0,10 0,10 10,0 10,0 0))\"^^geo:wktLiteral",
+                "\"POLYGON((5 5,15 5,15 15,5 15,5 5))\"^^geo:wktLiteral",
+                "\"POINT(-0.0754 51.5055)\"^^geo:wktLiteral" */
     }
 
-    @Ignore("Not supported for H2GIS")
+    @Ignore("Not supported yet")
     @Test
     public void testAggUnionWithValues() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +

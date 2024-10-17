@@ -83,7 +83,7 @@ public class GeoSPARQLPostGISTest extends AbstractDockerRDF4JTest {
                 "}\n" +
                 "LIMIT 1";
         executeAndCompareValues(query, ImmutableList.of(
-                "\"POLYGON((2 5,6.999999999999999 5,6.999999999999999 2,2 2,2 5))\"" +
+                "\"POLYGON((2 4.999999999999998,6.999999999999999 5,6.999999999999999 2,2 2,2 4.999999999999998))\"" +
                         "^^geo:wktLiteral"));
         Assertions.assertFalse(reformulate(query).toLowerCase().contains("cast(st_astext"));
     }

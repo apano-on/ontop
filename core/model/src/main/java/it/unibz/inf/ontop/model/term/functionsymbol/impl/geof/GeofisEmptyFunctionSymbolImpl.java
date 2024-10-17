@@ -9,7 +9,7 @@ import org.apache.commons.rdf.api.IRI;
 import javax.annotation.Nonnull;
 import java.util.function.Function;
 
-public class GeofisEmptyFunctionSymbolImpl extends AbstractGeofBooleanFunctionSymbolDirectImpl {
+public class GeofisEmptyFunctionSymbolImpl extends AbstractGeofBooleanFunctionSymbolDirectImpl<Function<ImmutableTerm, ImmutableTerm>> {
 
     public GeofisEmptyFunctionSymbolImpl(@Nonnull IRI functionIRI, RDFDatatype wktLiteralType, RDFDatatype xsdBooleanType) {
         super("GEOF_IS_EMPTY", functionIRI, ImmutableList.of(wktLiteralType), xsdBooleanType);
