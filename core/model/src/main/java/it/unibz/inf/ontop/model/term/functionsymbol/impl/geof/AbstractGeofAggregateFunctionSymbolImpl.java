@@ -39,10 +39,9 @@ public abstract class AbstractGeofAggregateFunctionSymbolImpl extends SPARQLFunc
 
         ImmutableTerm newTerm = newTerms.get(0);
         if (newTerms.stream()
-                .allMatch(t -> isRDFFunctionalTerm(t) || (t instanceof Constant))) {
-                /* Disabled since DISTINCT > AGGREGATE in tree does not allow to simplify to DBFunctionSymbol
+                .allMatch(t -> isRDFFunctionalTerm(t) || (t instanceof Constant))
                 // Do not simplify to DBFunctionSymbol any variables
-                && isGroundTerm(newTerms, termFactory)) {*/
+                && isGroundTerm(newTerms, termFactory)) {
 
             ImmutableList<ImmutableTerm> typeTerms = newTerms.stream()
                     .map(t -> extractRDFTermTypeTerm(t, termFactory))

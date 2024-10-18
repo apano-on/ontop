@@ -221,7 +221,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "SELECT ?v WHERE {\n" +
-                ":geomz1 a :GeomZ; geo:asWKT ?xWkt.\n" +
+                "<http://ex.org/geomz/1> a :GeomZ; geo:asWKT ?xWkt.\n" +
                 "BIND (geof:is3D(?xWkt) AS ?v)\n" +
                 "}\n";
         executeAndCompareValues(query, ImmutableList.of("\"true\"^^xsd:boolean"));
@@ -444,7 +444,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "SELECT ?v WHERE {\n" +
-                ":geomz2 a :GeomZ; geo:asWKT ?xWkt.\n" +
+                "<http://ex.org/geomz/2> a :GeomZ; geo:asWKT ?xWkt.\n" +
                 "BIND (geof:maxZ(?xWkt) AS ?v)\n" +
                 "}\n";
         executeAndCompareValues(query, ImmutableList.of("\"2\"^^xsd:double"));
@@ -483,7 +483,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "SELECT ?v WHERE {\n" +
-                ":geomz2 a :GeomZ; geo:asWKT ?xWkt.\n" +
+                "<http://ex.org/geomz/2> a :GeomZ; geo:asWKT ?xWkt.\n" +
                 "BIND (geof:minZ(?xWkt) AS ?v)\n" +
                 "}\n";
         executeAndCompareValues(query, ImmutableList.of("\"0\"^^xsd:double"));
@@ -627,7 +627,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "\"POINT(-0.0754 51.5055)\"^^geo:wktLiteral"));
     }
 
-    //@Disabled("Not supported yet")
+    @Disabled("Not supported yet")
     @Test
     public void testAggUnionWithValues() {
         String query = "PREFIX : <http://ex.org/> \n" +

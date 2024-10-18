@@ -42,9 +42,9 @@
 
     <owl:Class rdf:about="http://ex.org/Geom"/>
 
-    <!-- http://ex.org/NewGeom -->
+    <!-- http://ex.org/GeomZ -->
 
-        <owl:Class rdf:about="http://ex.org/NewGeom"/>
+    <owl:Class rdf:about="http://ex.org/GeomZ"/>
 
 
 </rdf:RDF>

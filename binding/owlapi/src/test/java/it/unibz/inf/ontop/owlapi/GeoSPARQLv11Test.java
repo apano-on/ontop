@@ -202,7 +202,7 @@ public class GeoSPARQLv11Test {
         assertEquals("<http://www.opengis.net/ont/sf#POLYGON>", val);
     }
 
-    @Ignore("We use ST_HASM which is not supported in H2GIS")
+    @Ignore("We use ST_HASZ which is not supported in H2GIS")
     @Test
     public void testis3DFalse() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -217,7 +217,7 @@ public class GeoSPARQLv11Test {
         assertTrue(val);
     }
 
-    @Ignore("We use ST_HASM which is not supported in H2GIS")
+    @Ignore("We use ST_HASZ which is not supported in H2GIS")
     @Test
     public void testis3DTrue() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -225,7 +225,7 @@ public class GeoSPARQLv11Test {
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "SELECT ?x WHERE {\n" +
-                ":geomz1 a :GeomZ; geo:asWKT ?xWkt.\n" +
+                "<http://ex.org/geomz/2> a :GeomZ; geo:asWKT ?xWkt.\n" +
                 "BIND (geof:is3D(?xWkt) AS ?x)\n" +
                 "}\n";
         boolean val = runQueryAndReturnString(query).equals("true");
@@ -465,7 +465,7 @@ public class GeoSPARQLv11Test {
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "SELECT ?x WHERE {\n" +
-                ":geomz2 a :GeomZ; geo:asWKT ?xWkt.\n" +
+                "<http://ex.org/geomz/2> a :GeomZ; geo:asWKT ?xWkt.\n" +
                 "BIND (geof:maxZ(?xWkt) AS ?x)\n" +
                 "}\n";
         double val = runQueryAndReturnDoubleX(query);
@@ -507,7 +507,7 @@ public class GeoSPARQLv11Test {
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "SELECT ?x WHERE {\n" +
-                ":geomz2 a :GeomZ; geo:asWKT ?xWkt.\n" +
+                "<http://ex.org/geomz/1> a :GeomZ; geo:asWKT ?xWkt.\n" +
                 "BIND (geof:minZ(?xWkt) AS ?x)\n" +
                 "}\n";
         double val = runQueryAndReturnDoubleX(query);
@@ -630,9 +630,6 @@ public class GeoSPARQLv11Test {
                 "POLYGON ((0 5, 0 10, 5 10, 5 15, 10 15, 15 15, 15 10, 15 5, 10 5, 10 0, 5 0, 0 0, 0 5)))", val);
     }
 
-    @Ignore("Not supported by H2GIS with given input data. H2GIS expects all geometries in a UNION operation to have " +
-            "the same dimensionality (2D or 3D). Not an issue for PostGIS where if you mix 2D (POLYGON) and " +
-            "3D (POLYGON Z) geometries in an operation, PostGIS treats them both as 2D. Test would work with just 2D data.")
     @Test
     public void testAggUnionWithGroupBy() throws Exception {
         String query = "PREFIX : <http://ex.org/> \n" +
@@ -640,7 +637,7 @@ public class GeoSPARQLv11Test {
                 "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>\n" +
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                "SELECT (geof:aggUnion(?xWkt) AS ?v) ?label WHERE {\n" +
+                "SELECT (geof:aggUnion(?xWkt) AS ?x) ?label WHERE {\n" +
                 "?g a :Geom; geo:asWKT ?xWkt.\n" +
                 "?g rdfs:label ?label .\n" +
                 "}\n" +
@@ -648,7 +645,7 @@ public class GeoSPARQLv11Test {
                 "ORDER BY ?label\n" +
                 "LIMIT 1";
         String val = runQueryAndReturnString(query);
-        assertEquals("\"POINT(2.2945 48.8584)\"^^geo:wktLiteral", val);
+        assertEquals("POINT (2.2945 48.8584)", val);
         /* All records: "\"POINT(2.2945 48.8584)\"^^geo:wktLiteral",
                 "\"LINESTRING(0 0,5 5,10 10)\"^^geo:wktLiteral",
                 "\"MULTIPOLYGON(((0 5,5 5,5 0,0 0,0 5)),((10 15,15 15,15 10,10 10,10 15)))\"^^geo:wktLiteral",

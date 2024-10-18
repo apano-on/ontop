@@ -13,14 +13,12 @@ import java.util.function.Function;
 public class GeofDefaultUnaryIntegerFunctionSymbolImpl extends AbstractGeofIntegerFunctionSymbolImpl {
 
     private final BiFunction<TermFactory, ImmutableTerm, ImmutableTerm> dbTermFct;
-    private final IRI functionIRI;
 
     public GeofDefaultUnaryIntegerFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
                                                  RDFDatatype wktLiteralType, RDFDatatype xsdIntegerType,
                                                  BiFunction<TermFactory, ImmutableTerm, ImmutableTerm> dbTermFct) {
         super(functionSymbolName, functionIRI, ImmutableList.of(wktLiteralType), xsdIntegerType);
         this.dbTermFct = dbTermFct;
-        this.functionIRI = functionIRI;
     }
 
     @Override
