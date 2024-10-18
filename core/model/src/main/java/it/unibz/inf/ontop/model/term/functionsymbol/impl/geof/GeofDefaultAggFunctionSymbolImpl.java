@@ -69,7 +69,7 @@ public class GeofDefaultAggFunctionSymbolImpl extends AbstractGeofAggregateFunct
                     .simplify();
         // Special case for concave hull, where the concaveness parameter is fixed
         } else if (this.getName().equals("GEOF_AGG_CONCAVEHULL")) {
-            DBConstant concavenessParameter = termFactory.getDBConstant("0.2", dbTypeFactory.getDBDecimalType());
+            DBConstant concavenessParameter = termFactory.getDBConstant(GeoUtils.CONCAVENESS_PARAMETER, dbTypeFactory.getDBDecimalType());
             return dbTermFctSTAsText.apply(termFactory,
                     termFactory.getDBSTConcaveHull(
                             dbTermFctSTCollect.apply(termFactory, v0.getGeometry()), concavenessParameter).simplify());

@@ -20,7 +20,7 @@ public class GeofConcaveHullFunctionSymbolImpl extends AbstractGeofWKTFunctionSy
                                           ImmutableList<ImmutableTerm> typeTerms, TermFactory termFactory) {
         WKTLiteralValue v0 = GeoUtils.extractWKTLiteralValue(termFactory, subLexicalTerms.get(0));
         DBTypeFactory dbTypeFactory = termFactory.getTypeFactory().getDBTypeFactory();
-        DBConstant concavenessParameter = termFactory.getDBConstant("0.2", dbTypeFactory.getDBDecimalType());
+        DBConstant concavenessParameter = termFactory.getDBConstant(GeoUtils.CONCAVENESS_PARAMETER, dbTypeFactory.getDBDecimalType());
         return termFactory.getDBAsText(termFactory.getDBSTConcaveHull(v0.getGeometry(), concavenessParameter).simplify());
     }
 }

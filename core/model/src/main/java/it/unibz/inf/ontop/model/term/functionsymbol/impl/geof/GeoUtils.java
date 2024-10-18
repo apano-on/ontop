@@ -16,6 +16,7 @@ import java.util.Optional;
 public class GeoUtils {
 
     static final double EARTH_MEAN_RADIUS_METER = 6370986;
+    static final String CONCAVENESS_PARAMETER = "0.2";
 
     private static final RDF rdfFactory = new SimpleRDF();
 
