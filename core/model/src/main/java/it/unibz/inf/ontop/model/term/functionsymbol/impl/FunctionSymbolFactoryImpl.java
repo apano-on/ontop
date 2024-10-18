@@ -314,7 +314,7 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                  */
                 new GeofDistanceFunctionSymbolImpl("GEOF_DISTANCE", GEOF.DISTANCE, wktLiteral, iriType,
                         xsdDouble, this),
-                new GeofBufferFunctionSymbolImpl("GEOF_BUFFER", GEOF.BUFFER, wktLiteral, xsdDecimal, iriType),
+                new GeofBufferFunctionSymbolImpl("GEOF_BUFFER", GEOF.BUFFER, wktLiteral, xsdDouble, iriType),
                 new GeofIntersectionFunctionSymbolImpl(GEOF.INTERSECTION, wktLiteral),
                 new GeofBoundaryFunctionSymbolImpl(GEOF.BOUNDARY, wktLiteral),
                 new GeofConvexHullFunctionSymbolImpl(GEOF.CONVEXHULL, wktLiteral),
@@ -332,7 +332,7 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                 new GeofDefaultUnaryWKTFunctionSymbolImpl("GEOF_BOUNDINGCIRCLE", GEOF.BOUNDINGCIRCLE,
                         wktLiteral, TermFactory::getDBSTBoundingCircle),
                 new GeofBufferFunctionSymbolImpl("GEOF_METRICBUFFER", GEOF.METRICBUFFER, wktLiteral,
-                        xsdDecimal),
+                        xsdDouble),
                 new GeofDefaultUnaryWKTFunctionSymbolImpl("GEOF_CENTROID", GEOF.CENTROID,
                         wktLiteral, TermFactory::getDBSTCentroid),
                 new GeofConcaveHullFunctionSymbolImpl(GEOF.CONCAVEHULL, wktLiteral),

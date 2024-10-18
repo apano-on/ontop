@@ -28,14 +28,14 @@ public class GeofBufferFunctionSymbolImpl extends AbstractGeofWKTFunctionSymbolI
     private static final double METRE_TO_DEGREE_RATIO = 1.0 / (180 * PI * GeoUtils.EARTH_MEAN_RADIUS_METER);
 
     public GeofBufferFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
-                                        RDFDatatype wktLiteralType, RDFDatatype decimalType, ObjectRDFType iriType) {
-        super(functionSymbolName, functionIRI, ImmutableList.of(wktLiteralType, decimalType, iriType), wktLiteralType);
+                                        RDFDatatype wktLiteralType, RDFDatatype doubleType, ObjectRDFType iriType) {
+        super(functionSymbolName, functionIRI, ImmutableList.of(wktLiteralType, doubleType, iriType), wktLiteralType);
         this.functionIRI = functionIRI;
     }
 
     public GeofBufferFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
-                                        RDFDatatype wktLiteralType, RDFDatatype decimalType) {
-        super(functionSymbolName, functionIRI, ImmutableList.of(wktLiteralType, decimalType), wktLiteralType);
+                                        RDFDatatype wktLiteralType, RDFDatatype doubleType) {
+        super(functionSymbolName, functionIRI, ImmutableList.of(wktLiteralType, doubleType), wktLiteralType);
         this.functionIRI = functionIRI;
     }
 

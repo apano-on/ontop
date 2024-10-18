@@ -77,7 +77,7 @@ public class GeoSPARQLPostGISTest extends AbstractDockerRDF4JTest {
                 "?x rdfs:label ?xname .\n" +
                 "?y a :Geog; geo:asWKT ?yWkt.\n" +
                 "?y rdfs:label ?yname .\n" +
-                "BIND(geof:buffer(?xWkt, 20, uom:metre) AS ?zWkt) .\n" +
+                "BIND(geof:buffer(?xWkt, \"20\"^^xsd:double, uom:metre) AS ?zWkt) .\n" +
                 "FILTER(?xname = ?yname) .\n" +
                 "BIND(geof:intersection(?zWkt, ?yWkt) as ?v) .\n" +
                 "}\n" +

@@ -98,7 +98,7 @@ public class AbstractGeoSPARQLv11Test extends AbstractDockerRDF4JTest {
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "SELECT ?v WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:metricBuffer(?xWkt, 1) AS ?v)\n" +
+                "BIND (geof:metricBuffer(?xWkt, \"1\"^^xsd:double) AS ?v)\n" +
                 "}\n";
         executeAndCompareValues(query, ImmutableList.of("\"POLYGON((-0.00000898054534 -0.000000153417746," +
                 "-0.000009183768035 9.999999736438603,-0.000009035580125 10.000001500063481," +

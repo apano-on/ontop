@@ -365,7 +365,7 @@ public class GeoSPARQLTest {
                 "\n" +
                 "SELECT ?x WHERE {\n" +
                 ":2 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND(geof:buffer(?xWkt, 1, uom:degree) as ?x) .\n" +
+                "BIND(geof:buffer(?xWkt, \"1\"^^xsd:double, uom:degree) as ?x) .\n" +
                 "}\n";
         String val = runQueryAndReturnString(query);
         assertTrue(val.startsWith("POLYGON ((0 1, 0 7,"));
@@ -381,7 +381,7 @@ public class GeoSPARQLTest {
                 "\n" +
                 "SELECT ?x WHERE {\n" +
                 ":2 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND(geof:buffer(geof:buffer(?xWkt, 1, uom:degree), 1, uom:degree) as ?x) .\n" +
+                "BIND(geof:buffer(geof:buffer(?xWkt, \"1\"^^xsd:double, uom:degree), \"1\"^^xsd:double, uom:degree) as ?x) .\n" +
                 "}\n";
         String val = runQueryAndReturnString(query);
         assertTrue(val.startsWith("POLYGON ((-0.99"));
@@ -397,7 +397,7 @@ public class GeoSPARQLTest {
                 "\n" +
                 "SELECT ?x WHERE {\n" +
                 ":2 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND(geof:buffer(?xWkt, 10000, uom:metre) as ?x) .\n" +
+                "BIND(geof:buffer(?xWkt, \"10000\"^^xsd:double, uom:metre) as ?x) .\n" +
                 "}\n";
         String val = runQueryAndReturnString(query);
         assertTrue(val.startsWith("POLYGON ((0.9100"));
@@ -413,7 +413,7 @@ public class GeoSPARQLTest {
                 "\n" +
                 "SELECT ?x WHERE {\n" +
                 "<http://ex.org/epsg3044/21> a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND(geof:buffer(?xWkt, 10000, uom:metre) as ?x) .\n" +
+                "BIND(geof:buffer(?xWkt, \"10000\"^^xsd:double, uom:metre) as ?x) .\n" +
                 "}\n";
         String val = runQueryAndReturnString(query);
         assertTrue(val.startsWith("POLYGON ((678682"));
@@ -1368,7 +1368,7 @@ public class GeoSPARQLTest {
                 "ASK WHERE {\n" +
                 "<http://ex.org/feature/1> a :Feature; geo:hasGeometry/geo:asWKT ?xWkt.\n" +
                 "<http://ex.org/feature/2> a :Feature; geo:hasGeometry/geo:asWKT ?yWkt.\n" +
-                "BIND(geof:buffer(?yWkt, 10, uom:degree) AS ?bWkt) .\n" +
+                "BIND(geof:buffer(?yWkt, \"10\"^^xsd:double, uom:degree) AS ?bWkt) .\n" +
                 "FILTER (geof:sfIntersects(?xWkt, ?bWkt))\n" +
                 "}\n";
         boolean val = runQueryAndReturnBooleanX(query);
@@ -1401,7 +1401,7 @@ public class GeoSPARQLTest {
                 "ASK WHERE {\n" +
                 "<http://ex.org/feature/1> a :Feature; geo:hasGeometry/geo:asWKT ?xWkt.\n" +
                 "<http://ex.org/feature/2> a :Feature; geo:hasGeometry/geo:asWKT ?yWkt.\n" +
-                "BIND(geof:buffer(?yWkt, 3500000, uom:metre) AS ?bWkt) .\n" +
+                "BIND(geof:buffer(?yWkt, \"3500000\"^^xsd:double, uom:metre) AS ?bWkt) .\n" +
                 "FILTER (geof:sfWithin(?xWkt, ?bWkt))\n" +
                 "}\n";
         boolean val = runQueryAndReturnBooleanX(query);

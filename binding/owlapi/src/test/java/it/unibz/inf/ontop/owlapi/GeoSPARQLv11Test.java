@@ -95,7 +95,7 @@ public class GeoSPARQLv11Test {
                 "PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>\n" +
                 "SELECT ?x WHERE {\n" +
                 ":1 a :Geom; geo:asWKT ?xWkt.\n" +
-                "BIND (geof:metricBuffer(?xWkt, 1) AS ?x)\n" +
+                "BIND (geof:metricBuffer(?xWkt, \"1\"^^xsd:double) AS ?x)\n" +
                 "}\n";
         String val = runQueryAndReturnString(query);
         assertEquals("POLYGON ((-0.0000089932358214 0, -0.0000089932358214 10, -0.0000088204333169 10.000001754493272, " +
