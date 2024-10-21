@@ -1534,4 +1534,64 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
                         " THEN NULL ELSE CAST(%1$s AS DATE) END",
                 term);
     }
+
+    /**
+     * Ontop defined OpenEO functions
+     */
+    @Override
+    protected String serializeOpenEOAvg(ImmutableList<? extends ImmutableTerm> terms,
+                                             Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
+        String start_date = termConverter.apply(terms.get(0));
+        String end_date = termConverter.apply(terms.get(1));
+        String polygon = termConverter.apply(terms.get(2));
+        String collection_id = termConverter.apply(terms.get(3));
+        String band = termConverter.apply(terms.get(4));
+        String crs = termConverter.apply(terms.get(5));
+
+        return String.format("ontop_openeo.aggfunction(%s, %s, %s, %s, %s, %s, \'mean\')",
+                start_date, end_date, polygon, collection_id, band, crs);
+    }
+
+    @Override
+    protected String serializeOpenEOMax(ImmutableList<? extends ImmutableTerm> terms,
+                                        Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
+        String start_date = termConverter.apply(terms.get(0));
+        String end_date = termConverter.apply(terms.get(1));
+        String polygon = termConverter.apply(terms.get(2));
+        String collection_id = termConverter.apply(terms.get(3));
+        String band = termConverter.apply(terms.get(4));
+        String crs = termConverter.apply(terms.get(5));
+
+        return String.format("ontop_openeo.aggfunction(%s, %s, %s, %s, %s, %s, \'max\')",
+                start_date, end_date, polygon, collection_id, band, crs);
+    }
+
+    @Override
+    protected String serializeOpenEOMin(ImmutableList<? extends ImmutableTerm> terms,
+                                        Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
+        String start_date = termConverter.apply(terms.get(0));
+        String end_date = termConverter.apply(terms.get(1));
+        String polygon = termConverter.apply(terms.get(2));
+        String collection_id = termConverter.apply(terms.get(3));
+        String band = termConverter.apply(terms.get(4));
+        String crs = termConverter.apply(terms.get(5));
+
+        return String.format("ontop_openeo.aggfunction(%s, %s, %s, %s, %s, %s, \'min\')",
+                start_date, end_date, polygon, collection_id, band, crs);
+    }
+
+    @Override
+    protected String serializeOpenEOAgg(ImmutableList<? extends ImmutableTerm> terms,
+                                        Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
+        String start_date = termConverter.apply(terms.get(0));
+        String end_date = termConverter.apply(terms.get(1));
+        String polygon = termConverter.apply(terms.get(2));
+        String collection_id = termConverter.apply(terms.get(3));
+        String band = termConverter.apply(terms.get(3));
+        String crs = termConverter.apply(terms.get(3));
+        String operation = termConverter.apply(terms.get(3));
+
+        return String.format("ontop_openeo.aggfunction(%s, %s, %s, %s, %s, %s, %s)",
+                start_date, end_date, polygon, collection_id, band, crs, operation);
+    }
 }

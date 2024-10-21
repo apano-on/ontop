@@ -1397,4 +1397,36 @@ public class TermFactoryImpl implements TermFactory {
 		return getImmutableFunctionalTerm(functionSymbolFactory.getIdentity(), term);
     }
 
+	/**
+	 * Ontop defined OpenEO functions
+	 */
+	@Override
+	public ImmutableFunctionalTerm getOpenEOAvg(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
+												ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOAvg(),
+				ImmutableList.of(term1, term2, term3, term4, term5, term6));
+	}
+
+	@Override
+	public ImmutableFunctionalTerm getOpenEOMax(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
+												ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOAvg(),
+				ImmutableList.of(term1, term2, term3, term4, term5, term6));
+	}
+
+	@Override
+	public ImmutableFunctionalTerm getOpenEOMin(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
+												ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOAvg(),
+				ImmutableList.of(term1, term2, term3, term4, term5, term6));
+	}
+
+	@Override
+	public ImmutableFunctionalTerm getOpenEOAgg(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
+												ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6,
+												ImmutableTerm term7) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOAgg(),
+				ImmutableList.of(term1, term2, term3, term4, term5, term6, term7));
+	}
+
 }

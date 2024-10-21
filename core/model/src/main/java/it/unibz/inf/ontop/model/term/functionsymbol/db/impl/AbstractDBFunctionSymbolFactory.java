@@ -166,6 +166,14 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     private DBFunctionSymbol checkAndConvertDateFromStringFunctionSymbol;
 
     /**
+     * Ontop defined OpenEO functions
+     */
+    private DBFunctionSymbol openEOAvgFunctionSymbol;
+    private DBFunctionSymbol openEOMaxFunctionSymbol;
+    private DBFunctionSymbol openEOMinFunctionSymbol;
+    private DBFunctionSymbol openEOAggFunctionSymbol;
+
+    /**
      *  For conversion function symbols that are SIMPLE CASTs from an undetermined type (no normalization)
      */
     private final Map<DBTermType, DBTypeConversionFunctionSymbol> castMap;
@@ -509,6 +517,14 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
         checkAndConvertStringFromDecimalFunctionSymbol = createCheckAndConvertStringFromDecimalFunctionSymbol();
         checkAndConvertDateTimeFromDateFunctionSymbol = createCheckAndConvertDateTimeFromDateFunctionSymbol();
         checkAndConvertDateTimeFromStringFunctionSymbol = createCheckAndConvertDateTimeFromStringFunctionSymbol();
+
+        /**
+         * Ontop defined OpenEO functions
+         */
+        openEOAvgFunctionSymbol = createOpenEOAvgFunctionSymbol();
+        openEOMaxFunctionSymbol = createOpenEOMaxFunctionSymbol();
+        openEOMinFunctionSymbol = createOpenEOMinFunctionSymbol();
+        openEOAggFunctionSymbol = createOpenEOAggFunctionSymbol();
     }
 
     protected ImmutableMap<DBTermType, DBTypeConversionFunctionSymbol> createNormalizationMap() {
@@ -1332,6 +1348,21 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     @Override
     public DBFunctionSymbol checkAndConvertDateFromString() { return checkAndConvertDateFromStringFunctionSymbol; }
 
+    /**
+     * Ontop defined OpenEO functions
+     */
+    @Override
+    public DBFunctionSymbol getOpenEOAvg() { return openEOAvgFunctionSymbol; }
+
+    @Override
+    public DBFunctionSymbol getOpenEOMax() { return openEOMaxFunctionSymbol; }
+
+    @Override
+    public DBFunctionSymbol getOpenEOMin() { return openEOMinFunctionSymbol; }
+
+    @Override
+    public DBFunctionSymbol getOpenEOAgg() { return openEOAggFunctionSymbol; }
+
     @Override
     public DBFunctionSymbol getDBArrayAccess() {
         throw new UnsupportedOperationException("Array support unavailable for this DBMS");
@@ -2041,6 +2072,49 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
         return new UnaryCastDBFunctionSymbolWithSerializerImpl("DB_DATE_FROM_STRING", dbStringType, dbDateType, false,
                 this::serializeCheckAndConvertDateFromString);
     }
+
+    /**
+     * Ontop defined OpenEO functions
+     */
+    protected DBFunctionSymbol createOpenEOAvgFunctionSymbol() {
+        return new DBFunctionSymbolWithSerializerImpl("OPENEO_AVG", ImmutableList.of(dbDateType, dbDateType, dbStringType,
+                dbStringType, dbStringType, dbStringType), dbDoubleType, false,
+                this::serializeOpenEOAvg);
+    }
+
+    protected DBFunctionSymbol createOpenEOMaxFunctionSymbol() {
+        return new DBFunctionSymbolWithSerializerImpl("OPENEO_MAX", ImmutableList.of(dbDateType, dbDateType, dbStringType,
+                dbStringType, dbStringType, dbStringType), dbDoubleType, false,
+                this::serializeOpenEOMax);
+    }
+
+    protected DBFunctionSymbol createOpenEOMinFunctionSymbol() {
+        return new DBFunctionSymbolWithSerializerImpl("OPENEO_MIN", ImmutableList.of(dbDateType, dbDateType, dbStringType,
+                dbStringType, dbStringType, dbStringType), dbDoubleType, false,
+                this::serializeOpenEOMin);
+    }
+
+    protected DBFunctionSymbol createOpenEOAggFunctionSymbol() {
+        return new DBFunctionSymbolWithSerializerImpl("OPENEO_MIN", ImmutableList.of(dbDateType, dbDateType, dbStringType,
+                dbStringType, dbStringType, dbStringType), dbDoubleType, false,
+                this::serializeOpenEOAgg);
+    }
+
+    protected abstract String serializeOpenEOAvg(ImmutableList<? extends ImmutableTerm> terms,
+                                                         Function<ImmutableTerm, String> termConverter,
+                                                         TermFactory termFactory);
+
+    protected abstract String serializeOpenEOMax(ImmutableList<? extends ImmutableTerm> terms,
+                                                 Function<ImmutableTerm, String> termConverter,
+                                                 TermFactory termFactory);
+
+    protected abstract String serializeOpenEOMin(ImmutableList<? extends ImmutableTerm> terms,
+                                                 Function<ImmutableTerm, String> termConverter,
+                                                 TermFactory termFactory);
+
+    protected abstract String serializeOpenEOAgg(ImmutableList<? extends ImmutableTerm> terms,
+                                                 Function<ImmutableTerm, String> termConverter,
+                                                 TermFactory termFactory);
 
     /**
      * By default, uses the row number

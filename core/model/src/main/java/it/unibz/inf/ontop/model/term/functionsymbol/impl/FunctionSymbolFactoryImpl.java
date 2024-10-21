@@ -12,6 +12,7 @@ import it.unibz.inf.ontop.model.term.functionsymbol.db.DBFunctionSymbolFactory;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.geof.*;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.ofn.OfnMultitypedInputBinarySPARQLFunctionSymbolImpl;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.ofn.OfnSimpleBinarySPARQLFunctionSymbolImpl;
+import it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo.OpenEOUnaryDoubleFunctionSymbolImpl;
 import it.unibz.inf.ontop.model.type.*;
 import it.unibz.inf.ontop.model.vocabulary.*;
 import org.apache.commons.rdf.api.IRI;
@@ -449,8 +450,17 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                                         typeFactory.getDBTypeFactory().getDBDateTimestampType()));
                             else
                                 return Optional.empty();
-                        })
-        );
+                        }),
+                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AVG", OPENEO.AVG, xsdDate, wktLiteral, xsdString, xsdDouble,
+                        TermFactory::getOpenEOAvg),
+                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MAX", OPENEO.MAX, xsdDate, wktLiteral, xsdString, xsdDouble,
+                        TermFactory::getOpenEOMax),
+                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MIN", OPENEO.MIN, xsdDate, wktLiteral, xsdString, xsdDouble,
+                        TermFactory::getOpenEOMin)
+                //new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG, xsdDatetime, wktLiteral, xsdString, xsdDouble,
+                //        TermFactory::getOpenEOAgg)
+
+                );
 
         ImmutableTable.Builder<String, Integer, SPARQLFunctionSymbol> tableBuilder = ImmutableTable.builder();
 

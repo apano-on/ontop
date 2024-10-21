@@ -426,4 +426,12 @@ public interface DBFunctionSymbolFactory {
     DBBooleanFunctionSymbol getOntopContainsRole();
     DBBooleanFunctionSymbol getOntopContainsGroup();
     DBBooleanFunctionSymbol getOntopContainsRoleOrGroup();
+
+    /**
+     * Ontop defined OpenEO functions
+     */
+    DBFunctionSymbol getOpenEOAvg();
+    DBFunctionSymbol getOpenEOMax();
+    DBFunctionSymbol getOpenEOMin();
+    DBFunctionSymbol getOpenEOAgg();
 }

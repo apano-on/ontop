@@ -983,6 +983,28 @@ public class MockupDBFunctionSymbolFactory extends AbstractDBFunctionSymbolFacto
         throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
     }
 
+    @Override
+    protected String serializeOpenEOAvg(ImmutableList<? extends ImmutableTerm> terms,
+                                                Function<ImmutableTerm, String> termConverter, TermFactory termFactory){
+        throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
+    }
 
+    @Override
+    protected String serializeOpenEOMax(ImmutableList<? extends ImmutableTerm> terms,
+                                        Function<ImmutableTerm, String> termConverter, TermFactory termFactory){
+        throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
+    }
+
+    @Override
+    protected String serializeOpenEOMin(ImmutableList<? extends ImmutableTerm> terms,
+                                        Function<ImmutableTerm, String> termConverter, TermFactory termFactory){
+        throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
+    }
+
+    @Override
+    protected String serializeOpenEOAgg(ImmutableList<? extends ImmutableTerm> terms,
+                                        Function<ImmutableTerm, String> termConverter, TermFactory termFactory){
+        throw new UnsupportedOperationException("Operation not supported by the MockupDBFunctionSymbolFactory");
+    }
 
 }

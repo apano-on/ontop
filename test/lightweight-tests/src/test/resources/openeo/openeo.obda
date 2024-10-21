@@ -1,0 +1,16 @@
+[PrefixDeclaration]
+:		http://www.unibz-openeo.org#
+geo:		http://www.opengis.net/ont/geosparql#
+owl:		http://www.w3.org/2002/07/owl#
+rdf:		http://www.w3.org/1999/02/22-rdf-syntax-ns#
+xml:		http://www.w3.org/XML/1998/namespace
+xsd:		http://www.w3.org/2001/XMLSchema#
+rdfs:		http://www.w3.org/2000/01/rdf-schema#
+sosa:		http://www.w3.org/ns/sosa/
+openeo:		http://www.openeo-ontop.org#
+
+[MappingDeclaration] @collection [[
+mappingId	vector_data
+target		:region/{"gid"} geo:asWKT {"geom1"}^^geo:wktLiteral ; rdfs:label {"name_3"}@it .
+source		select "gid", "name_3", ST_AsText("geom") as "geom1" from region_south_tyrol
+]]
