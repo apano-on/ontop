@@ -39,13 +39,61 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"2023-09-07\"^^xsd:date AS ?end_date) .\n"
                 + "BIND (\"SENTINEL3_SLSTR\" AS ?satellite) .\n"
                 + "BIND (\"S8\" AS ?band) .\n"
-                + "BIND (\"EPSG:4326\" AS ?crs) .\n"
+                + "BIND (<http://www.opengis.net/def/crs/EPSG/0/4326> AS ?crs) .\n"
                 + "BIND (openeo:avg(?start_date, ?end_date, ?xWkt, ?satellite, ?band, ?crs) AS ?kelvin_temp) .\n"
                 + "BIND (?kelvin_temp - 273.15  AS ?celsius_temp\n)"
                 + "BIND(ROUND(?celsius_temp * 1000) / 1000 AS ?v)"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of("\"4.438\"^^xsd:double", "\"5.64\"^^xsd:double"));
+    }
+
+    @Test
+    public void getOpenEOMin() {
+
+        String query = "PREFIX :\t<http://www.unibz-openeo.org#>\n"
+                + "PREFIX rdfs:\t<http://www.w3.org/2000/01/rdf-schema#>\n"
+                + "PREFIX geo:\t<http://www.opengis.net/ont/geosparql#>\n"
+                + "PREFIX openeo:\t<http://www.openeo-ontop.org#>\n"
+                + "SELECT ?v {\n"
+                + "?g geo:asWKT ?xWkt .\n"
+                + "?g rdfs:label ?name .\n"
+                + "FILTER(LANG(?name) = \"it\" && (STR(?name) = \"Bressanone\" || STR(?name) = \"Merano\")) .\n"
+                + "BIND (\"2023-09-01\"^^xsd:date AS ?start_date) .\n"
+                + "BIND (\"2023-09-07\"^^xsd:date AS ?end_date) .\n"
+                + "BIND (\"SENTINEL3_SLSTR\" AS ?satellite) .\n"
+                + "BIND (\"S8\" AS ?band) .\n"
+                + "BIND (<http://www.opengis.net/def/crs/EPSG/0/4326> AS ?crs) .\n"
+                + "BIND (openeo:min(?start_date, ?end_date, ?xWkt, ?satellite, ?band, ?crs) AS ?kelvin_temp) .\n"
+                + "BIND (?kelvin_temp - 273.15  AS ?celsius_temp\n)"
+                + "BIND(ROUND(?celsius_temp * 1000) / 1000 AS ?v)"
+                + "}\n";
+
+        executeAndCompareValues(query, ImmutableList.of("\"-22.13\"^^xsd:double", "\"-34\"^^xsd:double"));
+    }
+
+    @Test
+    public void getOpenEOMax() {
+
+        String query = "PREFIX :\t<http://www.unibz-openeo.org#>\n"
+                + "PREFIX rdfs:\t<http://www.w3.org/2000/01/rdf-schema#>\n"
+                + "PREFIX geo:\t<http://www.opengis.net/ont/geosparql#>\n"
+                + "PREFIX openeo:\t<http://www.openeo-ontop.org#>\n"
+                + "SELECT ?v {\n"
+                + "?g geo:asWKT ?xWkt .\n"
+                + "?g rdfs:label ?name .\n"
+                + "FILTER(LANG(?name) = \"it\" && (STR(?name) = \"Bressanone\" || STR(?name) = \"Merano\")) .\n"
+                + "BIND (\"2023-09-01\"^^xsd:date AS ?start_date) .\n"
+                + "BIND (\"2023-09-07\"^^xsd:date AS ?end_date) .\n"
+                + "BIND (\"SENTINEL3_SLSTR\" AS ?satellite) .\n"
+                + "BIND (\"S8\" AS ?band) .\n"
+                + "BIND (<http://www.opengis.net/def/crs/EPSG/0/4326> AS ?crs) .\n"
+                + "BIND (openeo:max(?start_date, ?end_date, ?xWkt, ?satellite, ?band, ?crs) AS ?kelvin_temp) .\n"
+                + "BIND (?kelvin_temp - 273.15  AS ?celsius_temp\n)"
+                + "BIND(ROUND(?celsius_temp * 1000) / 1000 AS ?v)"
+                + "}\n";
+
+        executeAndCompareValues(query, ImmutableList.of("\"15.94\"^^xsd:double", "\"18.02\"^^xsd:double"));
     }
 
 }

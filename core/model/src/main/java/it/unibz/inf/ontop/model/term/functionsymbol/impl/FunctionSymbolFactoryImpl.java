@@ -451,14 +451,14 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                             else
                                 return Optional.empty();
                         }),
-                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AVG", OPENEO.AVG, xsdDate, wktLiteral, xsdString, xsdDouble,
-                        TermFactory::getOpenEOAvg),
-                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MAX", OPENEO.MAX, xsdDate, wktLiteral, xsdString, xsdDouble,
-                        TermFactory::getOpenEOMax),
-                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MIN", OPENEO.MIN, xsdDate, wktLiteral, xsdString, xsdDouble,
-                        TermFactory::getOpenEOMin)
-                //new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG, xsdDatetime, wktLiteral, xsdString, xsdDouble,
-                //        TermFactory::getOpenEOAgg)
+                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AVG", OPENEO.AVG, xsdDate,
+                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOAvg),
+                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MAX", OPENEO.MAX, xsdDate,
+                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMax),
+                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MIN", OPENEO.MIN, xsdDate,
+                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMin)
+//                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG, xsdDate,
+//                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOAgg)
 
                 );
 

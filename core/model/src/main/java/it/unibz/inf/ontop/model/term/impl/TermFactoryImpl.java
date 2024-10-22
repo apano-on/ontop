@@ -1410,14 +1410,14 @@ public class TermFactoryImpl implements TermFactory {
 	@Override
 	public ImmutableFunctionalTerm getOpenEOMax(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
 												ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6) {
-		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOAvg(),
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOMax(),
 				ImmutableList.of(term1, term2, term3, term4, term5, term6));
 	}
 
 	@Override
 	public ImmutableFunctionalTerm getOpenEOMin(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
 												ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6) {
-		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOAvg(),
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOMin(),
 				ImmutableList.of(term1, term2, term3, term4, term5, term6));
 	}
 

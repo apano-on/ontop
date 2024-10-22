@@ -237,7 +237,7 @@ public class GeoUtils {
      * @param sridIRIString
      * @return Abbreviated SRID string
      */
-    static String toProj4jName(String sridIRIString) {
+    public static String toProj4jName(String sridIRIString) {
         final String CRS_PREFIX = "http://www.opengis.net/def/crs/OGC/1.3/CRS";
         final String EPSG_PREFIX = "http://www.opengis.net/def/crs/EPSG/0/";
 
