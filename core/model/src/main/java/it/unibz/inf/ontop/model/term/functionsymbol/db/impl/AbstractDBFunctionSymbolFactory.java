@@ -171,7 +171,11 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     private DBFunctionSymbol openEOAvgFunctionSymbol;
     private DBFunctionSymbol openEOMaxFunctionSymbol;
     private DBFunctionSymbol openEOMinFunctionSymbol;
+    private DBFunctionSymbol openEORasterFunctionSymbol;
     private DBFunctionSymbol openEOAggFunctionSymbol;
+    private DBFunctionSymbol openEOLoadCollectionFunctionSymbol;
+    private DBFunctionSymbol openEOReduceDimensionFunctionSymbol;
+    private DBFunctionSymbol openEOReduceSpatialDimensionFunctionSymbol;
 
     /**
      *  For conversion function symbols that are SIMPLE CASTs from an undetermined type (no normalization)
@@ -524,7 +528,11 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
         openEOAvgFunctionSymbol = createOpenEOAvgFunctionSymbol();
         openEOMaxFunctionSymbol = createOpenEOMaxFunctionSymbol();
         openEOMinFunctionSymbol = createOpenEOMinFunctionSymbol();
+        openEORasterFunctionSymbol = createOpenEORasterFunctionSymbol();
         openEOAggFunctionSymbol = createOpenEOAggFunctionSymbol();
+        openEOLoadCollectionFunctionSymbol = createOpenEOLoadCollectionFunctionSymbol();
+        openEOReduceDimensionFunctionSymbol = createOpenEOReduceDimensionFunctionSymbol();
+        openEOReduceSpatialDimensionFunctionSymbol = createOpenEOReduceSpatialDimensionFunctionSymbol();
     }
 
     protected ImmutableMap<DBTermType, DBTypeConversionFunctionSymbol> createNormalizationMap() {
@@ -1361,7 +1369,19 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     public DBFunctionSymbol getOpenEOMin() { return openEOMinFunctionSymbol; }
 
     @Override
+    public DBFunctionSymbol getOpenEORaster() { return openEORasterFunctionSymbol; }
+
+    @Override
     public DBFunctionSymbol getOpenEOAgg() { return openEOAggFunctionSymbol; }
+
+    @Override
+    public DBFunctionSymbol getOpenEOLoadCollection() { return openEOLoadCollectionFunctionSymbol; }
+
+    @Override
+    public DBFunctionSymbol getOpenEOReduceDimension() { return openEOReduceDimensionFunctionSymbol; }
+
+    @Override
+    public DBFunctionSymbol getOpenEOReduceSpatialDimension() { return openEOReduceSpatialDimensionFunctionSymbol; }
 
     @Override
     public DBFunctionSymbol getDBArrayAccess() {
@@ -2094,10 +2114,34 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
                 this::serializeOpenEOMin);
     }
 
+    protected DBFunctionSymbol createOpenEORasterFunctionSymbol() {
+        return new DBFunctionSymbolWithSerializerImpl("OPENEO_RASTER", ImmutableList.of(dbDateType, dbDateType, dbStringType,
+                dbStringType, dbStringType, dbStringType), dbStringType, false,
+                this::serializeOpenEORaster);
+    }
+
     protected DBFunctionSymbol createOpenEOAggFunctionSymbol() {
         return new DBFunctionSymbolWithSerializerImpl("OPENEO_MIN", ImmutableList.of(dbDateType, dbDateType, dbStringType,
                 dbStringType, dbStringType, dbStringType), dbDoubleType, false,
                 this::serializeOpenEOAgg);
+    }
+
+    protected DBFunctionSymbol createOpenEOLoadCollectionFunctionSymbol() {
+        return new DBFunctionSymbolWithSerializerImpl("OPENEO_LOAD_COLLECTION", ImmutableList.of(dbStringType,
+                dbStringType, dbDateTimestampType, dbDateTimestampType, dbStringType), dbStringType, false,
+                this::serializeOpenEOLoadCollection);
+    }
+
+    protected DBFunctionSymbol createOpenEOReduceDimensionFunctionSymbol() {
+        return new DBFunctionSymbolWithSerializerImpl("OPENEO_R_DIM", ImmutableList.of(dbStringType,
+                dbStringType, dbStringType), dbStringType, false,
+                this::serializeOpenEOReduceDimension);
+    }
+
+    protected DBFunctionSymbol createOpenEOReduceSpatialDimensionFunctionSymbol() {
+        return new DBFunctionSymbolWithSerializerImpl("OPENEO_RSPAT_DIM", ImmutableList.of(dbStringType,
+                dbStringType), dbDoubleType, false,
+                this::serializeOpenEOReduceSpatialDimension);
     }
 
     protected abstract String serializeOpenEOAvg(ImmutableList<? extends ImmutableTerm> terms,
@@ -2112,9 +2156,25 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
                                                  Function<ImmutableTerm, String> termConverter,
                                                  TermFactory termFactory);
 
+    protected abstract String serializeOpenEORaster(ImmutableList<? extends ImmutableTerm> terms,
+                                                 Function<ImmutableTerm, String> termConverter,
+                                                 TermFactory termFactory);
+
     protected abstract String serializeOpenEOAgg(ImmutableList<? extends ImmutableTerm> terms,
                                                  Function<ImmutableTerm, String> termConverter,
                                                  TermFactory termFactory);
+
+    protected abstract String serializeOpenEOLoadCollection(ImmutableList<? extends ImmutableTerm> terms,
+                                                 Function<ImmutableTerm, String> termConverter,
+                                                 TermFactory termFactory);
+
+    protected abstract String serializeOpenEOReduceDimension(ImmutableList<? extends ImmutableTerm> terms,
+                                                            Function<ImmutableTerm, String> termConverter,
+                                                            TermFactory termFactory);
+
+    protected abstract String serializeOpenEOReduceSpatialDimension(ImmutableList<? extends ImmutableTerm> terms,
+                                                            Function<ImmutableTerm, String> termConverter,
+                                                            TermFactory termFactory);
 
     /**
      * By default, uses the row number

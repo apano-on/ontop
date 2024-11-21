@@ -433,5 +433,9 @@ public interface DBFunctionSymbolFactory {
     DBFunctionSymbol getOpenEOAvg();
     DBFunctionSymbol getOpenEOMax();
     DBFunctionSymbol getOpenEOMin();
+    DBFunctionSymbol getOpenEORaster();
     DBFunctionSymbol getOpenEOAgg();
+    DBFunctionSymbol getOpenEOLoadCollection();
+    DBFunctionSymbol getOpenEOReduceDimension();
+    DBFunctionSymbol getOpenEOReduceSpatialDimension();
 }

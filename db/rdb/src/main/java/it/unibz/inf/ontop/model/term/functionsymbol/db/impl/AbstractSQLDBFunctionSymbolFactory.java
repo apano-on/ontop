@@ -1544,7 +1544,7 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
         String start_date = termConverter.apply(terms.get(0));
         String end_date = termConverter.apply(terms.get(1));
         String polygon = termConverter.apply(terms.get(2));
-        String collection_id = termConverter.apply(terms.get(3));
+        String collection_id = termConverter.apply(terms.get(3)); //satellite
         String band = termConverter.apply(terms.get(4));
         String crs = termConverter.apply(terms.get(5));
 
@@ -1581,6 +1581,20 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     }
 
     @Override
+    protected String serializeOpenEORaster(ImmutableList<? extends ImmutableTerm> terms,
+                                        Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
+        String start_date = termConverter.apply(terms.get(0));
+        String end_date = termConverter.apply(terms.get(1));
+        String polygon = termConverter.apply(terms.get(2));
+        String collection_id = termConverter.apply(terms.get(3));
+        String band = termConverter.apply(terms.get(4));
+        String crs = termConverter.apply(terms.get(5));
+
+        return String.format("ontop_openeo.filter_bbox(%s, %s, %s, %s, %s, %s)",
+                start_date, end_date, polygon, collection_id, band, crs);
+    }
+
+    @Override
     protected String serializeOpenEOAgg(ImmutableList<? extends ImmutableTerm> terms,
                                         Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
         String start_date = termConverter.apply(terms.get(0));
@@ -1593,5 +1607,130 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
 
         return String.format("ontop_openeo.aggfunction(%s, %s, %s, %s, %s, %s, %s)",
                 start_date, end_date, polygon, collection_id, band, crs, operation);
+    }
+
+    @Override
+    protected String serializeOpenEOLoadCollection(ImmutableList<? extends ImmutableTerm> terms,
+                                        Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
+        String collection_id = termConverter.apply(terms.get(0));
+        String polygon = termConverter.apply(terms.get(1));
+        String start_time = termConverter.apply(terms.get(2));
+        String end_time = termConverter.apply(terms.get(3));
+        String band = termConverter.apply(terms.get(4));
+
+        return String.format("ontop_openeo.process_graph('{\n" +
+                        "  \"process_graph\": {\n" +
+                        "    \"load1\": {\n" +
+                        "      \"process_id\": \"load_collection\",\n" +
+                        "      \"arguments\": {\n" +
+                        "        \"id\": %s,\n" +
+                        "        \"spatial_extent\": {\n" +
+                        "          \"type\": \"Polygon\",\n" +
+                        "          \"coordinates\": %s\n" +
+                        "        },\n" +
+                        "        \"temporal_extent\": [\n" +
+                        "          %s,\n" +
+                        "          %s\n" +
+                        "        ],\n" +
+                        "        \"bands\": [\n" +
+                        "          %s\n" +
+                        "        ]\n" +
+                        "      }\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}'::JSONB)",
+                collection_id, polygon, start_time, end_time, band);
+    }
+
+    @Override
+    protected String serializeOpenEOReduceDimension(ImmutableList<? extends ImmutableTerm> terms,
+                                                   Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
+        String datacube = termConverter.apply(terms.get(0));
+        String dimension = termConverter.apply(terms.get(1));
+        String reducer = termConverter.apply(terms.get(2));
+
+        return String.format("ontop_openeo.process_graph('\"reduce4\": {\n" +
+                        "      \"process_id\": \"reduce_dimension\",\n" +
+                        "      \"arguments\": {\n" +
+                        "        \"data\": {\n" +
+                        "          \"from_node\": \"load1\"\n" +
+                        "        },\n" +
+                        "        \"reducer\": {\n" +
+                        "          \"process_graph\": {\n" +
+                        "            \"mean1\": {\n" +
+                        "              \"process_id\": %s,\n" +
+                        "              \"arguments\": {\n" +
+                        "                \"data\": {\n" +
+                        "                  \"from_parameter\": \"data\"\n" +
+                        "                }\n" +
+                        "              },\n" +
+                        "              \"result\": true\n" +
+                        "            }\n" +
+                        "          }\n" +
+                        "        },\n" +
+                        "        \"dimension\": %s\n" +
+                        "      }\n" +
+                        "    }'::JSONB)",
+                datacube, dimension, reducer);
+    }
+
+    @Override
+    protected String serializeOpenEOReduceSpatialDimension(ImmutableList<? extends ImmutableTerm> terms,
+                                                    Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
+        //TODO: Inherit geom from load collection
+        String datacube = termConverter.apply(terms.get(0));
+        String reducer = termConverter.apply(terms.get(1));
+
+        return String.format("ontop_openeo.process_graph('\"aggregate3\": {\n" +
+                        "      \"process_id\": \"aggregate_spatial\",\n" +
+                        "      \"arguments\": {\n" +
+                        "        \"data\": {\n" +
+                        "          \"from_node\": \"reduce4\"\n" +
+                        "        },\n" +
+                        "        \"geometries\": {\n" +
+                        "          \"type\": \"Polygon\",\n" +
+                        "          \"coordinates\": [\n" +
+                        "            [\n" +
+                        "              [\n" +
+                        "                11.217295301447447,\n" +
+                        "                46.37782347360016\n" +
+                        "              ],\n" +
+                        "              [\n" +
+                        "                11.43588312997802,\n" +
+                        "                46.37782347360016\n" +
+                        "              ],\n" +
+                        "              [\n" +
+                        "                11.43588312997802,\n" +
+                        "                46.566060562926936\n" +
+                        "              ],\n" +
+                        "              [\n" +
+                        "                11.217295301447447,\n" +
+                        "                46.566060562926936\n" +
+                        "              ],\n" +
+                        "              [\n" +
+                        "                11.217295301447447,\n" +
+                        "                46.37782347360016\n" +
+                        "              ]\n" +
+                        "            ]\n" +
+                        "          ]\n" +
+                        "        },\n" +
+                        "        \"reducer\": {\n" +
+                        "          \"process_graph\": {\n" +
+                        "            \"mean1\": {\n" +
+                        "              \"process_id\": \"mean\",\n" +
+                        "              \"arguments\": {\n" +
+                        "                \"data\": {\n" +
+                        "                  \"from_parameter\": \"data\"\n" +
+                        "                }\n" +
+                        "              },\n" +
+                        "              \"result\": true\n" +
+                        "            }\n" +
+                        "          }\n" +
+                        "        }\n" +
+                        "      },\n" +
+                        "      \"result\": true\n" +
+                        "    }\n" +
+                        "  }'::JSONB)",
+                datacube, reducer);
     }
 }

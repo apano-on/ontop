@@ -1,11 +1,17 @@
-package it.unibz.inf.ontop.model.term.functionsymbol.impl;
+package it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo;
 
 import com.google.common.collect.ImmutableList;
 import it.unibz.inf.ontop.exception.MinorOntopInternalBugException;
 import it.unibz.inf.ontop.iq.node.VariableNullability;
-import it.unibz.inf.ontop.model.term.*;
+import it.unibz.inf.ontop.model.term.Constant;
+import it.unibz.inf.ontop.model.term.ImmutableExpression;
+import it.unibz.inf.ontop.model.term.ImmutableTerm;
+import it.unibz.inf.ontop.model.term.TermFactory;
+import it.unibz.inf.ontop.model.term.functionsymbol.impl.SPARQLFunctionSymbolImpl;
+import it.unibz.inf.ontop.model.type.ObjectRDFType;
+import it.unibz.inf.ontop.model.type.RDFDatatype;
 import it.unibz.inf.ontop.model.type.RDFTermType;
-import it.unibz.inf.ontop.model.type.TermType;
+import it.unibz.inf.ontop.model.type.TermTypeInference;
 import it.unibz.inf.ontop.utils.ImmutableCollectors;
 import org.apache.commons.rdf.api.IRI;
 
@@ -13,31 +19,22 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-/**
- * The SPARQL function must be reducible to DB functions and RDF construction and testing functions
- *
- * Arity {@code >= 1 }
- */
-public abstract class ReduciblePositiveAritySPARQLFunctionSymbolImpl extends SPARQLFunctionSymbolImpl {
+public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolImpl {
 
-    protected ReduciblePositiveAritySPARQLFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
-                                                             @Nonnull ImmutableList<TermType> expectedBaseTypes) {
-        super(functionSymbolName, functionIRI, expectedBaseTypes);
-        if (expectedBaseTypes.isEmpty())
-            throw new IllegalArgumentException("The arity must be >= 1");
-    }
+    private final RDFDatatype xsdStringType;
 
-    protected ReduciblePositiveAritySPARQLFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull String officialName,
-                                                             @Nonnull ImmutableList<TermType> expectedBaseTypes) {
-        super(functionSymbolName, officialName, expectedBaseTypes);
-        if (expectedBaseTypes.isEmpty())
-            throw new IllegalArgumentException("The arity must be >= 1");
+    public OpenEOProcessGraphFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
+                                                   RDFDatatype xsdDateTime, RDFDatatype wktLiteralType, RDFDatatype xsdStringDatatype,
+                                                   RDFDatatype xsdIntegerTYpe) {
+        super(functionSymbolName, functionIRI,
+                ImmutableList.of(xsdStringDatatype, wktLiteralType, xsdDateTime, xsdDateTime, xsdStringDatatype));
+        this.xsdStringType = xsdStringDatatype;
     }
 
     @Override
-    protected ImmutableTerm buildTermAfterEvaluation(ImmutableList<ImmutableTerm> newTerms,
+    protected final ImmutableTerm buildTermAfterEvaluation(ImmutableList<ImmutableTerm> newTerms,
                                                            TermFactory termFactory, VariableNullability variableNullability) {
-        if ((!tolerateNulls()
+        /*if ((!tolerateNulls()
                 && newTerms.stream().anyMatch(ImmutableTerm::isNull)))
             return termFactory.getNullConstant();
 
@@ -62,7 +59,7 @@ public abstract class ReduciblePositiveAritySPARQLFunctionSymbolImpl extends SPA
                     case NULL:
                         throw new MinorOntopInternalBugException("This evaluation (SPARQL type error on the arguments) " +
                                 "should not produce a NULL");
-                    // TRUE: continue
+                        // TRUE: continue
                     default:
                         break;
                 }
@@ -81,49 +78,52 @@ public abstract class ReduciblePositiveAritySPARQLFunctionSymbolImpl extends SPA
 
             return termFactory.getRDFFunctionalTerm(
                     inputErrorCondition
-                        .map(c -> (ImmutableTerm) termFactory.getIfElseNull(c, lexicalTerm))
-                        .orElse(lexicalTerm),
+                            .map(c -> (ImmutableTerm) termFactory.getIfElseNull(c, lexicalTerm))
+                            .orElse(lexicalTerm),
                     termFactory.getIfElseNull(typeCondition, typeTerm));
         }
-        else
+        else*/
             return termFactory.getImmutableFunctionalTerm(this, newTerms);
     }
 
-    /**
-     * By default, does not tolerate receiving NULLs (SPARQL errors) as input
-     */
     @Override
-    protected boolean tolerateNulls() {
-        return false;
+    public Optional<TermTypeInference> inferType(ImmutableList<? extends ImmutableTerm> terms) {
+        return Optional.of(TermTypeInference.declareTermType(xsdStringType));
     }
 
     /**
-     * MUST detect ALL the cases where the SPARQL function would produce an error (that is a NULL)
-     * {@code ---> } the resulting condition must determine if the output of the SPARQL function is NULL (evaluates to FALSE or NULL)
-     *      or not (evaluates to TRUE).
-     *
-     * Default implementation, can be overridden
-     *
+     * Compute the lexical term when there is no input type error
      */
+    /*protected abstract ImmutableTerm computeLexicalTerm(ImmutableList<ImmutableTerm> subLexicalTerms,
+                                                        ImmutableList<ImmutableTerm> typeTerms, TermFactory termFactory,
+                                                        ImmutableTerm returnedTypeTerm);
+
+    protected abstract ImmutableTerm computeTypeTerm(ImmutableList<? extends ImmutableTerm> subLexicalTerms,
+                                                     ImmutableList<ImmutableTerm> typeTerms, TermFactory termFactory,
+                                                     VariableNullability variableNullability);*/
+
     protected ImmutableExpression.Evaluation evaluateInputTypeError(ImmutableList<ImmutableTerm> subLexicalTerms, ImmutableList<ImmutableTerm> typeTerms,
                                                                     TermFactory termFactory, VariableNullability variableNullability) {
         ImmutableList<ImmutableExpression> typeTestExpressions = IntStream.range(0, typeTerms.size())
                 .mapToObj(i -> termFactory.getIsAExpression(typeTerms.get(i), (RDFTermType) getExpectedBaseType(i)))
                 .collect(ImmutableCollectors.toList());
 
-         return termFactory.getConjunction(typeTestExpressions)
-                 .evaluate(variableNullability);
+        return termFactory.getConjunction(typeTestExpressions)
+                .evaluate(variableNullability);
     }
 
-    /**
-     * Compute the lexical term when there is no input type error
-     */
-    protected abstract ImmutableTerm computeLexicalTerm(ImmutableList<ImmutableTerm> subLexicalTerms,
-                                                        ImmutableList<ImmutableTerm> typeTerms, TermFactory termFactory,
-                                                        ImmutableTerm returnedTypeTerm);
+    @Override
+    public boolean canBePostProcessed(ImmutableList<? extends ImmutableTerm> arguments) {
+        return false;
+    }
 
-    protected abstract ImmutableTerm computeTypeTerm(ImmutableList<? extends ImmutableTerm> subLexicalTerms,
-                                                     ImmutableList<ImmutableTerm> typeTerms, TermFactory termFactory,
-                                                     VariableNullability variableNullability);
+    @Override
+    protected boolean isAlwaysInjectiveInTheAbsenceOfNonInjectiveFunctionalTerms() {
+        return false;
+    }
 
+    @Override
+    protected boolean tolerateNulls() {
+        return false;
+    }
 }

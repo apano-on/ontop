@@ -1422,11 +1422,37 @@ public class TermFactoryImpl implements TermFactory {
 	}
 
 	@Override
+	public ImmutableFunctionalTerm getOpenEORaster(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
+												ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEORaster(),
+				ImmutableList.of(term1, term2, term3, term4, term5, term6));
+	}
+
+	@Override
 	public ImmutableFunctionalTerm getOpenEOAgg(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
 												ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6,
 												ImmutableTerm term7) {
 		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOAgg(),
 				ImmutableList.of(term1, term2, term3, term4, term5, term6, term7));
+	}
+
+	@Override
+	public ImmutableFunctionalTerm getOpenEOLoadCollection(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
+												   ImmutableTerm term4, ImmutableTerm term5) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOLoadCollection(),
+				ImmutableList.of(term1, term2, term3, term4, term5));
+	}
+
+	@Override
+	public ImmutableFunctionalTerm getOpenEOReduceDimension(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOReduceDimension(),
+				ImmutableList.of(term1, term2, term3));
+	}
+
+	@Override
+	public ImmutableFunctionalTerm getOpenEOReduceSpatialDimension(ImmutableTerm term1, ImmutableTerm term2) {
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOReduceSpatialDimension(),
+				ImmutableList.of(term1, term2));
 	}
 
 }

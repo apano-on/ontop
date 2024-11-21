@@ -12,7 +12,7 @@ import it.unibz.inf.ontop.model.term.functionsymbol.db.DBFunctionSymbolFactory;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.geof.*;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.ofn.OfnMultitypedInputBinarySPARQLFunctionSymbolImpl;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.ofn.OfnSimpleBinarySPARQLFunctionSymbolImpl;
-import it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo.OpenEOUnaryDoubleFunctionSymbolImpl;
+import it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo.*;
 import it.unibz.inf.ontop.model.type.*;
 import it.unibz.inf.ontop.model.vocabulary.*;
 import org.apache.commons.rdf.api.IRI;
@@ -456,7 +456,17 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                 new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MAX", OPENEO.MAX, xsdDate,
                         wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMax),
                 new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MIN", OPENEO.MIN, xsdDate,
-                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMin)
+                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMin),
+                new OpenEORasterFunctionSymbolImpl("ONTOP_OPENEO_RASTER", OPENEO.RASTER, xsdDate,
+                        wktLiteral, xsdString, iriType, TermFactory::getOpenEORaster),
+                new OpenEOLoadCollectionFunctionSymbolImpl("ONTOP_OPENEO_LOAD_COLLECTION", OPENEO.LOAD_COLLECTION,
+                        xsdString, wktLiteral, xsdDatetime, TermFactory::getOpenEOLoadCollection),
+                new OpenEOReduceDimensionFunctionSymbolImpl("ONTOP_OPENEO_R_DIM", OPENEO.REDUCE_DIMENSION,
+                        xsdString, TermFactory::getOpenEOReduceDimension),
+                new OpenEOReduceSpatialDimensionFunctionSymbolImpl("ONTOP_OPENEO_R_SPAT", OPENEO.SPATIAL_AGG,
+                        xsdString, TermFactory::getOpenEOReduceSpatialDimension)
+//                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_LOAD", OPENEO.LOAD_COLLECTION, xsdDatetime,
+//                        wktLiteral, xsdString, xsdInteger/*, TermFactory::getOpenEOLoadCollection*/)
 //                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG, xsdDate,
 //                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOAgg)
 
