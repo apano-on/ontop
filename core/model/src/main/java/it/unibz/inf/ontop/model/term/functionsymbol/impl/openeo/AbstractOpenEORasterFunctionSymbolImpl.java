@@ -13,6 +13,7 @@ import org.apache.commons.rdf.api.IRI;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 /**
  * GeoSPARQL function must be reducible to DB functions and RDF construction and testing functions
@@ -43,15 +44,16 @@ public abstract class AbstractOpenEORasterFunctionSymbolImpl extends ReduciblePo
         // CASE 1 - Load Collection
         if (this instanceof OpenEOLoadCollectionFunctionSymbolImpl) {
             RDFDatatype wktLiteralType = termFactory.getTypeFactory().getWktLiteralDatatype();
-            RDFDatatype xsdDateTime = termFactory.getTypeFactory().getXsdDatetimeStampDatatype();
+            RDFDatatype xsdDateTime = termFactory.getTypeFactory().getXsdDatetimeDatatype();
             ImmutableList<ImmutableTerm> updatedTerms = ImmutableList.<ImmutableTerm>builder()
                     .addAll(newTerms)
+                    .add(termFactory.getRDFLiteralConstant("", termFactory.getTypeFactory().getXsdStringDatatype()))
                     .add(termFactory.getRDFLiteralConstant("", termFactory.getTypeFactory().getXsdStringDatatype()))
                     .add(termFactory.getRDFLiteralConstant("", termFactory.getTypeFactory().getXsdStringDatatype()))
                     .build();
             return termFactory.getImmutableFunctionalTerm(
                     new OpenEODefaultAggFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG,
-                            xsdStringType, wktLiteralType, xsdDateTime, xsdStringType, xsdStringType),
+                            xsdStringType, wktLiteralType, xsdDateTime),
                     updatedTerms);
         }
 
@@ -60,16 +62,31 @@ public abstract class AbstractOpenEORasterFunctionSymbolImpl extends ReduciblePo
         //TODO: Consider generating the JSON in python and not serializing here at all???
         if (this instanceof OpenEOReduceDimensionFunctionSymbolImpl) {
             RDFDatatype wktLiteralType = termFactory.getTypeFactory().getWktLiteralDatatype();
-            RDFDatatype xsdDateTime = termFactory.getTypeFactory().getXsdDatetimeStampDatatype();
+            RDFDatatype xsdDateTime = termFactory.getTypeFactory().getXsdDatetimeDatatype();
             //TODO: Condition is that the subterm is an ONTOP_OPENEO_AGG function
             ImmutableList<ImmutableTerm> updatedTerms = ImmutableList.<ImmutableTerm>builder()
-                    .addAll(((NonGroundFunctionalTerm) newTerms.get(0)).getTerms().subList(0, Math.min(newTerms.size(), 5)))
+                    .addAll(((NonGroundFunctionalTerm) newTerms.get(0)).getTerms().subList(0, 5))
                     .add(newTerms.get(1))
                     .add(newTerms.get(2))
+                    .add(termFactory.getRDFLiteralConstant("", termFactory.getTypeFactory().getXsdStringDatatype()))
                     .build();
             return termFactory.getImmutableFunctionalTerm(
                     new OpenEODefaultAggFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG,
-                            xsdStringType, wktLiteralType, xsdDateTime, xsdStringType, xsdStringType),
+                            xsdStringType, wktLiteralType, xsdDateTime),
+                    updatedTerms);
+        }
+
+        if (this instanceof OpenEOReduceSpatialDimensionFunctionSymbolImpl) {
+            RDFDatatype wktLiteralType = termFactory.getTypeFactory().getWktLiteralDatatype();
+            RDFDatatype xsdDateTime = termFactory.getTypeFactory().getXsdDatetimeDatatype();
+            //TODO: Condition is that the subterm is an ONTOP_OPENEO_AGG function
+            ImmutableList<ImmutableTerm> updatedTerms = ImmutableList.<ImmutableTerm>builder()
+                    .addAll(((NonGroundFunctionalTerm) newTerms.get(0)).getTerms().subList(0, 7))
+                    .add(newTerms.get(1))
+                    .build();
+            return termFactory.getImmutableFunctionalTerm(
+                    new OpenEODefaultAggFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG,
+                            xsdStringType, wktLiteralType, xsdDateTime),
                     updatedTerms);
         }
 
@@ -168,6 +185,16 @@ public abstract class AbstractOpenEORasterFunctionSymbolImpl extends ReduciblePo
             return termFactory.getDBStringConstant(((DBConstant) term).getValue());
         }
         return term;
+    }
+
+    protected ImmutableExpression.Evaluation evaluateInputTypeError(ImmutableList<ImmutableTerm> subLexicalTerms, ImmutableList<ImmutableTerm> typeTerms,
+                                                                    TermFactory termFactory, VariableNullability variableNullability) {
+        ImmutableList<ImmutableExpression> typeTestExpressions = IntStream.range(0, typeTerms.size())
+                .mapToObj(i -> termFactory.getIsAExpression(typeTerms.get(i), (RDFTermType) getExpectedBaseType(i)))
+                .collect(ImmutableCollectors.toList());
+
+        return termFactory.getConjunction(typeTestExpressions)
+                .evaluate(variableNullability);
     }
 
 }

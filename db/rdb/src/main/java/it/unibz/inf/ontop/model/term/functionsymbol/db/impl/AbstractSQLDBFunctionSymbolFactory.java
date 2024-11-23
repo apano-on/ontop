@@ -1597,16 +1597,17 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     @Override
     protected String serializeOpenEOAgg(ImmutableList<? extends ImmutableTerm> terms,
                                         Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
-        String start_date = termConverter.apply(terms.get(0));
-        String end_date = termConverter.apply(terms.get(1));
-        String polygon = termConverter.apply(terms.get(2));
-        String collection_id = termConverter.apply(terms.get(3));
-        String band = termConverter.apply(terms.get(3));
-        String crs = termConverter.apply(terms.get(3));
-        String operation = termConverter.apply(terms.get(3));
+        String collection_id = termConverter.apply(terms.get(0));
+        String polygon = termConverter.apply(terms.get(1));
+        String start_time = termConverter.apply(terms.get(2));
+        String end_time = termConverter.apply(terms.get(3));
+        String band = termConverter.apply(terms.get(4));
+        String dim1 = termConverter.apply(terms.get(5));
+        String operation1 = termConverter.apply(terms.get(6));
+        String operation2 = termConverter.apply(terms.get(7));
 
-        return String.format("ontop_openeo.aggfunction(%s, %s, %s, %s, %s, %s, %s)",
-                start_date, end_date, polygon, collection_id, band, crs, operation);
+        return String.format("ontop_openeo.aggfunction(%s, %s, %s, %s, %s, %s, %s, %s)",
+                collection_id, polygon, start_time, end_time, band, dim1, operation1, operation2);
     }
 
     @Override

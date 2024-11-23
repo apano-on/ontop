@@ -2121,8 +2121,9 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     }
 
     protected DBFunctionSymbol createOpenEOAggFunctionSymbol() {
-        return new DBFunctionSymbolWithSerializerImpl("OPENEO_MIN", ImmutableList.of(dbDateType, dbDateType, dbStringType,
-                dbStringType, dbStringType, dbStringType), dbDoubleType, false,
+        return new DBFunctionSymbolWithSerializerImpl("OPENEO_DEFAULT_AGG", ImmutableList.of(dbStringType,
+                dbStringType, dbDateTimestampType, dbDateTimestampType, dbStringType, dbStringType, dbStringType, dbStringType),
+                dbDoubleType, false,
                 this::serializeOpenEOAgg);
     }
 

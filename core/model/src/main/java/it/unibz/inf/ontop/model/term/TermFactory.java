@@ -680,7 +680,7 @@ public interface TermFactory {
 										 ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6);
 	ImmutableFunctionalTerm getOpenEOAgg(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
 										 ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6,
-										 ImmutableTerm term7);
+										 ImmutableTerm term7, ImmutableTerm term8);
 	ImmutableFunctionalTerm getOpenEOLoadCollection(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
 													ImmutableTerm term4, ImmutableTerm term5);
 	ImmutableFunctionalTerm getOpenEOReduceDimension(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3);

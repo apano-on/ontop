@@ -1431,9 +1431,9 @@ public class TermFactoryImpl implements TermFactory {
 	@Override
 	public ImmutableFunctionalTerm getOpenEOAgg(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
 												ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6,
-												ImmutableTerm term7) {
+												ImmutableTerm term7, ImmutableTerm term8) {
 		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOAgg(),
-				ImmutableList.of(term1, term2, term3, term4, term5, term6, term7));
+				ImmutableList.of(term1, term2, term3, term4, term5, term6, term7, term8));
 	}
 
 	@Override
