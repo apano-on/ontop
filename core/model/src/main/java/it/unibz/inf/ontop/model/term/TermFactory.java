@@ -679,4 +679,5 @@ public interface TermFactory {
 	ImmutableFunctionalTerm getOpenEOAgg(ImmutableTerm term1, ImmutableTerm term2, ImmutableTerm term3,
 										 ImmutableTerm term4, ImmutableTerm term5, ImmutableTerm term6,
 										 ImmutableTerm term7);
+	ImmutableFunctionalTerm getOpenEOProcessGraph(ImmutableList<? extends ImmutableTerm> terms);
 }

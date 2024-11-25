@@ -12,6 +12,8 @@ import it.unibz.inf.ontop.model.type.*;
 import it.unibz.inf.ontop.model.vocabulary.SPARQL;
 import org.apache.commons.rdf.api.IRI;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -172,6 +174,7 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     private DBFunctionSymbol openEOMaxFunctionSymbol;
     private DBFunctionSymbol openEOMinFunctionSymbol;
     private DBFunctionSymbol openEOAggFunctionSymbol;
+    private DBFunctionSymbol openEOProcessGraphFunctionSymbol;
 
     /**
      *  For conversion function symbols that are SIMPLE CASTs from an undetermined type (no normalization)
@@ -525,6 +528,7 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
         openEOMaxFunctionSymbol = createOpenEOMaxFunctionSymbol();
         openEOMinFunctionSymbol = createOpenEOMinFunctionSymbol();
         openEOAggFunctionSymbol = createOpenEOAggFunctionSymbol();
+        openEOProcessGraphFunctionSymbol = createOpenEOProcessGraphFunctionSymbol();
     }
 
     protected ImmutableMap<DBTermType, DBTypeConversionFunctionSymbol> createNormalizationMap() {
@@ -1364,6 +1368,13 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     public DBFunctionSymbol getOpenEOAgg() { return openEOAggFunctionSymbol; }
 
     @Override
+    public DBFunctionSymbol getOpenEOProcessGraph(int arity) {
+        List<DBTermType> myList = Collections.nCopies(arity, rootDBType);
+        return new OpenEODBFunctionSymbolWithSerializer("OPENEO_PROCESS_GRAPH", ImmutableList.copyOf(myList),
+            dbStringType, false,
+            this::serializeOpenEOProcessGraph); }
+
+    @Override
     public DBFunctionSymbol getDBArrayAccess() {
         throw new UnsupportedOperationException("Array support unavailable for this DBMS");
     }
@@ -2100,6 +2111,12 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
                 this::serializeOpenEOAgg);
     }
 
+    protected DBFunctionSymbol createOpenEOProcessGraphFunctionSymbol() {
+        return new OpenEODBFunctionSymbolWithSerializer("OPENEO_PROCESS_GRAPH", ImmutableList.of(rootDBType, rootDBType),
+                dbStringType, false,
+                this::serializeOpenEOProcessGraph);
+    }
+
     protected abstract String serializeOpenEOAvg(ImmutableList<? extends ImmutableTerm> terms,
                                                          Function<ImmutableTerm, String> termConverter,
                                                          TermFactory termFactory);
@@ -2113,6 +2130,10 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
                                                  TermFactory termFactory);
 
     protected abstract String serializeOpenEOAgg(ImmutableList<? extends ImmutableTerm> terms,
+                                                 Function<ImmutableTerm, String> termConverter,
+                                                 TermFactory termFactory);
+
+    protected abstract String serializeOpenEOProcessGraph(ImmutableList<? extends ImmutableTerm> terms,
                                                  Function<ImmutableTerm, String> termConverter,
                                                  TermFactory termFactory);
 
