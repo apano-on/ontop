@@ -1,5 +1,7 @@
 package it.unibz.inf.ontop.model.term.functionsymbol.db.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Maps;
@@ -12,9 +14,7 @@ import it.unibz.inf.ontop.model.type.*;
 import it.unibz.inf.ontop.model.type.impl.DateDBTermType;
 import it.unibz.inf.ontop.model.type.impl.DatetimeDBTermType;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -1593,5 +1593,35 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
 
         return String.format("ontop_openeo.aggfunction(%s, %s, %s, %s, %s, %s, %s)",
                 start_date, end_date, polygon, collection_id, band, crs, operation);
+    }
+
+    // TODO: Input will be an array or a JSON?
+    // TODO: Terms should be one list or json of VARIABLE arity
+    @Override
+    protected String serializeOpenEOProcessGraph(ImmutableList<? extends ImmutableTerm> terms,
+                                        Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
+
+        String jsonInput = convertToJSON(termConverter.apply(terms.get(0)));
+        return String.format("ontop_openeo.process_graph_function(%s::JSONB)",
+                jsonInput);
+    }
+
+    private String convertToJSON(String term) {
+
+        List<Object> jsonList = new ArrayList<>();
+        String[] items = term.split(",");
+        for (String item : items) {
+            // Remove surrounding quotes and type annotations
+            String cleaned = item.replaceAll("\"", "").replaceAll("\\^\\^TEXT", "").trim();
+
+            // Add to the list (strings will remain as is, expressions can be parsed further if needed)
+            jsonList.add(cleaned);
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(jsonList);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

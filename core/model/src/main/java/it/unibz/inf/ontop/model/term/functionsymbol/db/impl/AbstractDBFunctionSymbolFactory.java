@@ -172,6 +172,7 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     private DBFunctionSymbol openEOMaxFunctionSymbol;
     private DBFunctionSymbol openEOMinFunctionSymbol;
     private DBFunctionSymbol openEOAggFunctionSymbol;
+    private DBFunctionSymbol openEOProcessGraphFunctionSymbol;
 
     /**
      *  For conversion function symbols that are SIMPLE CASTs from an undetermined type (no normalization)
@@ -525,6 +526,7 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
         openEOMaxFunctionSymbol = createOpenEOMaxFunctionSymbol();
         openEOMinFunctionSymbol = createOpenEOMinFunctionSymbol();
         openEOAggFunctionSymbol = createOpenEOAggFunctionSymbol();
+        openEOProcessGraphFunctionSymbol = createOpenEOProcessGraphFunctionSymbol();
     }
 
     protected ImmutableMap<DBTermType, DBTypeConversionFunctionSymbol> createNormalizationMap() {
@@ -1364,6 +1366,9 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     public DBFunctionSymbol getOpenEOAgg() { return openEOAggFunctionSymbol; }
 
     @Override
+    public DBFunctionSymbol getOpenEOProcessGraph() { return openEOProcessGraphFunctionSymbol; }
+
+    @Override
     public DBFunctionSymbol getDBArrayAccess() {
         throw new UnsupportedOperationException("Array support unavailable for this DBMS");
     }
@@ -2100,6 +2105,11 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
                 this::serializeOpenEOAgg);
     }
 
+    protected DBFunctionSymbol createOpenEOProcessGraphFunctionSymbol() {
+        return new OpenEODBFunctionSymbolWithSerializer("OPENEO_PROCESS_GRAPH", ImmutableList.of(rootDBType), dbStringType, false,
+                this::serializeOpenEOProcessGraph);
+    }
+
     protected abstract String serializeOpenEOAvg(ImmutableList<? extends ImmutableTerm> terms,
                                                          Function<ImmutableTerm, String> termConverter,
                                                          TermFactory termFactory);
@@ -2113,6 +2123,10 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
                                                  TermFactory termFactory);
 
     protected abstract String serializeOpenEOAgg(ImmutableList<? extends ImmutableTerm> terms,
+                                                 Function<ImmutableTerm, String> termConverter,
+                                                 TermFactory termFactory);
+
+    protected abstract String serializeOpenEOProcessGraph(ImmutableList<? extends ImmutableTerm> terms,
                                                  Function<ImmutableTerm, String> termConverter,
                                                  TermFactory termFactory);
 

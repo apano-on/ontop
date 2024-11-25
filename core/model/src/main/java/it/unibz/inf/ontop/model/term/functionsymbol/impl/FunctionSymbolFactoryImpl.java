@@ -12,6 +12,7 @@ import it.unibz.inf.ontop.model.term.functionsymbol.db.DBFunctionSymbolFactory;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.geof.*;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.ofn.OfnMultitypedInputBinarySPARQLFunctionSymbolImpl;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.ofn.OfnSimpleBinarySPARQLFunctionSymbolImpl;
+import it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo.OpenEOProcessGraphFunctionSymbolImpl;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo.OpenEOUnaryDoubleFunctionSymbolImpl;
 import it.unibz.inf.ontop.model.type.*;
 import it.unibz.inf.ontop.model.vocabulary.*;
@@ -456,7 +457,13 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                 new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MAX", OPENEO.MAX, xsdDate,
                         wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMax),
                 new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MIN", OPENEO.MIN, xsdDate,
-                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMin)
+                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMin),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_LOAD_COLLECTION", OPENEO.LOAD_COLLECTION,
+                        xsdString, wktLiteral, xsdDatetime, xsdString),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_REDUCE_DIMENSION", OPENEO.REDUCE_DIMENSION,
+                        xsdString, xsdString, xsdString),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_AGGREGATE_SPATIAL", OPENEO.SPATIAL_AGG,
+                        xsdString, wktLiteral, xsdString)
 //                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG, xsdDate,
 //                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOAgg)
 
