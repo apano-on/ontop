@@ -12,6 +12,8 @@ import it.unibz.inf.ontop.model.type.*;
 import it.unibz.inf.ontop.model.vocabulary.SPARQL;
 import org.apache.commons.rdf.api.IRI;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1366,7 +1368,11 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     public DBFunctionSymbol getOpenEOAgg() { return openEOAggFunctionSymbol; }
 
     @Override
-    public DBFunctionSymbol getOpenEOProcessGraph() { return openEOProcessGraphFunctionSymbol; }
+    public DBFunctionSymbol getOpenEOProcessGraph(int arity) {
+        List<DBTermType> myList = Collections.nCopies(arity, rootDBType);
+        return new OpenEODBFunctionSymbolWithSerializer("OPENEO_PROCESS_GRAPH", ImmutableList.copyOf(myList),
+            dbStringType, false,
+            this::serializeOpenEOProcessGraph); }
 
     @Override
     public DBFunctionSymbol getDBArrayAccess() {
@@ -2106,7 +2112,8 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     }
 
     protected DBFunctionSymbol createOpenEOProcessGraphFunctionSymbol() {
-        return new OpenEODBFunctionSymbolWithSerializer("OPENEO_PROCESS_GRAPH", ImmutableList.of(rootDBType), dbStringType, false,
+        return new OpenEODBFunctionSymbolWithSerializer("OPENEO_PROCESS_GRAPH", ImmutableList.of(rootDBType, rootDBType),
+                dbStringType, false,
                 this::serializeOpenEOProcessGraph);
     }
 

@@ -1431,7 +1431,7 @@ public class TermFactoryImpl implements TermFactory {
 
 	@Override
 	public ImmutableFunctionalTerm getOpenEOProcessGraph(ImmutableList<? extends ImmutableTerm> terms) {
-		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOProcessGraph(), terms);
+		return getImmutableFunctionalTerm(dbFunctionSymbolFactory.getOpenEOProcessGraph(terms.size()), terms);
 	}
 
 }

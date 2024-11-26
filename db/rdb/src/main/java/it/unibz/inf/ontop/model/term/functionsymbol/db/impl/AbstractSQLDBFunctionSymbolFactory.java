@@ -1601,27 +1601,15 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
     protected String serializeOpenEOProcessGraph(ImmutableList<? extends ImmutableTerm> terms,
                                         Function<ImmutableTerm, String> termConverter, TermFactory termFactory) {
 
-        String jsonInput = convertToJSON(termConverter.apply(terms.get(0)));
-        return String.format("ontop_openeo.process_graph_function(%s::JSONB)",
-                jsonInput);
-    }
-
-    private String convertToJSON(String term) {
-
-        List<Object> jsonList = new ArrayList<>();
-        String[] items = term.split(",");
-        for (String item : items) {
-            // Remove surrounding quotes and type annotations
-            String cleaned = item.replaceAll("\"", "").replaceAll("\\^\\^TEXT", "").trim();
-
-            // Add to the list (strings will remain as is, expressions can be parsed further if needed)
-            jsonList.add(cleaned);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < terms.size(); i++) {
+            sb.append(termConverter.apply(terms.get(i)));
+            if (i < terms.size() - 1) {
+                sb.append(", ");
+            }
         }
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(jsonList);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+
+        return String.format("ontop_openeo.process_graph_function(TO_JSONB(ARRAY[%s]))",
+                sb.toString());
     }
 }

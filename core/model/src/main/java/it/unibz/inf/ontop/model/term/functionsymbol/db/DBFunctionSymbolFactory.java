@@ -434,5 +434,5 @@ public interface DBFunctionSymbolFactory {
     DBFunctionSymbol getOpenEOMax();
     DBFunctionSymbol getOpenEOMin();
     DBFunctionSymbol getOpenEOAgg();
-    DBFunctionSymbol getOpenEOProcessGraph();
+    DBFunctionSymbol getOpenEOProcessGraph(int arity);
 }

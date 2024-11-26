@@ -63,7 +63,7 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             ImmutableList<? extends ImmutableTerm> subTerms = newTerms;
             //ImmutableTerm id_term = termFactory.getRDFLiteralConstant("id", termFactory.getTypeFactory().getXsdStringDatatype());
             ImmutableTerm id_term = termFactory.getRDFLiteralConstant(generateUniqueId(subTerms), termFactory.getTypeFactory().getXsdStringDatatype());
-            ImmutableTerm function_term = termFactory.getRDFLiteralConstant("LOAD_COLLECTION", termFactory.getTypeFactory().getXsdStringDatatype());
+            ImmutableTerm function_term = termFactory.getRDFLiteralConstant("load_collection", termFactory.getTypeFactory().getXsdStringDatatype());
             updatedTerms = ImmutableList.<ImmutableTerm>builder()
                     .add(id_term)
                     .add(function_term)
@@ -81,18 +81,18 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             ImmutableList<? extends ImmutableTerm> subTerms = ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
             ImmutableTerm id_term = termFactory.getRDFLiteralConstant(generateUniqueId(subTerms), termFactory.getTypeFactory().getXsdStringDatatype());
             ImmutableTerm id_from_node_term = termFactory.getRDFLiteralConstant(generateUniqueIdFromNode(subTerms), termFactory.getTypeFactory().getXsdStringDatatype());
-            ImmutableTerm function_term = termFactory.getRDFLiteralConstant("REDUCE_DIMENSION", termFactory.getTypeFactory().getXsdStringDatatype());
+            ImmutableTerm function_term = termFactory.getRDFLiteralConstant("reduce_dimension", termFactory.getTypeFactory().getXsdStringDatatype());
             //TODO: It should reference the id it is connected to
             //TODO: Add a term for the from_id of the process graph? Or just assume it is the previous id?
             ImmutableList.Builder<ImmutableTerm> builder = ImmutableList.<ImmutableTerm>builder()
-                    .add(id_term);
+                    .add(id_term)
+                    .add(function_term);
 
             if (id_from_node_term != null) {
                 builder.add(id_from_node_term);
             }
 
             updatedTerms = builder
-                    .add(function_term)
                     .addAll(newTerms.subList(1, newTerms.size()))
                     .addAll(subTerms)
                     .build();
@@ -108,16 +108,16 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             ImmutableList<? extends ImmutableTerm> subTerms = ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
             ImmutableTerm id_term = termFactory.getRDFLiteralConstant(generateUniqueId(subTerms), termFactory.getTypeFactory().getXsdStringDatatype());
             ImmutableTerm id_from_node_term = termFactory.getRDFLiteralConstant(generateUniqueIdFromNode(subTerms), termFactory.getTypeFactory().getXsdStringDatatype());
-            ImmutableTerm function_term = termFactory.getRDFLiteralConstant("AGGREGATE_SPATIAL", termFactory.getTypeFactory().getXsdStringDatatype());
+            ImmutableTerm function_term = termFactory.getRDFLiteralConstant("aggregate_spatial", termFactory.getTypeFactory().getXsdStringDatatype());
             ImmutableList.Builder<ImmutableTerm> builder = ImmutableList.<ImmutableTerm>builder()
-                    .add(id_term);
+                    .add(id_term)
+                    .add(function_term);
 
             if (id_from_node_term != null) {
                 builder.add(id_from_node_term);
             }
 
             updatedTerms = builder
-                    .add(function_term)
                     .addAll(newTerms.subList(1, newTerms.size()))
                     .addAll(subTerms)
                     .build();
@@ -199,11 +199,7 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
     //@Override
     protected ImmutableTerm computeDBTerm(ImmutableList<ImmutableTerm> subLexicalTerms, ImmutableList<ImmutableTerm> typeTerms,
                                           TermFactory termFactory) {
-        DBConstant newTerm = termFactory.getDBStringConstant(subLexicalTerms.stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(",")));
-        //return termFactory.getOpenEOProcessGraph(subLexicalTerms);
-        return termFactory.getOpenEOProcessGraph(ImmutableList.of(newTerm));
+        return termFactory.getOpenEOProcessGraph(subLexicalTerms);
     }
 
     //@Override
