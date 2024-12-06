@@ -122,4 +122,29 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
         executeAndCompareValues(query, ImmutableList.of("\"[[277.5884282038762]]\"^^xsd:string", "\"[[278.78968620300293]]\"^^xsd:string"));
     }
 
+    @Test
+    public void getOpenEONDVIAvg() {
+
+        String query = "PREFIX :\t<http://www.unibz-openeo.org#>\n"
+                + "PREFIX rdfs:\t<http://www.w3.org/2000/01/rdf-schema#>\n"
+                + "PREFIX geo:\t<http://www.opengis.net/ont/geosparql#>\n"
+                + "PREFIX openeo:\t<http://www.openeo-ontop.org#>\n"
+                + "SELECT ?v {\n"
+                + "?g geo:asWKT ?xWkt .\n"
+                + "?g rdfs:label ?name .\n"
+                + "FILTER(LANG(?name) = \"it\" && (STR(?name) = \"Bressanone\" || STR(?name) = \"Merano\")) .\n"
+                + "BIND (\"2023-09-01T00:00:00Z\"^^xsd:dateTime AS ?start_time) .\n"
+                + "BIND (\"2023-09-07T00:00:00Z\"^^xsd:dateTime AS ?end_time) .\n"
+                + "BIND (\"SENTINEL2_L2A\" AS ?satellite) .\n"
+                + "BIND (\"[\"B04\",\"B08\"]\" AS ?band) .\n"
+                + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band) AS ?coll1) .\n"
+                + "BIND (openeo:reduce_dimension(?coll1, \"bands\", \"max\") AS ?coll2) .\n"
+                + "BIND (openeo:reduce_dimension(?coll1, \"t\", \"max\") AS ?coll2) .\n"
+                //+ "BIND (?kelvin_temp - 273.15  AS ?celsius_temp\n)"
+                //+ "BIND(ROUND(?celsius_temp * 1000) / 1000 AS ?v)"
+                + "}\n";
+
+        executeAndCompareValues(query, ImmutableList.of("\"[[277.5884282038762]]\"^^xsd:string", "\"[[278.78968620300293]]\"^^xsd:string"));
+    }
+
 }
