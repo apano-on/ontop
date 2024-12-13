@@ -64,6 +64,9 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
 
             case "ONTOP_OPENEO_AGGREGATE_SPATIAL":
                 return handleAggregateSpatial(newTerms, termFactory);
+
+            case "ONTOP_OPENEO_BAND_MATH":
+                return handleBandMath(newTerms, termFactory);
         }
 
         if ((!tolerateNulls()
@@ -272,6 +275,48 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
         );
         ImmutableTerm function_term = termFactory.getRDFLiteralConstant(
                 "aggregate_spatial",
+                termFactory.getTypeFactory().getXsdStringDatatype()
+        );
+
+        ImmutableList.Builder<ImmutableTerm> builder = ImmutableList.<ImmutableTerm>builder()
+                .add(id_term)
+                .add(function_term);
+
+        if (id_from_node_term != null) {
+            builder.add(id_from_node_term);
+        }
+
+        ImmutableList<ImmutableTerm> updatedTerms = builder
+                .addAll(newTerms.subList(1, newTerms.size()))
+                .addAll(subTerms)
+                .build();
+
+        List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
+
+        return termFactory.getImmutableFunctionalTerm(
+                new OpenEOProcessGraphFunctionSymbolImpl(
+                        "ONTOP_OPENEO_BASE",
+                        this.getIRI().get(),
+                        datatypes.toArray(new RDFDatatype[0])
+                ),
+                updatedTerms
+        );
+    }
+
+    private ImmutableFunctionalTerm handleBandMath(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
+        ImmutableList<? extends ImmutableTerm> subTerms =
+                ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
+
+        ImmutableTerm id_term = termFactory.getRDFLiteralConstant(
+                generateUniqueId(subTerms),
+                termFactory.getTypeFactory().getXsdStringDatatype()
+        );
+        ImmutableTerm id_from_node_term = termFactory.getRDFLiteralConstant(
+                generateUniqueIdFromNode(subTerms),
+                termFactory.getTypeFactory().getXsdStringDatatype()
+        );
+        ImmutableTerm function_term = termFactory.getRDFLiteralConstant(
+                "process_graph",
                 termFactory.getTypeFactory().getXsdStringDatatype()
         );
 
