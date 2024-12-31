@@ -176,4 +176,60 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
         executeAndCompareValues(query, ImmutableList.of("\"[[277.5884282038762]]\"^^xsd:string", "\"[[278.78968620300293]]\"^^xsd:string"));
     }
 
+    @Test
+    public void getOpenEOHeatwave() {
+
+        String query = "PREFIX :\t<http://www.unibz-openeo.org#>\n"
+                + "PREFIX rdfs:\t<http://www.w3.org/2000/01/rdf-schema#>\n"
+                + "PREFIX geo:\t<http://www.opengis.net/ont/geosparql#>\n"
+                + "PREFIX openeo:\t<http://www.openeo-ontop.org#>\n"
+                + "SELECT ?v {\n"
+                + "?g geo:asWKT ?xWkt .\n"
+                + "?g rdfs:label ?name .\n"
+                + "FILTER(LANG(?name) = \"it\" && (STR(?name) = \"Bressanone\" || STR(?name) = \"Merano\")) .\n"
+                + "BIND (\"2023-09-01T00:00:00Z\"^^xsd:dateTime AS ?start_time) .\n"
+                + "BIND (\"2023-09-07T00:00:00Z\"^^xsd:dateTime AS ?end_time) .\n"
+                + "BIND (\"SENTINEL2_L2A\" AS ?satellite) .\n"
+                + "BIND (\"LST\" AS ?band1) .\n"
+                + "BIND (\"confidence_in\" AS ?band2) .\n"
+                + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll1) .\n"
+                + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band2) AS ?coll2) .\n"
+                + "BIND (openeo:apply(?coll2 >= 16384) AS ?coll3) .\n"
+                + "BIND (openeo:mask(?coll1, ?coll3) AS ?coll4) .\n"
+                + "BIND (openeo:apply_dimension(?coll4, \"t\", ?udf) AS ?coll5) .\n"
+                + "BIND (openeo:reduce_dimension(?coll5, \"t\", \"sum\") AS ?v) .\n"
+                + "}\n";
+
+        executeAndCompareValues(query, ImmutableList.of("\"[[277.5884282038762]]\"^^xsd:string", "\"[[278.78968620300293]]\"^^xsd:string"));
+    }
+
+    @Test
+    public void getOpenEOWildfire() {
+
+        String query = "PREFIX :\t<http://www.unibz-openeo.org#>\n"
+                + "PREFIX rdfs:\t<http://www.w3.org/2000/01/rdf-schema#>\n"
+                + "PREFIX geo:\t<http://www.opengis.net/ont/geosparql#>\n"
+                + "PREFIX openeo:\t<http://www.openeo-ontop.org#>\n"
+                + "SELECT ?v {\n"
+                + "?g geo:asWKT ?xWkt .\n"
+                + "?g rdfs:label ?name .\n"
+                + "FILTER(LANG(?name) = \"it\" && (STR(?name) = \"Bressanone\" || STR(?name) = \"Merano\")) .\n"
+                + "BIND (\"2023-09-01T00:00:00Z\"^^xsd:dateTime AS ?start_time) .\n"
+                + "BIND (\"2023-09-07T00:00:00Z\"^^xsd:dateTime AS ?end_time) .\n"
+                + "BIND (\"SENTINEL2_L2A\" AS ?satellite) .\n"
+                + "BIND (\"[\"B04\",\"B08\",\"B12\"]\" AS ?band1) .\n"
+                + "BIND (\"SCL\" AS ?band2) .\n"
+                + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1, \"cloud_cover=90\") AS ?coll1) .\n"
+                + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band2, \"cloud_cover=90\") AS ?coll2) .\n"
+                + "BIND (openeo:ndvi(?coll1) AS ?coll3) .\n"
+                + "BIND (openeo:oneof(?coll2, \"3,8,9,10\") AS ?coll4) .\n"
+                + "BIND (openeo:apply_kernel(?coll4, ?kernel) AS ?coll5) .\n"
+                + "BIND (openeo:apply(?coll5 >= 98) AS ?coll6) .\n"
+                + "BIND (openeo:mask(?coll3, ?coll6) AS ?coll7) .\n"
+                + "BIND (openeo:reduce_dimension(?coll7, \"t\", \"first\") AS ?v) .\n"
+                + "}\n";
+
+        executeAndCompareValues(query, ImmutableList.of("\"[[277.5884282038762]]\"^^xsd:string", "\"[[278.78968620300293]]\"^^xsd:string"));
+    }
+
 }

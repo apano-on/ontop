@@ -465,7 +465,17 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                 new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_AGGREGATE_SPATIAL", OPENEO.SPATIAL_AGG,
                         xsdString, wktLiteral, xsdString),
                 new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_BAND_MATH", OPENEO.BAND_MATH,
-                        xsdString, xsdString, xsdString)
+                        xsdString, xsdString, xsdString),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_APPLY", OPENEO.APPLY,
+                        xsdString),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_APPLY_DIMENSION", OPENEO.APPLY_DIMENSION,
+                        xsdString, xsdString, xsdString),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_APPLY_KERNEL", OPENEO.APPLY_KERNEL,
+                        xsdString, xsdString),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_MASK", OPENEO.MASK,
+                        xsdString, xsdString),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_NDVI", OPENEO.NDVI,
+                        xsdString)
 //                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG, xsdDate,
 //                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOAgg)
 

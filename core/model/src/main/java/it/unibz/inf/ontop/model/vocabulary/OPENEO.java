@@ -20,6 +20,11 @@ public class OPENEO {
     public static final IRI REDUCE_DIMENSION;
     public static final IRI FILTER_DIMENSION;
     public static final IRI BAND_MATH;
+    public static final IRI APPLY;
+    public static final IRI MASK;
+    public static final IRI APPLY_DIMENSION;
+    public static final IRI NDVI;
+    public static final IRI APPLY_KERNEL;
 
     static {
         org.apache.commons.rdf.api.RDF factory = new SimpleRDF();
@@ -38,6 +43,11 @@ public class OPENEO {
         REDUCE_DIMENSION = factory.createIRI(PREFIX + "reduce_dimension");
         FILTER_DIMENSION = factory.createIRI(PREFIX + "filterDimension");
         BAND_MATH = factory.createIRI(PREFIX + "band_math");
+        APPLY = factory.createIRI(PREFIX + "apply");
+        MASK = factory.createIRI(PREFIX + "mask");
+        APPLY_DIMENSION = factory.createIRI(PREFIX + "apply_dimension");
+        NDVI = factory.createIRI(PREFIX + "ndvi");
+        APPLY_KERNEL = factory.createIRI(PREFIX + "apply_kernel");
     }
 
 }
