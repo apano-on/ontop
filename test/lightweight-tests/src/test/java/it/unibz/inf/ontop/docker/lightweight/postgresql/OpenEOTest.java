@@ -196,6 +196,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band2) AS ?coll2) .\n"
                 + "BIND (openeo:apply(?coll2 >= 16384) AS ?coll3) .\n"
                 + "BIND (openeo:mask(?coll1, ?coll3) AS ?coll4) .\n"
+                + "BIND (\"import xarray\\\\nimport numpy as np\\\\nfrom openeo.udf import inspect\\\\n\\\\ndef apply_datacube(cube: xarray.DataArray, context: dict) -> xarray.DataArray:\\\\n    \\\\n    array = cube.values\\\\n    inspect(data=[array.shape], message = \\\\\\\\\\\\\\\"Array dimensions\\\\\\\\\\\\\\\")\\\\n    res_arr=np.zeros(array.shape)\\\\n    for i in range(array.shape[0]-4):\\\\n        ar_sub=np.take(array,  range(i, i+5), axis=0)\\\\n        res_arr[i]=(np.all(ar_sub>295,axis=0)) & (np.nansum(ar_sub>300,axis=0)>2)\\\\n    return xarray.DataArray(res_arr, dims=cube.dims, coords=cube.coords)\" AS ?udf) .\n"
                 + "BIND (openeo:apply_dimension(?coll4, \"t\", ?udf) AS ?coll5) .\n"
                 + "BIND (openeo:reduce_dimension(?coll5, \"t\", \"sum\") AS ?v) .\n"
                 + "}\n";

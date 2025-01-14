@@ -1,5 +1,10 @@
 package it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo;
 
+import com.google.common.collect.ImmutableList;
+import it.unibz.inf.ontop.model.term.ImmutableTerm;
+import it.unibz.inf.ontop.model.term.NonGroundFunctionalTerm;
+import it.unibz.inf.ontop.model.term.functionsymbol.impl.GreaterThanSPARQLFunctionSymbolImpl;
+import it.unibz.inf.ontop.model.term.functionsymbol.impl.LessThanSPARQLFunctionSymbolImpl;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.geof.GeoUtils;
 import org.locationtech.proj4j.CRSFactory;
 import org.locationtech.proj4j.CoordinateReferenceSystem;
@@ -31,5 +36,37 @@ public class OpenEOUtils {
         } catch (Exception e) {
             throw new IllegalArgumentException("Unknown SRID: " + srid);
         }
+    }
+
+    protected static ImmutableList<? extends ImmutableTerm> getOpenEOBaseTerms(ImmutableList<? extends ImmutableTerm> newTerms) {
+        if(((NonGroundFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("ONTOP_OPENEO_BASE") ) {
+            return ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
+        } else {
+            ImmutableTerm firstTerm = ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms().get(0);
+            return getOpenEOBaseTerms(((NonGroundFunctionalTerm) firstTerm).getTerms());
+        }
+    }
+
+    protected static String getComparisonFunctionSymbol(NonGroundFunctionalTerm term) {
+        if (term.getFunctionSymbol().getName().equals("SP_LT")) {
+            return "lt";
+        } else if (term.getFunctionSymbol().getName().equals("SP_GT")) {
+            return "gt";
+        } else if (term.getFunctionSymbol().getName().equals("SP_EQ")) {
+            return "eq";
+        } else if (term.getFunctionSymbol().getName().equals("SP_NOT")) {
+            ImmutableTerm subTerm = ((NonGroundFunctionalTerm) term).getTerms().get(0);
+            String secondOperator = ((NonGroundFunctionalTerm) subTerm).getFunctionSymbol().getName();
+            if (secondOperator.equals("SP_LT")) {
+                return "gte";
+            } else if (secondOperator.equals("SP_GT")) {
+                return "lte";
+            } else if (secondOperator.equals("SP_EQ")) {
+                return "neq";
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported comparison operator: " + term.getFunctionSymbol().getName());
+        }
+        return null;
     }
 }
