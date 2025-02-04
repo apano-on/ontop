@@ -460,6 +460,8 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                         wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMin),
                 new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_LOAD_COLLECTION", OPENEO.LOAD_COLLECTION,
                         xsdString, wktLiteral, xsdDatetime, xsdString),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_LOAD_COLLECTION_WITH_PARAMETER", OPENEO.LOAD_COLLECTION_P,
+                        xsdString, wktLiteral, xsdDatetime, xsdString, xsdString),
                 new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_REDUCE_DIMENSION", OPENEO.REDUCE_DIMENSION,
                         xsdString, xsdString, xsdString),
                 new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_AGGREGATE_SPATIAL", OPENEO.SPATIAL_AGG,
@@ -471,11 +473,13 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                 new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_APPLY_DIMENSION", OPENEO.APPLY_DIMENSION,
                         xsdString, xsdString, xsdString),
                 new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_APPLY_KERNEL", OPENEO.APPLY_KERNEL,
-                        xsdString, xsdString),
+                        xsdString, xsdInteger, xsdDouble),
                 new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_MASK", OPENEO.MASK,
                         xsdString, xsdString),
                 new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_NDVI", OPENEO.NDVI,
-                        xsdString)
+                        xsdString),
+                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_ONEOF", OPENEO.ONEOF,
+                        xsdString, xsdString)
 //                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG, xsdDate,
 //                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOAgg)
 

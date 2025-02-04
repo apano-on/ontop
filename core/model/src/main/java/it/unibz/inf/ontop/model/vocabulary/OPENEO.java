@@ -11,6 +11,7 @@ public class OPENEO {
     public static final IRI AGG;
     public static final IRI RASTER;
     public static final IRI LOAD_COLLECTION;
+    public static final IRI LOAD_COLLECTION_P;
     public static final IRI SPATIAL_AGG;
     public static final IRI TEMPORAL_AGG;
     public static final IRI SPATIAL_TEMPORAL_AGG;
@@ -25,6 +26,7 @@ public class OPENEO {
     public static final IRI APPLY_DIMENSION;
     public static final IRI NDVI;
     public static final IRI APPLY_KERNEL;
+    public static final IRI ONEOF;
 
     static {
         org.apache.commons.rdf.api.RDF factory = new SimpleRDF();
@@ -34,6 +36,7 @@ public class OPENEO {
         AGG = factory.createIRI(PREFIX + "agg");
         RASTER = factory.createIRI(PREFIX + "raster");
         LOAD_COLLECTION = factory.createIRI(PREFIX + "load_collection");
+        LOAD_COLLECTION_P = factory.createIRI(PREFIX + "load_collection");
         SPATIAL_AGG = factory.createIRI(PREFIX + "aggregate_spatial");
         TEMPORAL_AGG = factory.createIRI(PREFIX + "temporalAgg");
         SPATIAL_TEMPORAL_AGG = factory.createIRI(PREFIX + "spatialTemporalAgg");
@@ -48,6 +51,7 @@ public class OPENEO {
         APPLY_DIMENSION = factory.createIRI(PREFIX + "apply_dimension");
         NDVI = factory.createIRI(PREFIX + "ndvi");
         APPLY_KERNEL = factory.createIRI(PREFIX + "apply_kernel");
+        ONEOF = factory.createIRI(PREFIX + "oneof");
     }
 
 }
