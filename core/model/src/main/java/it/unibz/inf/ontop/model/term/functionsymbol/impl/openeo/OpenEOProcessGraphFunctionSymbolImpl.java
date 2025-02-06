@@ -269,7 +269,7 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
 
         // Drop square brackets, and split down the middle the properties
         ImmutableList<ImmutableTerm> prunedNewTerms = newTerms.subList(2, newTerms.size()).stream()
-                .map(t -> t.toString())
+                .map(t -> ((RDFLiteralConstant) t).getValue())
                 .map(t -> {
                     String[] parts = t.split("=");
                     if (parts.length == 2) {
@@ -553,15 +553,15 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
 
         /*ImmutableList<RDFLiteralConstant> fixedTerms = subTerms.stream()
                 .map(t -> termFactory.getRDFLiteralConstant(((DBConstant) t).getValue().replaceAll("^\"|\"$", ""), termFactory.getTypeFactory().getXsdStringDatatype()))
-                .collect(ImmutableList.toImmutableList());
+                .collect(ImmutableList.toImmutableList());*/
 
         newTerms.subList(1, newTerms.size()).stream()
                 .map(t -> ((RDFLiteralConstant) t).getValue())
                 .map(t -> termFactory.getRDFLiteralConstant(t, termFactory.getTypeFactory().getXsdStringDatatype()))
-                .forEach(builder::add);*/
+                .forEach(builder::add);
 
         ImmutableList<ImmutableTerm> updatedTerms = builder
-                .addAll(subTerms.subList(1, subTerms.size()))
+                .addAll(subTerms)
                 //.addAll(fixedTerms)
                 .build();
 
@@ -704,7 +704,7 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
                 .collect(ImmutableList.toImmutableList());*/
 
         ImmutableList<ImmutableTerm> updatedTerms = builder
-                .addAll(subTerms.subList(1, subTerms.size()))
+                .addAll(subTerms)
                 //.addAll(fixedTerms)
                 .build();
 
