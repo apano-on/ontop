@@ -266,9 +266,23 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
                 "load_collection_with_parameter",
                 termFactory.getTypeFactory().getXsdStringDatatype()
         );
+        String filter_operator_string = OpenEOUtils.convertSymbolsRegex(((RDFLiteralConstant) newTerms.get(5)).getValue());
+        ImmutableTerm filter_operator_term = termFactory.getRDFLiteralConstant(
+                filter_operator_string,
+                termFactory.getTypeFactory().getXsdStringDatatype()
+        );
+        ImmutableList<String> value_terms = OpenEOUtils.splitTerm(((RDFLiteralConstant) newTerms.get(5)).getValue());
+        ImmutableTerm filtername_term = termFactory.getRDFLiteralConstant(
+                value_terms.get(0),
+                termFactory.getTypeFactory().getXsdStringDatatype()
+        );
+        ImmutableTerm filtervalue_term = termFactory.getRDFLiteralConstant(
+                value_terms.get(1),
+                termFactory.getTypeFactory().getXsdStringDatatype()
+        );
 
-        // Drop square brackets, and split down the middle the properties
-        ImmutableList<ImmutableTerm> prunedNewTerms = newTerms.subList(2, newTerms.size()).stream()
+        // Drop square brackets, and split down the middle the properties, ignore property term
+        ImmutableList<ImmutableTerm> prunedNewTerms = newTerms.subList(2, newTerms.size()-1).stream()
                 .map(t -> ((RDFLiteralConstant) t).getValue())
                 .map(t -> {
                     String[] parts = t.split("=");
@@ -288,6 +302,9 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
                 .add(newTerms.get(0))
                 .add(newTerms.get(1))
                 .addAll(prunedNewTerms)
+                .add(filtername_term)
+                .add(filter_operator_term)
+                .add(filtervalue_term)
                 .build();
 
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
@@ -304,7 +321,10 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
 
     private ImmutableFunctionalTerm handleReduceDimension(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
         ImmutableList<? extends ImmutableTerm> subTerms =
-                ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
+                ((ImmutableFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("OPENEO_PROCESS_GRAPH")
+                || ((ImmutableFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("ONTOP_OPENEO_BASE")
+                ? ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms()
+                : ((ImmutableFunctionalTerm) ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms().get(0)).getTerms();
 
         ImmutableTerm id_term = termFactory.getRDFLiteralConstant(
                 generateUniqueId(subTerms),
@@ -327,9 +347,14 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             builder.add(id_from_node_term);
         }
 
+        // Convert subTerms to RDFLiteralConstant where appropriate
+        ImmutableList<? extends ImmutableTerm> fixedTerms = subTerms.stream()
+                .map(t -> t instanceof Constant ? termFactory.getRDFLiteralConstant(((Constant) t).getValue(), termFactory.getTypeFactory().getXsdStringDatatype()) : t)
+                .collect(ImmutableCollectors.toList());
+
         ImmutableList<ImmutableTerm> updatedTerms = builder
                 .addAll(newTerms.subList(1, newTerms.size()))
-                .addAll(subTerms)
+                .addAll(fixedTerms)
                 .build();
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
 
@@ -345,7 +370,10 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
 
     private ImmutableFunctionalTerm handleAggregateSpatial(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
         ImmutableList<? extends ImmutableTerm> subTerms =
-                ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
+                ((ImmutableFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("OPENEO_PROCESS_GRAPH")
+                        || ((ImmutableFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("ONTOP_OPENEO_BASE")
+                        ? ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms()
+                        : ((ImmutableFunctionalTerm) ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms().get(0)).getTerms();
 
         ImmutableTerm id_term = termFactory.getRDFLiteralConstant(
                 generateUniqueId(subTerms),
@@ -368,9 +396,14 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             builder.add(id_from_node_term);
         }
 
+        // Convert subTerms to RDFLiteralConstant where appropriate
+        ImmutableList<? extends ImmutableTerm> fixedTerms = subTerms.stream()
+                .map(t -> t instanceof Constant ? termFactory.getRDFLiteralConstant(((Constant) t).getValue(), termFactory.getTypeFactory().getXsdStringDatatype()) : t)
+                .collect(ImmutableCollectors.toList());
+
         ImmutableList<ImmutableTerm> updatedTerms = builder
                 .addAll(newTerms.subList(1, newTerms.size()))
-                .addAll(subTerms)
+                .addAll(fixedTerms)
                 .build();
 
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
@@ -430,14 +463,14 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
     private ImmutableFunctionalTerm handleApply(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
         ImmutableList<? extends ImmutableTerm> subTerms = OpenEOUtils.getOpenEOBaseTerms(newTerms);
 
-        String apply_operator_string = OpenEOUtils.getComparisonFunctionSymbol((NonGroundFunctionalTerm) newTerms.get(0));
+        String apply_operator_string = OpenEOUtils.getComparisonFunctionSymbol((ImmutableFunctionalTerm) newTerms.get(0));
         ImmutableTerm apply_operator_term = termFactory.getRDFLiteralConstant(
                 apply_operator_string,
                 termFactory.getTypeFactory().getXsdStringDatatype()
         );
-        String value_comparator_string = ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms().size() > 1
-                ? ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms().get(1).toString()
-                : ((NonGroundFunctionalTerm) ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms().get(0)).getTerms().get(1).toString();
+        String value_comparator_string = ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms().size() > 1
+                ? ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms().get(1).toString()
+                : ((ImmutableFunctionalTerm) ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms().get(0)).getTerms().get(1).toString();
         ImmutableTerm value_comparator_term = termFactory.getRDFLiteralConstant(
                 value_comparator_string.replaceAll("^\"|\"\\^\\^.*$", ""),
                 termFactory.getTypeFactory().getXsdStringDatatype()
@@ -463,11 +496,16 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             builder.add(id_from_node_term);
         }
 
+        // Convert subTerms to RDFLiteralConstant where appropriate
+        ImmutableList<? extends ImmutableTerm> fixedTerms = subTerms.stream()
+                .map(t -> t instanceof Constant ? termFactory.getRDFLiteralConstant(((Constant) t).getValue(), termFactory.getTypeFactory().getXsdStringDatatype()) : t)
+                .collect(ImmutableCollectors.toList());
+
         ImmutableList<ImmutableTerm> updatedTerms = builder
                 .add(apply_operator_term)
                 .add(value_comparator_term)
                 .addAll(newTerms.subList(1, newTerms.size()))
-                .addAll(subTerms)
+                .addAll(fixedTerms)
                 .build();
 
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
@@ -483,8 +521,14 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
     }
 
     private ImmutableFunctionalTerm handleApplyDimension(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
+        if(newTerms.get(0).isGround() && ((GroundFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("RDF")) {
+            return handleApplyDimension(newTerms.stream()
+                    .map(t -> t instanceof Constant ? t : ((GroundFunctionalTerm) t).getTerms().get(0))
+                    .collect(ImmutableCollectors.toList()), termFactory);
+        }
+
         ImmutableList<? extends ImmutableTerm> subTerms =
-                ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
+                ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms();
 
         ImmutableTerm id_term = termFactory.getRDFLiteralConstant(
                 generateUniqueId(subTerms),
@@ -507,9 +551,14 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             builder.add(id_from_node_term);
         }
 
+        // Convert subTerms to RDFLiteralConstant where appropriate
+        ImmutableList<? extends ImmutableTerm> fixedTerms = subTerms.stream()
+                .map(t -> t instanceof Constant ? termFactory.getRDFLiteralConstant(((Constant) t).getValue(), termFactory.getTypeFactory().getXsdStringDatatype()) : t)
+                .collect(ImmutableCollectors.toList());
+
         ImmutableList<ImmutableTerm> updatedTerms = builder
                 .addAll(newTerms.subList(1, newTerms.size()))
-                .addAll(subTerms)
+                .addAll(fixedTerms)
                 .build();
 
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
@@ -525,10 +574,10 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
     }
 
     private ImmutableFunctionalTerm handleApplyKernel(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
-        /*ImmutableList<? extends ImmutableTerm> subTerms =
-                ((GroundFunctionalTerm) ((GroundFunctionalTerm) newTerms.get(0)).getTerms().get(0)).getTerms();*/
-        ImmutableList<? extends ImmutableTerm> subTerms =
-                ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
+
+        ImmutableList<? extends ImmutableTerm> subTerms = !(newTerms.get(0).isGround())
+                ? ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms()
+                : ((GroundFunctionalTerm) ((GroundFunctionalTerm) newTerms.get(0)).getTerms().get(0)).getTerms();
 
         ImmutableTerm id_term = termFactory.getRDFLiteralConstant(
                 generateUniqueId(subTerms),
@@ -551,18 +600,19 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             builder.add(id_from_node_term);
         }
 
-        /*ImmutableList<RDFLiteralConstant> fixedTerms = subTerms.stream()
-                .map(t -> termFactory.getRDFLiteralConstant(((DBConstant) t).getValue().replaceAll("^\"|\"$", ""), termFactory.getTypeFactory().getXsdStringDatatype()))
-                .collect(ImmutableList.toImmutableList());*/
-
         newTerms.subList(1, newTerms.size()).stream()
                 .map(t -> ((RDFLiteralConstant) t).getValue())
                 .map(t -> termFactory.getRDFLiteralConstant(t, termFactory.getTypeFactory().getXsdStringDatatype()))
                 .forEach(builder::add);
 
+        // Convert subTerms to RDFLiteralConstant where appropriate
+        ImmutableList<? extends ImmutableTerm> fixedTerms = subTerms.stream()
+                .map(t -> t instanceof Constant ? termFactory.getRDFLiteralConstant(((Constant) t).getValue(), termFactory.getTypeFactory().getXsdStringDatatype()) : t)
+                .collect(ImmutableCollectors.toList());
+
         ImmutableList<ImmutableTerm> updatedTerms = builder
-                .addAll(subTerms)
-                //.addAll(fixedTerms)
+                //.addAll(subTerms)
+                .addAll(fixedTerms)
                 .build();
 
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
@@ -578,9 +628,17 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
     }
 
     private ImmutableFunctionalTerm handleMask(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
+
+        if(newTerms.get(0).isGround() && ((GroundFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("RDF")
+        && newTerms.get(0).isGround() && ((GroundFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("RDF")) {
+            return handleMask(newTerms.stream()
+                    .map(t -> ((GroundFunctionalTerm) t).getTerms().get(0))
+                    .collect(ImmutableCollectors.toList()), termFactory);
+        }
+
         ImmutableList<? extends ImmutableTerm> subTerms = Stream.of(
-                        ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms(),
-                        ((NonGroundFunctionalTerm) newTerms.get(1)).getTerms())
+                        ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms(),
+                        ((ImmutableFunctionalTerm) newTerms.get(1)).getTerms())
                 .flatMap(List::stream)
                 .collect(ImmutableList.toImmutableList());
 
@@ -589,13 +647,13 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
                 termFactory.getTypeFactory().getXsdStringDatatype()
         );
         ImmutableTerm id_from_node_term = termFactory.getRDFLiteralConstant("to_node_" +
-                ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms().get(0).toString().replaceAll("^\"|\"$", ""),
-                termFactory.getTypeFactory().getXsdStringDatatype()
-        );
+                        ((Constant) ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms().get(0)).getValue(),
+                termFactory.getTypeFactory().getXsdStringDatatype());
+
         ImmutableTerm id_to_node_term = termFactory.getRDFLiteralConstant("from_node_" +
-                ((NonGroundFunctionalTerm) newTerms.get(1)).getTerms().get(0).toString().replaceAll("^\"|\"$", ""),
-                termFactory.getTypeFactory().getXsdStringDatatype()
-        );
+                        ((Constant) ((ImmutableFunctionalTerm) newTerms.get(1)).getTerms().get(0)).getValue(),
+                termFactory.getTypeFactory().getXsdStringDatatype());
+
         ImmutableTerm function_term = termFactory.getRDFLiteralConstant(
                 "mask",
                 termFactory.getTypeFactory().getXsdStringDatatype()
@@ -607,9 +665,14 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
                 .add(id_from_node_term)
                 .add(id_to_node_term);
 
+        // Convert subTerms to RDFLiteralConstant where appropriate
+        ImmutableList<? extends ImmutableTerm> fixedTerms = subTerms.stream()
+                .map(t -> t instanceof Constant ? termFactory.getRDFLiteralConstant(((Constant) t).getValue(), termFactory.getTypeFactory().getXsdStringDatatype()) : t)
+                .collect(ImmutableCollectors.toList());
+
         ImmutableList<ImmutableTerm> updatedTerms = builder
                 //.addAll(newTerms.subList(1, newTerms.size()))
-                .addAll(subTerms)
+                .addAll(fixedTerms)
                 .build();
 
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
@@ -625,7 +688,14 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
     }
 
     private ImmutableFunctionalTerm handleNDVI(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
-        ImmutableList<? extends ImmutableTerm> subTerms = ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
+
+        if(newTerms.get(0).isGround() && ((GroundFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("RDF")) {
+            return handleNDVI(newTerms.stream()
+                    .map(t -> ((ImmutableFunctionalTerm) t).getTerms().get(0))
+                    .collect(ImmutableCollectors.toList()), termFactory);
+        }
+
+        ImmutableList<? extends ImmutableTerm> subTerms = ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms();
 
         ImmutableTerm id_term = termFactory.getRDFLiteralConstant(
                 generateUniqueId(subTerms),
@@ -648,14 +718,15 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             builder.add(id_from_node_term);
         }
 
-        /*ImmutableList<RDFLiteralConstant> fixedTerms = subTerms.stream()
-                .map(t -> termFactory.getRDFLiteralConstant(((DBConstant) t).getValue().replaceAll("^\"|\"$", ""), termFactory.getTypeFactory().getXsdStringDatatype()))
-                .collect(ImmutableList.toImmutableList());*/
+        // Convert subTerms to RDFLiteralConstant where appropriate
+        ImmutableList<? extends ImmutableTerm> fixedTerms = subTerms.stream()
+                .map(t -> t instanceof Constant ? termFactory.getRDFLiteralConstant(((Constant) t).getValue(), termFactory.getTypeFactory().getXsdStringDatatype()) : t)
+                .collect(ImmutableCollectors.toList());
 
         ImmutableList<ImmutableTerm> updatedTerms = builder
                 .addAll(newTerms.subList(1, newTerms.size()))
-                //.addAll(fixedTerms)
-                .addAll(subTerms)
+                .addAll(fixedTerms)
+                //.addAll(subTerms)
                 .build();
 
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
@@ -671,8 +742,12 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
     }
 
     private ImmutableFunctionalTerm handleoneof(ImmutableList<ImmutableTerm> newTerms, TermFactory termFactory) {
+
+
         ImmutableList<? extends ImmutableTerm> subTerms =
-                ((NonGroundFunctionalTerm) newTerms.get(0)).getTerms();
+                ((ImmutableFunctionalTerm) newTerms.get(0)).getFunctionSymbol().getName().equals("RDF")
+                        ? ((ImmutableFunctionalTerm) ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms().get(0)).getTerms()
+                        : ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms();
 
         ImmutableTerm id_term = termFactory.getRDFLiteralConstant(
                 generateUniqueId(subTerms),
@@ -699,13 +774,14 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
                 .stream().map(t -> termFactory.getRDFLiteralConstant(t, termFactory.getTypeFactory().getXsdStringDatatype()))
                 .forEach(builder::add);
 
-        /*ImmutableList<RDFLiteralConstant> fixedTerms = subTerms.stream()
-                .map(t -> termFactory.getRDFLiteralConstant(((DBConstant) t).getValue().replaceAll("^\"|\"$", ""), termFactory.getTypeFactory().getXsdStringDatatype()))
-                .collect(ImmutableList.toImmutableList());*/
+        // Convert subTerms to RDFLiteralConstant where appropriate
+        ImmutableList<? extends ImmutableTerm> fixedTerms = subTerms.stream()
+                .map(t -> t instanceof Constant ? termFactory.getRDFLiteralConstant(((Constant) t).getValue(), termFactory.getTypeFactory().getXsdStringDatatype()) : t)
+                .collect(ImmutableCollectors.toList());
 
         ImmutableList<ImmutableTerm> updatedTerms = builder
-                .addAll(subTerms)
-                //.addAll(fixedTerms)
+                //.addAll(subTerms)
+                .addAll(fixedTerms)
                 .build();
 
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
@@ -724,20 +800,28 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
     public ImmutableTerm simplify(ImmutableList<? extends ImmutableTerm> terms,
                                   TermFactory termFactory, VariableNullability variableNullability) {
 
-        if (this.getName() != "ONTOP_OPENEO_ONEOF") {
-            return super.simplify(terms, termFactory, variableNullability);
+        if (this.getName() == "ONTOP_OPENEO_APPLY") {
+            return buildTermAfterEvaluation(terms.stream().collect(ImmutableCollectors.toList()),
+                    termFactory, variableNullability);
         }
 
-        ImmutableList<ImmutableTerm> newTerms = terms.stream()
-                .map(t -> (t instanceof ImmutableFunctionalTerm && !(((ImmutableFunctionalTerm) t).getFunctionSymbol() instanceof AbstractBinaryBooleanOperatorSPARQLFunctionSymbol))
-                        ? t.simplify(variableNullability)
-                        : t)
-                .collect(ImmutableCollectors.toList());
+        if (this.getName() == "ONTOP_OPENEO_ONEOF") {
 
-        if ((!tolerateNulls()) && newTerms.stream().anyMatch(ImmutableTerm::isNull))
-            return termFactory.getNullConstant();
+            ImmutableList<ImmutableTerm> newTerms = terms.stream()
+                    /*.map(t -> (t instanceof RDFTermFunctionSymbol)
+                            ? ((ImmutableFunctionalTerm) t).getTerm(0).simplify(variableNullability)
+                            : ((ImmutableFunctionalTerm) t).getTerm(0))*/
+                    .map(t -> (t instanceof ImmutableFunctionalTerm && !(((ImmutableFunctionalTerm) t).getFunctionSymbol() instanceof AbstractBinaryBooleanOperatorSPARQLFunctionSymbol))
+                            ? t.simplify(variableNullability)
+                            : t)
+                    .collect(ImmutableCollectors.toList());
 
-        return buildTermAfterEvaluation(newTerms, termFactory, variableNullability);
+            if ((!tolerateNulls()) && newTerms.stream().anyMatch(ImmutableTerm::isNull))
+                return termFactory.getNullConstant();
+
+            return buildTermAfterEvaluation(newTerms, termFactory, variableNullability);
+            }
+        return super.simplify(terms, termFactory, variableNullability);
     }
 
     private static List<String> parseExpression(String input) {
@@ -758,5 +842,12 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
         String input = "SP_OR(SP_EBV(\"3\"^^xsd:integer),SP_OR(SP_EBV(\"8\"^^xsd:integer),SP_OR(SP_EBV(\"9\"^^xsd:integer),SP_EBV(\"10\"^^xsd:integer))))";
         List<String> output = parseExpression(input);
         System.out.println(output); // Expected: [or, 3, 8, 9, 10]
+    }
+
+    private ImmutableList<? extends ImmutableTerm> getSubTermsRecursively(ImmutableFunctionalTerm term) {
+        if (term.getFunctionSymbol().getName().equals(this.getName())) {
+            return term.getTerms();
+        }
+        return getSubTermsRecursively((ImmutableFunctionalTerm) term.getTerms().get(0));
     }
 }
