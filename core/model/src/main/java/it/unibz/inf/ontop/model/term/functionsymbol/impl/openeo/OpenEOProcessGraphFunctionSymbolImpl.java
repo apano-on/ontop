@@ -431,7 +431,7 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
                 termFactory.getTypeFactory().getXsdStringDatatype()
         );
         ImmutableTerm function_term = termFactory.getRDFLiteralConstant(
-                "process_graph",
+                "band_math",
                 termFactory.getTypeFactory().getXsdStringDatatype()
         );
 
@@ -443,9 +443,14 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
             builder.add(id_from_node_term);
         }
 
+        // Convert subTerms to RDFLiteralConstant where appropriate
+        ImmutableList<? extends ImmutableTerm> fixedTerms = subTerms.stream()
+                .map(t -> t instanceof Constant ? termFactory.getRDFLiteralConstant(((Constant) t).getValue(), termFactory.getTypeFactory().getXsdStringDatatype()) : t)
+                .collect(ImmutableCollectors.toList());
+
         ImmutableList<ImmutableTerm> updatedTerms = builder
                 .addAll(newTerms.subList(1, newTerms.size()))
-                .addAll(subTerms)
+                .addAll(fixedTerms)
                 .build();
 
         List<RDFDatatype> datatypes = Collections.nCopies(updatedTerms.size(), this.xsdStringType);
