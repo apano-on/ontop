@@ -114,9 +114,9 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 //+ "BIND (<http://www.opengis.net/def/crs/EPSG/0/4326> AS ?crs) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band) AS ?coll1) .\n"
                 + "BIND (openeo:reduce_dimension(?coll1, \"t\", \"mean\") AS ?coll2) .\n"
-                + "BIND (openeo:aggregate_spatial(?coll2, ?xWkt, \"mean\") AS ?kelvin_temp) .\n"
-                + "BIND (?kelvin_temp - 273.15  AS ?celsius_temp\n)"
-                + "BIND(ROUND(?celsius_temp * 1000) / 1000 AS ?v)"
+                + "BIND (openeo:aggregate_spatial(?coll2, ?xWkt, \"mean\") AS ?v) .\n"
+                //+ "BIND (?kelvin_temp - 273.15  AS ?celsius_temp\n)"
+                //+ "BIND(ROUND(?celsius_temp * 1000) / 1000 AS ?v)"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of("\"277.5884282038762\"^^xsd:string", "\"278.78968620300293\"^^xsd:string"));

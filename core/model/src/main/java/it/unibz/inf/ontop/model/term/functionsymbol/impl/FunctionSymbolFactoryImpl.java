@@ -12,8 +12,7 @@ import it.unibz.inf.ontop.model.term.functionsymbol.db.DBFunctionSymbolFactory;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.geof.*;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.ofn.OfnMultitypedInputBinarySPARQLFunctionSymbolImpl;
 import it.unibz.inf.ontop.model.term.functionsymbol.impl.ofn.OfnSimpleBinarySPARQLFunctionSymbolImpl;
-import it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo.OpenEOProcessGraphFunctionSymbolImpl;
-import it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo.OpenEOUnaryDoubleFunctionSymbolImpl;
+import it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo.*;
 import it.unibz.inf.ontop.model.type.*;
 import it.unibz.inf.ontop.model.vocabulary.*;
 import org.apache.commons.rdf.api.IRI;
@@ -458,31 +457,28 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                         wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMax),
                 new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_MIN", OPENEO.MIN, xsdDate,
                         wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOMin),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_LOAD_COLLECTION", OPENEO.LOAD_COLLECTION,
-                        xsdString, wktLiteral, xsdDatetime, xsdString),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_LOAD_COLLECTION_WITH_PARAMETER", OPENEO.LOAD_COLLECTION_P,
-                        xsdString, wktLiteral, xsdDatetime, xsdString, xsdString),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_REDUCE_DIMENSION", OPENEO.REDUCE_DIMENSION,
-                        xsdString, xsdString, xsdString),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_AGGREGATE_SPATIAL", OPENEO.SPATIAL_AGG,
-                        xsdString, wktLiteral, xsdString),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_BAND_MATH", OPENEO.BAND_MATH,
-                        xsdString, xsdString),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_APPLY", OPENEO.APPLY,
+                new OpenEOLoadCollectionFunctionSymbolImpl("ONTOP_OPENEO_LOAD_COLLECTION", OPENEO.LOAD_COLLECTION,
+                        xsdString, wktLiteral, xsdDatetime),
+                new OpenEOLoadCollectionWithParameterFunctionSymbolImpl("ONTOP_OPENEO_LOAD_COLLECTION_WITH_PARAMETER", OPENEO.LOAD_COLLECTION_P,
+                        xsdString, wktLiteral, xsdDatetime),
+                new OpenEOReduceDimensionFunctionSymbolImpl("ONTOP_OPENEO_REDUCE_DIMENSION", OPENEO.REDUCE_DIMENSION,
                         xsdString),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_APPLY_DIMENSION", OPENEO.APPLY_DIMENSION,
-                        xsdString, xsdString, xsdString),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_APPLY_KERNEL", OPENEO.APPLY_KERNEL,
+                new OpenEOAggregateSpatialFunctionSymbolImpl("ONTOP_OPENEO_AGGREGATE_SPATIAL", OPENEO.SPATIAL_AGG,
+                        xsdString, wktLiteral),
+                new OpenEOBandMathFunctionSymbolImpl("ONTOP_OPENEO_BAND_MATH", OPENEO.BAND_MATH,
+                        xsdString),
+                new OpenEOApplyFunctionSymbolImpl("ONTOP_OPENEO_APPLY", OPENEO.APPLY,
+                        xsdString),
+                new OpenEOApplyDimensionFunctionSymbolImpl("ONTOP_OPENEO_APPLY_DIMENSION", OPENEO.APPLY_DIMENSION,
+                        xsdString),
+                new OpenEOApplyKernelFunctionSymbolImpl("ONTOP_OPENEO_APPLY_KERNEL", OPENEO.APPLY_KERNEL,
                         xsdString, xsdInteger, xsdDouble),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_MASK", OPENEO.MASK,
-                        xsdString, xsdString),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_NDVI", OPENEO.NDVI,
+                new OpenEOMaskFunctionSymbolImpl("ONTOP_OPENEO_MASK", OPENEO.MASK,
                         xsdString),
-                new OpenEOProcessGraphFunctionSymbolImpl("ONTOP_OPENEO_ONEOF", OPENEO.ONEOF,
-                        xsdString, xsdString)
-//                new OpenEOUnaryDoubleFunctionSymbolImpl("ONTOP_OPENEO_AGG", OPENEO.AGG, xsdDate,
-//                        wktLiteral, xsdString, iriType, xsdDouble, TermFactory::getOpenEOAgg)
-
+                new OpenEONDVIFunctionSymbolImpl("ONTOP_OPENEO_NDVI", OPENEO.NDVI,
+                        xsdString),
+                new OpenEOOneOfFunctionSymbolImpl("ONTOP_OPENEO_ONEOF", OPENEO.ONEOF,
+                        xsdString)
                 );
 
         ImmutableTable.Builder<String, Integer, SPARQLFunctionSymbol> tableBuilder = ImmutableTable.builder();
