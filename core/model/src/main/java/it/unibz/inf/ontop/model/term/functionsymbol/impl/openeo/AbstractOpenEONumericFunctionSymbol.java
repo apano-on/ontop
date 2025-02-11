@@ -16,11 +16,11 @@ import java.util.Optional;
  *
  * Arity {@code >= 1 }
  */
-public abstract class AbstractOpenEOFunctionSymbolImpl extends ReduciblePositiveAritySPARQLFunctionSymbolImpl {
+public abstract class AbstractOpenEONumericFunctionSymbol extends ReduciblePositiveAritySPARQLFunctionSymbolImpl {
 
     private final RDFDatatype xsdDoubleType;
 
-    protected AbstractOpenEOFunctionSymbolImpl(
+    protected AbstractOpenEONumericFunctionSymbol(
             @Nonnull String functionSymbolName,
             @Nonnull IRI functionIRI,
             ImmutableList<TermType> inputTypes,

@@ -25,6 +25,30 @@ public class OpenEOApplyFunctionSymbolImpl extends OpenEOProcessGraphFunctionSym
         this.xsdStringType = xsdStringDatatype;
     }
 
+    /*@Override
+    protected String initFunctionName() {
+        return "apply";
+    }
+
+    @Override
+    protected ImmutableList<ImmutableTerm> additionalTerms(ImmutableList<ImmutableTerm> terms, TermFactory termFactory) {
+        ImmutableList<? extends ImmutableTerm> subTerms = OpenEOUtils.getOpenEOBaseTerms(terms);
+
+        String apply_operator_string = OpenEOUtils.getComparisonFunctionSymbol((ImmutableFunctionalTerm) terms.get(0));
+        ImmutableTerm apply_operator_term = termFactory.getRDFLiteralConstant(
+                apply_operator_string,
+                termFactory.getTypeFactory().getXsdStringDatatype()
+        );
+        String value_comparator_string = ((ImmutableFunctionalTerm) terms.get(0)).getTerms().size() > 1
+                ? ((ImmutableFunctionalTerm) terms.get(0)).getTerms().get(1).toString()
+                : ((ImmutableFunctionalTerm) ((ImmutableFunctionalTerm) terms.get(0)).getTerms().get(0)).getTerms().get(1).toString();
+        ImmutableTerm value_comparator_term = termFactory.getRDFLiteralConstant(
+                value_comparator_string.replaceAll("^\"|\"\\^\\^.*$", ""),
+                termFactory.getTypeFactory().getXsdStringDatatype()
+        );
+        return ImmutableList.of(apply_operator_term, value_comparator_term);
+    }*/
+
     @Override
     protected final ImmutableTerm buildTermAfterEvaluation(ImmutableList<ImmutableTerm> newTerms,
                                                            TermFactory termFactory, VariableNullability variableNullability) {
@@ -87,11 +111,18 @@ public class OpenEOApplyFunctionSymbolImpl extends OpenEOProcessGraphFunctionSym
         );
     }
 
+    // Apply checks for boolean expressions, they should not be simplified
+    // TODO: Check if this is the correct approach
     @Override
     public ImmutableTerm simplify(ImmutableList<? extends ImmutableTerm> terms,
                                   TermFactory termFactory, VariableNullability variableNullability) {
         return buildTermAfterEvaluation(terms.stream().collect(ImmutableCollectors.toList()),
                 termFactory, variableNullability);
     }
+
+    /*@Override
+    protected boolean customAdditionalTerms() {
+        return true;
+    }*/
 }
 

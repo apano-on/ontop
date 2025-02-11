@@ -115,8 +115,6 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band) AS ?coll1) .\n"
                 + "BIND (openeo:reduce_dimension(?coll1, \"t\", \"mean\") AS ?coll2) .\n"
                 + "BIND (openeo:aggregate_spatial(?coll2, ?xWkt, \"mean\") AS ?v) .\n"
-                //+ "BIND (?kelvin_temp - 273.15  AS ?celsius_temp\n)"
-                //+ "BIND(ROUND(?celsius_temp * 1000) / 1000 AS ?v)"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of("\"277.5884282038762\"^^xsd:string", "\"278.78968620300293\"^^xsd:string"));
@@ -135,12 +133,9 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"2023-09-07T00:00:00Z\"^^xsd:dateTime AS ?end_time) .\n"
                 + "BIND (\"SENTINEL3_SLSTR\" AS ?satellite) .\n"
                 + "BIND (\"S8\" AS ?band) .\n"
-                //+ "BIND (<http://www.opengis.net/def/crs/EPSG/0/4326> AS ?crs) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band) AS ?coll1) .\n"
                 + "BIND (openeo:reduce_dimension(?coll1, \"t\", \"mean\") AS ?coll2) .\n"
-                + "BIND (openeo:aggregate_spatial(?coll2, ?xWkt, \"mean\") AS ?kelvin_temp) .\n"
-                + "BIND (?kelvin_temp - 273.15  AS ?celsius_temp\n)"
-                + "BIND(ROUND(?celsius_temp * 1000) / 1000 AS ?v)"
+                + "BIND (openeo:aggregate_spatial(?coll2, ?xWkt, \"mean\") AS ?v) .\n"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of("\"277.8469262491862\"^^xsd:string"));
@@ -163,10 +158,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"[B04, B08]\" AS ?band1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll1) .\n"
                 + "BIND (openeo:band_math(?coll1, \"x2 - x1 / x2 + x1\") AS ?coll2) .\n"
-                //+ "BIND (openeo:reduce_dimension(?coll1, \"bands\", ?math_op) AS ?coll2) .\n"
                 + "BIND (openeo:reduce_dimension(?coll2, \"t\", \"max\") AS ?v) .\n"
-                //+ "BIND (?kelvin_temp - 273.15  AS ?celsius_temp\n)"
-                //+ "BIND(ROUND(?celsius_temp * 1000) / 1000 AS ?v)"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of("\"[[277.5884282038762]]\"^^xsd:string", "\"[[278.78968620300293]]\"^^xsd:string"));

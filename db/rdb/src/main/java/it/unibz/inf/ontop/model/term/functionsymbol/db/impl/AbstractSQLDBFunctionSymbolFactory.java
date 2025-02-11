@@ -1610,6 +1610,6 @@ public abstract class AbstractSQLDBFunctionSymbolFactory extends AbstractDBFunct
         }
 
         return String.format("ontop_openeo.process_graph_function(TO_JSONB(ARRAY[%s]))",
-                sb.toString());
+                sb);
     }
 }

@@ -23,6 +23,30 @@ public class OpenEOMaskFunctionSymbolImpl extends OpenEOProcessGraphFunctionSymb
         this.xsdStringType = xsdStringDatatype;
     }
 
+    /*@Override
+    protected String initFunctionName() {
+        return "mask";
+    }
+
+    @Override
+    protected ImmutableList<ImmutableTerm> additionalTerms(ImmutableList<ImmutableTerm> terms, TermFactory termFactory) {
+        if(terms.get(0).isGround() && ((GroundFunctionalTerm) terms.get(0)).getFunctionSymbol().getName().equals("RDF")
+                && terms.get(0).isGround() && ((GroundFunctionalTerm) terms.get(0)).getFunctionSymbol().getName().equals("RDF")) {
+            return additionalTerms(terms.stream()
+                    .map(t -> ((GroundFunctionalTerm) t).getTerms().get(0))
+                    .collect(ImmutableCollectors.toList()), termFactory);
+        }
+
+        ImmutableTerm id_from_node_term = termFactory.getRDFLiteralConstant("to_node_" +
+                        ((Constant) ((ImmutableFunctionalTerm) terms.get(0)).getTerms().get(0)).getValue(),
+                termFactory.getTypeFactory().getXsdStringDatatype());
+
+        ImmutableTerm id_to_node_term = termFactory.getRDFLiteralConstant("from_node_" +
+                        ((Constant) ((ImmutableFunctionalTerm) terms.get(1)).getTerms().get(0)).getValue(),
+                termFactory.getTypeFactory().getXsdStringDatatype());
+        return ImmutableList.of(id_to_node_term, id_from_node_term);
+    }*/
+
     @Override
     protected final ImmutableTerm buildTermAfterEvaluation(ImmutableList<ImmutableTerm> newTerms,
                                                            TermFactory termFactory, VariableNullability variableNullability) {
@@ -88,4 +112,14 @@ public class OpenEOMaskFunctionSymbolImpl extends OpenEOProcessGraphFunctionSymb
                 updatedTerms
         );
     }
+
+    /*@Override
+    protected boolean customAdditionalTerms() {
+        return true;
+    }
+
+    @Override
+    protected boolean shouldExtractSubTerms() {
+        return false;
+    }*/
 }

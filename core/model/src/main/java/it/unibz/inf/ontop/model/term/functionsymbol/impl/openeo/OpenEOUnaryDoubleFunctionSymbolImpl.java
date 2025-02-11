@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import static it.unibz.inf.ontop.model.term.functionsymbol.impl.openeo.OpenEOUtils.getSRID;
 
-public class OpenEOUnaryDoubleFunctionSymbolImpl extends AbstractOpenEOFunctionSymbolImpl {
+public class OpenEOUnaryDoubleFunctionSymbolImpl extends AbstractOpenEONumericFunctionSymbol {
 
     private final SeptFunction<TermFactory, ImmutableTerm, ImmutableTerm, ImmutableTerm, ImmutableTerm, ImmutableTerm,
             ImmutableTerm, ImmutableTerm> dbTermFct;

@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolImpl {
 
-    private final RDFDatatype xsdStringType;
+    protected final RDFDatatype xsdStringType;
     private static Set<Integer> idTerms = new HashSet<>();
 
     public OpenEOProcessGraphFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
@@ -69,6 +69,11 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
         if ((!tolerateNulls()
                 && newTerms.stream().anyMatch(ImmutableTerm::isNull)))
             return termFactory.getNullConstant();
+
+        if (!this.getName().equals("ONTOP_OPENEO_BASE")) {
+            return computeOpenEOTerm(newTerms, termFactory);
+        }
+
         if (newTerms.stream()
                 .allMatch(t -> isRDFFunctionalTerm(t) || (t instanceof Constant))) {
             ImmutableList<ImmutableTerm> typeTerms = newTerms.stream()
@@ -105,9 +110,9 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
                             .map(c -> (ImmutableTerm) termFactory.getIfElseNull(c, lexicalTerm))
                             .orElse(lexicalTerm),
                     termFactory.getIfElseNull(typeCondition, typeTerm));
+        } else {
+            return termFactory.getImmutableFunctionalTerm(this, newTerms);
         }
-        else
-        return termFactory.getImmutableFunctionalTerm(this, newTerms);
     }
 
     @Override
@@ -136,7 +141,9 @@ public class OpenEOProcessGraphFunctionSymbolImpl extends SPARQLFunctionSymbolIm
         return termFactory.getRDFTermTypeConstant(xsdStringType);
     }
 
-
+    protected ImmutableTerm computeOpenEOTerm(ImmutableList<ImmutableTerm> subLexicalTerms, TermFactory termFactory) {
+        return termFactory.getOpenEOProcessGraph(subLexicalTerms);
+    }
 
     protected ImmutableExpression.Evaluation evaluateInputTypeError(ImmutableList<ImmutableTerm> subLexicalTerms, ImmutableList<ImmutableTerm> typeTerms,
                                                                     TermFactory termFactory, VariableNullability variableNullability) {
