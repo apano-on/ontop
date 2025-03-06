@@ -27,6 +27,7 @@ public class OPENEO {
     public static final IRI NDVI;
     public static final IRI APPLY_KERNEL;
     public static final IRI ONEOF;
+    public static final IRI CUBE_MATH;
 
     static {
         org.apache.commons.rdf.api.RDF factory = new SimpleRDF();
@@ -52,6 +53,7 @@ public class OPENEO {
         NDVI = factory.createIRI(PREFIX + "ndvi");
         APPLY_KERNEL = factory.createIRI(PREFIX + "apply_kernel");
         ONEOF = factory.createIRI(PREFIX + "oneof");
+        CUBE_MATH = factory.createIRI(PREFIX + "cube_math");
     }
 
 }

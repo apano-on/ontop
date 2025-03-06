@@ -478,6 +478,8 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                 new OpenEONDVIFunctionSymbolImpl("ONTOP_OPENEO_NDVI", OPENEO.NDVI,
                         xsdString),
                 new OpenEOOneOfFunctionSymbolImpl("ONTOP_OPENEO_ONEOF", OPENEO.ONEOF,
+                        xsdString),
+                new OpenEOCubeMathFunctionSymbolImpl("ONTOP_OPENEO_CUBE_MATH", OPENEO.CUBE_MATH,
                         xsdString)
                 );
 
