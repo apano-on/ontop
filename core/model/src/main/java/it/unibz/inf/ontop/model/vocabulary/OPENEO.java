@@ -28,6 +28,15 @@ public class OPENEO {
     public static final IRI APPLY_KERNEL;
     public static final IRI ONEOF;
     public static final IRI CUBE_MATH;
+    public static final IRI MERGE_CUBES;
+    public static final IRI SAR_BACKSCATTER;
+    public static final IRI RENAME_LABELS;
+    public static final IRI TO_SCL_DISTILLATION_MASK;
+    public static final IRI APPLY_NEIGHBORHOOD;
+    public static final IRI LINEAR_SCALE_RANGE;
+    public static final IRI AGGREGATE_TEMPORAL_PERIOD;
+    public static final IRI FILTER_BBOX;
+    public static final IRI FILTER_BANDS;
 
     static {
         org.apache.commons.rdf.api.RDF factory = new SimpleRDF();
@@ -54,6 +63,15 @@ public class OPENEO {
         APPLY_KERNEL = factory.createIRI(PREFIX + "apply_kernel");
         ONEOF = factory.createIRI(PREFIX + "oneof");
         CUBE_MATH = factory.createIRI(PREFIX + "cube_math");
+        MERGE_CUBES = factory.createIRI(PREFIX + "merge_cubes");
+        SAR_BACKSCATTER = factory.createIRI(PREFIX + "sar_backscatter");
+        RENAME_LABELS = factory.createIRI(PREFIX + "rename_labels");
+        TO_SCL_DISTILLATION_MASK = factory.createIRI(PREFIX + "to_scl_distillation_mask");
+        APPLY_NEIGHBORHOOD = factory.createIRI(PREFIX + "apply_neighborhood");
+        LINEAR_SCALE_RANGE = factory.createIRI(PREFIX + "linear_scale_range");
+        AGGREGATE_TEMPORAL_PERIOD = factory.createIRI(PREFIX + "aggregate_temporal_period");
+        FILTER_BBOX = factory.createIRI(PREFIX + "filter_bbox");
+        FILTER_BANDS = factory.createIRI(PREFIX + "filter_bands");
     }
 
 }
