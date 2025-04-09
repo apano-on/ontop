@@ -157,7 +157,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"SENTINEL2_L2A\" AS ?satellite) .\n"
                 + "BIND (\"[B04, B08]\" AS ?band1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll1) .\n"
-                + "BIND (openeo:band_math(?coll1, \"x2 - x1 / x2 + x1\") AS ?coll2) .\n"
+                + "BIND (openeo:band_math(?coll1, \"(x2 - x1) / (x2 + x1)\") AS ?coll2) .\n"
                 + "BIND (openeo:reduce_dimension(?coll2, \"t\", \"max\") AS ?v) .\n"
                 + "}\n";
 
@@ -349,15 +349,17 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND(\"POLYGON((11.25 46.4, 11.75 46.4, 11.75 46.7, 11.25 46.7, 11.25 46.4))\"^^geo:wktLiteral AS ?xWkt) .\n"
                 + "BIND (\"2023-09-01T00:00:00Z\"^^xsd:dateTime AS ?start_time) .\n"
                 + "BIND (\"2023-09-07T00:00:00Z\"^^xsd:dateTime AS ?end_time) .\n"
+                + "BIND (\"2023-09-08T00:00:00Z\"^^xsd:dateTime AS ?start_time2) .\n"
+                + "BIND (\"2023-09-15T00:00:00Z\"^^xsd:dateTime AS ?end_time2) .\n"
                 + "BIND (\"SENTINEL2_L2A\" AS ?satellite) .\n"
                 + "BIND (\"[B04, B08]\" AS ?band1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll1) .\n"
                 + "BIND (openeo:ndvi(?coll1) AS ?coll2) .\n"
                 + "BIND (openeo:reduce_dimension(?coll2, \"t\", \"mean\") AS ?coll3) .\n"
-                + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll4) .\n"
+                + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time2, ?end_time2, ?band1) AS ?coll4) .\n"
                 + "BIND (openeo:ndvi(?coll4) AS ?coll5) .\n"
                 + "BIND (openeo:reduce_dimension(?coll5, \"t\", \"mean\") AS ?coll6) .\n"
-                + "BIND (openeo:merge_cubes(?coll5, ?coll6, \"subtract\") AS ?v) .\n"
+                + "BIND (openeo:merge_cubes(?coll6, ?coll3, '{\"overlap_resolver\": \"subtract\"}') AS ?v) .\n"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of());
@@ -383,7 +385,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (openeo:rename_labels(?coll3, \"bands\", \"amplitude\") AS ?coll5) .\n"
                 + "BIND (openeo:apply(?coll5 - 3.5) AS ?coll6) .\n"
                 + "BIND (openeo:rename_labels(?coll6, \"bands\", \"threshold\") AS ?coll7) .\n"
-                + "BIND (openeo:merge_cubes(?coll4, ?coll7) AS ?coll8) .\n"
+                + "BIND (openeo:merge_cubes(?coll4, ?coll7, '{\"overlap_resolver\": null}') AS ?coll8) .\n"
                 + "BIND (openeo:reduce_dimension(?coll8, \"bands\", \"amplitude\" < \"threshold\") AS ?v) .\n"
                 + "}\n";
 
@@ -439,15 +441,15 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND(\"POLYGON((11.25 46.4, 11.75 46.4, 11.75 46.7, 11.25 46.7, 11.25 46.4))\"^^geo:wktLiteral AS ?xWkt) .\n"
                 + "BIND (\"2023-09-01T00:00:00Z\"^^xsd:dateTime AS ?start_time) .\n"
                 + "BIND (\"2023-09-07T00:00:00Z\"^^xsd:dateTime AS ?end_time) .\n"
-                + "BIND (\"SENTINEL1_GRDF\" AS ?satellite) .\n"
+                + "BIND (\"SENTINEL1_GRD\" AS ?satellite) .\n"
                 + "BIND (\"[VV, VH]\" AS ?band1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll1) .\n"
-                + "BIND (openeo:sar_backscatter(?coll1, {coefficient: \"sigma0-ellipsoid\"}) AS ?coll2) .\n"
-                //+ "BIND (openeo:filter_bands(?coll2, \"VV\") AS ?coll3) .\n"
-                //+ "BIND (openeo:filter_bands(?coll2, \"VH\") AS ?coll4) .\n"
-                //Alternatively use a process for multiply, add, filter_bands
-                + "BIND (openeo:band_math(?coll2, 4 * x2 / (x1 + x2)) AS ?v) .\n"
+                + "BIND (openeo:sar_backscatter(?coll1, '{\"coefficient\": \"sigma0-ellipsoid\"}') AS ?coll2) .\n"
+                + "BIND (openeo:band_math(?coll2, \"4 * x2 / (x1 + x2)\") AS ?v) .\n"
                 + "}\n";
+        //+ "BIND (openeo:filter_bands(?coll2, \"VV\") AS ?coll3) .\n"
+        //+ "BIND (openeo:filter_bands(?coll2, \"VH\") AS ?coll4) .\n"
+        //Alternatively use a process for multiply, add, filter_bands
 
         executeAndCompareValues(query, ImmutableList.of());
     }
@@ -464,7 +466,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"2023-09-01T00:00:00Z\"^^xsd:dateTime AS ?start_time) .\n"
                 + "BIND (\"2023-09-07T00:00:00Z\"^^xsd:dateTime AS ?end_time) .\n"
                 + "BIND (\"2023-09-14T00:00:00Z\"^^xsd:dateTime AS ?end_time2) .\n"
-                + "BIND (\"SENTINEL1_GRDF\" AS ?satellite) .\n"
+                + "BIND (\"SENTINEL1_GRD\" AS ?satellite) .\n"
                 + "BIND (\"VV\" AS ?band1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll1) .\n"
                 + "BIND (openeo:sar_backscatter(?coll1, {coefficient: \"sigma0-ellipsoid\"}) AS ?coll2) .\n"
@@ -505,6 +507,17 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (openeo:oneof(?coll2, \"3\"^^xsd:integer || \"8\"^^xsd:integer || \"9\"^^xsd:integer) AS ?coll3) .\n"
                 + "BIND (openeo:aggregate_spatial(?coll3, ?xWkt, \"mean\") AS ?coll4) .\n"
                 // Next they sort data with xarray ... not something we can do ...
+                + "BIND (import xarray as xr\n" +
+                "from pandas import to_datetime\n" +
+                "\n" +
+                "def apply_timeseries(data: xr.DataArray, context: dict):\n" +
+                "    nb = context.get(\"nb_of_timesteps\", 12)\n" +
+                "    sorted_data = data.sortby(data)\n" +
+                "    best_dates = sorted_data[\"t\"].values[:nb]\n" +
+                "    # Convert to ISO date strings (YYYY-MM-DD)\n" +
+                "    return [str(to_datetime(d).date()) for d in best_dates]\n AS ?udf) .\n"
+                + "BIND (openeo:reduce_dimension(?coll4, \"t\", udf={?udf, context={\"nb_of_timesteps\": nb_of_timesteps}) AS ?coll5) .\n"
+                + "BIND (openeo:filter_temporal(?coll1, ?coll5) AS ?coll6) .\n"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of());

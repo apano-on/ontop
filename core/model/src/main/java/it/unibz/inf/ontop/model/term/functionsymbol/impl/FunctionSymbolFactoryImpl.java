@@ -498,6 +498,8 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                 new OpenEOFilterBboxFunctionSymbolImpl("ONTOP_OPENEO_FILTER_BBOX", OPENEO.FILTER_BBOX,
                         xsdString),
                 new OpenEOLinearScaleRangeFunctionSymbolImpl("ONTOP_OPENEO_LINEAR_SCALE_RANGE", OPENEO.LINEAR_SCALE_RANGE,
+                        xsdString),
+                new OpenEOFilterTemporalFunctionSymbolImpl("ONTOP_OPENEO_FILTER_TEMPORAL", OPENEO.FILTER_TEMPORAL,
                         xsdString)
                 );
 

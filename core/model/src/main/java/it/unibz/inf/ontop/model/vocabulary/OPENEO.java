@@ -16,7 +16,7 @@ public class OPENEO {
     public static final IRI TEMPORAL_AGG;
     public static final IRI SPATIAL_TEMPORAL_AGG;
     public static final IRI SPATIAL_FILTER;
-    public static final IRI TEMPORAL_FILTER;
+    public static final IRI FILTER_TEMPORAL;
     public static final IRI BAND_FILTER;
     public static final IRI REDUCE_DIMENSION;
     public static final IRI FILTER_DIMENSION;
@@ -51,7 +51,7 @@ public class OPENEO {
         TEMPORAL_AGG = factory.createIRI(PREFIX + "temporalAgg");
         SPATIAL_TEMPORAL_AGG = factory.createIRI(PREFIX + "spatialTemporalAgg");
         SPATIAL_FILTER = factory.createIRI(PREFIX + "spatialFilter");
-        TEMPORAL_FILTER = factory.createIRI(PREFIX + "temporalFilter");
+        FILTER_TEMPORAL = factory.createIRI(PREFIX + "filter_temporal");
         BAND_FILTER = factory.createIRI(PREFIX + "bandFilter");
         REDUCE_DIMENSION = factory.createIRI(PREFIX + "reduce_dimension");
         FILTER_DIMENSION = factory.createIRI(PREFIX + "filterDimension");
