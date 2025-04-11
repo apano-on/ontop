@@ -11,7 +11,7 @@ public class OpenEORenameLabelsFunctionSymbolImpl extends AbstractOpenEOFunction
     public OpenEORenameLabelsFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
                                                            RDFDatatype xsdStringDatatype) {
         super(functionSymbolName, functionIRI,
-                ImmutableList.of(xsdStringDatatype, xsdStringDatatype), xsdStringDatatype);
+                ImmutableList.of(xsdStringDatatype, xsdStringDatatype, xsdStringDatatype), xsdStringDatatype);
     }
 
     @Override

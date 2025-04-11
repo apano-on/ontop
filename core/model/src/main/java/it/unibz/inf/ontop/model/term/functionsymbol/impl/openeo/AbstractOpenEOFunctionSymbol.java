@@ -7,8 +7,7 @@ import it.unibz.inf.ontop.utils.ImmutableCollectors;
 import org.apache.commons.rdf.api.IRI;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * OpenEO function symbol that represents a process graph function.
@@ -30,7 +29,8 @@ public abstract class AbstractOpenEOFunctionSymbol extends OpenEOProcessGraphFun
     protected ImmutableTerm computeOpenEOTerm(ImmutableList<ImmutableTerm> subLexicalTerms,
                                           TermFactory termFactory) {
         ImmutableList<ImmutableTerm> processedTerms = processTermsBeforeComputation(subLexicalTerms, termFactory);
-        List<RDFDatatype> datatypes = Collections.nCopies(processedTerms.size(), super.xsdStringType);
+        ImmutableList<ImmutableTerm> newProcessedTerms = removeDuplicatePipelines(processedTerms);
+        List<RDFDatatype> datatypes = Collections.nCopies(newProcessedTerms.size(), super.xsdStringType);
 
         return termFactory.getImmutableFunctionalTerm(
                 new OpenEOProcessGraphFunctionSymbolImpl(
@@ -38,7 +38,7 @@ public abstract class AbstractOpenEOFunctionSymbol extends OpenEOProcessGraphFun
                         super.getIRI().get(),
                         datatypes.toArray(new RDFDatatype[0])
                 ),
-                processedTerms
+                newProcessedTerms
         );
     }
 
@@ -132,6 +132,70 @@ public abstract class AbstractOpenEOFunctionSymbol extends OpenEOProcessGraphFun
     // Override for specific functions like apply
     protected ImmutableList<ImmutableTerm> additionalTerms(ImmutableList<ImmutableTerm> terms, TermFactory termFactory) {
         return ImmutableList.of();
+    }
+
+    // With examples like OilSpills we reuse the same load collection in 2 ways, it must be removed/de-duplicated
+    protected ImmutableList<ImmutableTerm> removeDuplicatePipelines(ImmutableList<ImmutableTerm> processedTerms) {
+        // Create a mutable copy of the list to allow for removal
+        List<ImmutableTerm> mutableTerms = new ArrayList<>(processedTerms);
+
+        // Keep track of ID literals we've already seen
+        Set<String> seenIds = new HashSet<>();
+
+        // For tracking ranges to remove
+        int startRemovalIndex = -1;
+
+        for (int i = 0; i < mutableTerms.size(); i++) {
+            ImmutableTerm term = mutableTerms.get(i);
+
+            // Check if term is an RDFLiteralConstant and starts with "id_"
+            if (term instanceof RDFLiteralConstant) {
+                RDFLiteralConstant literalTerm = (RDFLiteralConstant) term;
+                String value = literalTerm.getValue();
+
+                if (value.startsWith("id_")) {
+                    if (seenIds.contains(value)) {
+                        // This is a duplicate - mark the start of removal range
+                        startRemovalIndex = i;
+                    } else {
+                        // First time seeing this ID
+                        seenIds.add(value);
+
+                        // If we have a pending removal range, execute the removal now
+                        if (startRemovalIndex != -1) {
+                            // Remove all terms from startRemovalIndex up to (but not including) current index
+                            for (int j = i - 1; j >= startRemovalIndex; j--) {
+                                mutableTerms.remove(j);
+                            }
+
+                            // Adjust current index after removal
+                            i -= (i - startRemovalIndex);
+
+                            // Reset removal marker
+                            startRemovalIndex = -1;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Handle case where the removal range extends to the end of the list
+        if (startRemovalIndex != -1) {
+            for (int j = mutableTerms.size() - 1; j >= startRemovalIndex; j--) {
+                mutableTerms.remove(j);
+            }
+        }
+
+        // Replace the contents of processedTerms with our filtered list
+        // Note: Since ImmutableList is immutable, we would need the actual implementation
+        // to determine how to update it. This code assumes there's a way to update it.
+        // If processedTerms is truly immutable, you might need to return the new list instead.
+
+        // Possible solution if processedTerms can be reassigned:
+        // processedTerms = ImmutableList.copyOf(mutableTerms);
+
+        // Or if you need to modify the method signature:
+        return ImmutableList.copyOf(mutableTerms);
     }
 }
 

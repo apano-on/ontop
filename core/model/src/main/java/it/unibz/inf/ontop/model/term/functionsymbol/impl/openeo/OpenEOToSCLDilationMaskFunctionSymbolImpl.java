@@ -6,16 +6,16 @@ import org.apache.commons.rdf.api.IRI;
 
 import javax.annotation.Nonnull;
 
-public class OpenEOToSCLDistillationMaskFunctionSymbolImpl extends AbstractOpenEOFunctionSymbol {
+public class OpenEOToSCLDilationMaskFunctionSymbolImpl extends AbstractOpenEOFunctionSymbol {
 
-    public OpenEOToSCLDistillationMaskFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
-                                                           RDFDatatype xsdStringDatatype) {
+    public OpenEOToSCLDilationMaskFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
+                                                     RDFDatatype xsdStringDatatype) {
         super(functionSymbolName, functionIRI,
                 ImmutableList.of(xsdStringDatatype, xsdStringDatatype), xsdStringDatatype);
     }
 
     @Override
     protected String initFunctionName() {
-        return "aggregate_temporal_period";
+        return "to_scl_dilation_mask";
     }
 }

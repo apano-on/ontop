@@ -16,6 +16,6 @@ public class OpenEOApplyKernelFunctionSymbolImpl extends AbstractOpenEOFunctionS
 
     @Override
     protected String initFunctionName() {
-        return "apply_kernel";
+        return "apply_kernel_gaussian";
     }
 }

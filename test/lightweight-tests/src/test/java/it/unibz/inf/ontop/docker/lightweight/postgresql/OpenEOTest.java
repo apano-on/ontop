@@ -338,6 +338,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 "0.49754300713539124, 0.4847819209098816, 0.4654255211353302]]]\"^^xsd:string"));
     }
 
+    //Query takes too long
     @Test
     public void getOpenEOLandSlidesNDVI() {
 
@@ -346,7 +347,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "PREFIX geo:\t<http://www.opengis.net/ont/geosparql#>\n"
                 + "PREFIX openeo:\t<http://www.openeo-ontop.org#>\n"
                 + "SELECT ?v {\n"
-                + "BIND(\"POLYGON((11.25 46.4, 11.75 46.4, 11.75 46.7, 11.25 46.7, 11.25 46.4))\"^^geo:wktLiteral AS ?xWkt) .\n"
+                + "BIND(\"POLYGON((11.25 46.4, 11.35 46.4, 11.35 46.5, 11.25 46.5, 11.25 46.4))\"^^geo:wktLiteral AS ?xWkt) .\n"
                 + "BIND (\"2023-09-01T00:00:00Z\"^^xsd:dateTime AS ?start_time) .\n"
                 + "BIND (\"2023-09-07T00:00:00Z\"^^xsd:dateTime AS ?end_time) .\n"
                 + "BIND (\"2023-09-08T00:00:00Z\"^^xsd:dateTime AS ?start_time2) .\n"
@@ -359,7 +360,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time2, ?end_time2, ?band1) AS ?coll4) .\n"
                 + "BIND (openeo:ndvi(?coll4) AS ?coll5) .\n"
                 + "BIND (openeo:reduce_dimension(?coll5, \"t\", \"mean\") AS ?coll6) .\n"
-                + "BIND (openeo:merge_cubes(?coll6, ?coll3, '{\"overlap_resolver\": \"subtract\"}') AS ?v) .\n"
+                + "BIND (openeo:merge_cubes(?coll6, ?coll3, \"subtract\") AS ?v) .\n"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of());
@@ -379,14 +380,15 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"SENTINEL1_GRD\" AS ?satellite) .\n"
                 + "BIND (\"VV\" AS ?band1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll1) .\n"
-                + "BIND (openeo:sar_backscatter(?coll1, {coefficient: \"sigma0-ellipsoid\"}) AS ?coll2) .\n"
-                + "BIND (openeo:apply(10 * log(?coll2, 10)) AS ?coll3) .\n"
-                + "BIND (openeo:apply_kernel(?coll3, {kernel: filter_window, factor: factor}) AS ?coll4) .\n"
+                + "BIND (openeo:sar_backscatter(?coll1, '{\"coefficient\": \"sigma0-ellipsoid\"}') AS ?coll2) .\n"
+                //+ "BIND (openeo:log(10) AS ?log10) .\n"
+                + "BIND (openeo:apply(10 * openeo:log(?coll2, 10)) AS ?coll3) .\n"
+                + "BIND (openeo:apply_kernel(?coll3, '{\"kernel\": [ [ 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1 ] ], \"factor\": 0}') AS ?coll4) .\n"
                 + "BIND (openeo:rename_labels(?coll3, \"bands\", \"amplitude\") AS ?coll5) .\n"
-                + "BIND (openeo:apply(?coll5 - 3.5) AS ?coll6) .\n"
+                + "BIND (openeo:apply(?coll4 - 3.5) AS ?coll6) .\n"
                 + "BIND (openeo:rename_labels(?coll6, \"bands\", \"threshold\") AS ?coll7) .\n"
-                + "BIND (openeo:merge_cubes(?coll4, ?coll7, '{\"overlap_resolver\": null}') AS ?coll8) .\n"
-                + "BIND (openeo:reduce_dimension(?coll8, \"bands\", \"amplitude\" < \"threshold\") AS ?v) .\n"
+                + "BIND (openeo:merge_cubes(?coll5, ?coll7) AS ?coll8) .\n"
+                + "BIND (openeo:reduce_dimension(?coll8, \"bands\", \"amplitude < threshold\") AS ?v) .\n"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of());
@@ -409,7 +411,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"[B02, B03, B04]\" AS ?band3) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1, \"eo:cloud_cover<=95\") AS ?coll1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band2, \"eo:cloud_cover<=95\") AS ?coll2) .\n"
-                + "BIND (openeo:to_scl_distillation_mask(?coll2, {erosion_kernel_size: 3, kernel1_size: 17, kernel2_size: 77, mask1_values: [2, 4, 5, 6, 7], mask2_values: [3, 8, 9, 10, 11]}) AS ?coll3) .\n"
+                + "BIND (openeo:to_scl_dilation_mask(?coll2, {\"erosion_kernel_size\": 3, \"kernel1_size\": 17, \"kernel2_size\": 77, \"mask1_values\": [2, 4, 5, 6, 7], \"mask2_values\": [3, 8, 9, 10, 11]}) AS ?coll3) .\n"
                 + "BIND (openeo:mask(?coll1, ?coll3) AS ?coll4) .\n"
                 + "BIND (openeo:ndvi(?coll4) AS ?coll5) .\n"
                 //set dimension to null, get max over all dimensions?? double check!!
@@ -469,9 +471,9 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"SENTINEL1_GRD\" AS ?satellite) .\n"
                 + "BIND (\"VV\" AS ?band1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll1) .\n"
-                + "BIND (openeo:sar_backscatter(?coll1, {coefficient: \"sigma0-ellipsoid\"}) AS ?coll2) .\n"
+                + "BIND (openeo:sar_backscatter(?coll1, {\"coefficient\": \"sigma0-ellipsoid\"}) AS ?coll2) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time2, ?band1) AS ?coll3) .\n"
-                + "BIND (openeo:sar_backscatter(?coll3, {coefficient: \"sigma0-ellipsoid\"}) AS ?coll4) .\n"
+                + "BIND (openeo:sar_backscatter(?coll3, {\"coefficient\": \"sigma0-ellipsoid\"}) AS ?coll4) .\n"
                 + "BIND (openeo:reduce_dimension(?coll4, \"t\", \"last\") AS ?coll5) .\n"
                 + "BIND (openeo:reduce_dimension(?coll2, \"t\", \"min\") AS ?coll6) .\n"
                 + "BIND (openeo:reduce_dimension(?coll2, \"t\", \"max\") AS ?coll7) .\n"

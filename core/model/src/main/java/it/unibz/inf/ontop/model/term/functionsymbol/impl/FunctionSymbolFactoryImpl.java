@@ -473,6 +473,8 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                         xsdString),
                 new OpenEOApplyKernelFunctionSymbolImpl("ONTOP_OPENEO_APPLY_KERNEL", OPENEO.APPLY_KERNEL,
                         xsdString, xsdInteger, xsdDouble),
+                new OpenEOApplyKernelCFunctionSymbolImpl("ONTOP_OPENEO_APPLY_KERNEL_CUSTOM", OPENEO.APPLY_KERNEL_C,
+                        xsdString),
                 new OpenEOMaskFunctionSymbolImpl("ONTOP_OPENEO_MASK", OPENEO.MASK,
                         xsdString),
                 new OpenEONDVIFunctionSymbolImpl("ONTOP_OPENEO_NDVI", OPENEO.NDVI,
@@ -483,11 +485,13 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                         xsdString),
                 new OpenEOMergeCubesFunctionSymbolImpl("ONTOP_OPENEO_MERGE_CUBES", OPENEO.MERGE_CUBES,
                         xsdString),
+                new OpenEOMergeCubesNFunctionSymbolImpl("ONTOP_OPENEO_MERGE_CUBES_STACK", OPENEO.MERGE_CUBES_N,
+                        xsdString),
                 new OpenEORenameLabelsFunctionSymbolImpl("ONTOP_OPENEO_RENAME_LABELS", OPENEO.RENAME_LABELS,
                         xsdString),
                 new OpenEOSarBackscatterFunctionSymbolImpl("ONTOP_OPENEO_SAR_BACKSCATTER", OPENEO.SAR_BACKSCATTER,
                         xsdString),
-                new OpenEOToSCLDistillationMaskFunctionSymbolImpl("ONTOP_OPENEO_TO_SCL_DISTILLATION_MASK", OPENEO.TO_SCL_DISTILLATION_MASK,
+                new OpenEOToSCLDilationMaskFunctionSymbolImpl("ONTOP_OPENEO_TO_SCL_DILATION_MASK", OPENEO.TO_SCL_DILATION_MASK,
                         xsdString),
                 new OpenEOApplyNeighborhoodFunctionSymbolImpl("ONTOP_OPENEO_APPLY_NEIGHBORHOOD", OPENEO.APPLY_NEIGHBORHOOD,
                         xsdString),
@@ -500,7 +504,9 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
                 new OpenEOLinearScaleRangeFunctionSymbolImpl("ONTOP_OPENEO_LINEAR_SCALE_RANGE", OPENEO.LINEAR_SCALE_RANGE,
                         xsdString),
                 new OpenEOFilterTemporalFunctionSymbolImpl("ONTOP_OPENEO_FILTER_TEMPORAL", OPENEO.FILTER_TEMPORAL,
-                        xsdString)
+                        xsdString),
+                new OpenEOLogFunctionSymbolImpl("ONTOP_OPENEO_LOG", OPENEO.LOG,
+                        xsdString, xsdInteger)
                 );
 
         ImmutableTable.Builder<String, Integer, SPARQLFunctionSymbol> tableBuilder = ImmutableTable.builder();

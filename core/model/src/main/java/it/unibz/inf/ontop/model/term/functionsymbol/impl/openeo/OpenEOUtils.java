@@ -9,6 +9,7 @@ import org.locationtech.proj4j.CoordinateReferenceSystem;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +49,34 @@ public class OpenEOUtils {
         } else {
             ImmutableTerm firstTerm = ((ImmutableFunctionalTerm) newTerms.get(0)).getTerms().get(0);
             return getOpenEOBaseTerms(((ImmutableFunctionalTerm) firstTerm).getTerms());
+        }
+    }
+
+    protected static ImmutableList<? extends ImmutableTerm> getOpenEONonComparisonBaseTerms(ImmutableList<? extends ImmutableTerm> newTerms) {
+        // Drop any constants, filter them out
+        ImmutableTerm myTerm = newTerms.stream().filter(t -> t instanceof ImmutableFunctionalTerm).findFirst().get();
+        if (((ImmutableFunctionalTerm) myTerm).getFunctionSymbol().getName().equals("ONTOP_OPENEO_BASE")
+                || ((ImmutableFunctionalTerm) myTerm).getFunctionSymbol().getName().equals("OPENEO_PROCESS_GRAPH")) {
+            return ((ImmutableFunctionalTerm) myTerm).getTerms();
+        } else {
+            ImmutableTerm firstTerm = ((ImmutableFunctionalTerm) myTerm).getTerms().stream().filter(t -> t instanceof ImmutableFunctionalTerm).findFirst().get();
+            return firstTerm.toString().startsWith("OPENEO_PROCESS_GRAPH")
+                    ? getOpenEONonComparisonBaseTerms(ImmutableList.of(firstTerm))
+                    : getOpenEONonComparisonBaseTerms(ImmutableList.of(((ImmutableFunctionalTerm) firstTerm).getTerms().get(0)));
+        }
+    }
+
+    protected static String getNonComparisonFunctionSymbol(ImmutableFunctionalTerm term) {
+        if (term.getFunctionSymbol().getName().equals("SP_ADD")) {
+            return "add";
+        } else if (term.getFunctionSymbol().getName().equals("SP_SUBSTRACT")) {
+            return "subtract";
+        } else if (term.getFunctionSymbol().getName().equals("SP_MULTIPLY")) {
+            return "multiply";
+        } else if (term.getFunctionSymbol().getName().equals("SP_DIVIDE")) {
+            return "divide";
+        } else {
+            throw new IllegalArgumentException("Unsupported comparison operator: " + term.getFunctionSymbol().getName());
         }
     }
 
