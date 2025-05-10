@@ -174,7 +174,7 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "SELECT ?v {\n"
                 + "?g geo:asWKT ?xWkt .\n"
                 + "?g rdfs:label ?name .\n"
-                + "FILTER(LANG(?name) = \"it\" && (STR(?name) = \"Bressanone\" || STR(?name) = \"Merano\")) .\n"
+                + "FILTER(LANG(?name) = \"it\" && (STR(?name) = \"Bolzano\")) .\n"
                 + "BIND (\"2023-07-01T00:00:00Z\"^^xsd:dateTime AS ?start_time) .\n"
                 + "BIND (\"2023-07-07T00:00:00Z\"^^xsd:dateTime AS ?end_time) .\n"
                 + "BIND (\"SENTINEL3_SLSTR_L2_LST\" AS ?satellite) .\n"

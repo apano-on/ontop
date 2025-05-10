@@ -10,7 +10,7 @@ sosa:		http://www.w3.org/ns/sosa/
 openeo:		http://www.openeo-ontop.org#
 
 [MappingDeclaration] @collection [[
-mappingId	vector_data
-target		:region/{"gid"} geo:asWKT {"geom1"}^^geo:wktLiteral ; rdfs:label {"name_3"}@it .
-source		select "gid", "name_3", ST_AsText("geom") as "geom1" from region_south_tyrol
+mappingId	vector_data_wildfires_southtyrol
+target		:regionST/{"istat_code_t"} a :SouthTyrolMuni ; geo:asWKT {"geom1"}^^geo:wktLiteral ; rdfs:label {"name_it"}@it ; rdfs:label {"name_de"}@de ; :belongsToDistrict {"distr_it"}@it .
+source		select TRIM_SCALE("istat_code")::TEXT AS "istat_code_t", "name_it", "name_de", "distr_it", ST_AsText(ST_Transform("geom", 4326)) as "geom1" from municipalities_polygon
 ]]
