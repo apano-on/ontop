@@ -411,22 +411,24 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"[B02, B03, B04]\" AS ?band3) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1, \"eo:cloud_cover<=95\") AS ?coll1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band2, \"eo:cloud_cover<=95\") AS ?coll2) .\n"
-                + "BIND (openeo:to_scl_dilation_mask(?coll2, {\"erosion_kernel_size\": 3, \"kernel1_size\": 17, \"kernel2_size\": 77, \"mask1_values\": [2, 4, 5, 6, 7], \"mask2_values\": [3, 8, 9, 10, 11]}) AS ?coll3) .\n"
+                + "BIND (openeo:to_scl_dilation_mask(?coll2, '{\"erosion_kernel_size\": 3, \"kernel1_size\": 17, \"kernel2_size\": 77, \"mask1_values\": [2, 4, 5, 6, 7], \"mask2_values\": [3, 8, 9, 10, 11]}'^^xsd:string) AS ?coll3) .\n"
                 + "BIND (openeo:mask(?coll1, ?coll3) AS ?coll4) .\n"
                 + "BIND (openeo:ndvi(?coll4) AS ?coll5) .\n"
                 //set dimension to null, get max over all dimensions?? double check!!
                 + "BIND (openeo:reduce_dimension(?coll5, \"null\", \"max\") AS ?max_ndvi) .\n"
                 //equality returns true or false, then int to 1 or 0
                 //could just true or false be enough?
-                + "BIND (openeo:apply(int(?coll5 = ?max_ndvi)) AS ?coll6) .\n"
-                + "BIND (openeo:apply_neighborhood(?coll5, ?coll6, size=[{'dimension': 'x', 'unit': 'px', 'value': 1}, {'dimension': 'y', 'unit': 'px', 'value': 1},\n" +
-                "              {'dimension': 't', 'value': \"month\"}], overlap=[], ) AS ?coll7) .\n"
-                + "BIND (openeo:linear_scale_range(?coll7, {\"inputMin\": 0, \"inputMax\": 200, \"outputMin\": 0, \"outputMax\": 200}) AS ?coll8) .\n"
-                + "BIND (openeo:merge_cubes(?coll8, ?coll3) AS ?coll9) .\n"
-                + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band3, \"eo:cloud_cover<=95\") AS ?coll10) .\n"
-                + "BIND (openeo:mask(?coll10, ?coll9) AS ?coll11) .\n"
-                + "BIND (openeo:aggregate_temporal_period(?coll11, \"month\", \"first\") AS ?coll12) .\n"
-                + "BIND (openeo:filter_bbox(?coll12, ?xWkt) AS ?v) .\n"
+                //+ "BIND (openeo:apply(int(?coll5 = ?max_ndvi)) AS ?coll6) .\n"
+                + "BIND (openeo:apply(?coll5 = ?max_ndvi) AS ?coll6) .\n"
+                + "BIND (openeo:mask(?coll5, ?coll6) AS ?coll7) .\n"
+                + "BIND (openeo:apply(?coll7 / 100) AS ?coll8) .\n"
+                + "BIND (openeo:apply_neighborhood(?coll5, ?coll8, STR('{size=[{\"dimension\": \"x\", \"unit\": \"px\", \"value\": 1}, {\"dimension\": \"y\", \"unit\": \"px\", \"value\": 1}, {\"dimension\": \"t\", \"value\": \"month\"}], \"overlap\"=[]}')) AS ?coll9) .\n"
+                + "BIND (openeo:linear_scale_range(?coll9, '{\"inputMin\": 0, \"inputMax\": 200, \"outputMin\": 0, \"outputMax\": 200}') AS ?coll10) .\n"
+                + "BIND (openeo:merge_cubes(?coll10, ?coll3) AS ?coll13) .\n"
+                + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band3, \"eo:cloud_cover<=95\") AS ?coll14) .\n"
+                + "BIND (openeo:mask(?coll14, ?coll13) AS ?coll15) .\n"
+                + "BIND (openeo:aggregate_temporal_period(?coll15, \"month\", \"first\") AS ?coll16) .\n"
+                + "BIND (openeo:filter_bbox(?coll17, ?xWkt) AS ?v) .\n"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of());
@@ -471,9 +473,9 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (\"SENTINEL1_GRD\" AS ?satellite) .\n"
                 + "BIND (\"VV\" AS ?band1) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time, ?band1) AS ?coll1) .\n"
-                + "BIND (openeo:sar_backscatter(?coll1, {\"coefficient\": \"sigma0-ellipsoid\"}) AS ?coll2) .\n"
+                + "BIND (openeo:sar_backscatter(?coll1, '{\"coefficient\": \"sigma0-ellipsoid\"}') AS ?coll2) .\n"
                 + "BIND (openeo:load_collection(?satellite, ?xWkt, ?start_time, ?end_time2, ?band1) AS ?coll3) .\n"
-                + "BIND (openeo:sar_backscatter(?coll3, {\"coefficient\": \"sigma0-ellipsoid\"}) AS ?coll4) .\n"
+                + "BIND (openeo:sar_backscatter(?coll3, '{\"coefficient\": \"sigma0-ellipsoid\"}') AS ?coll4) .\n"
                 + "BIND (openeo:reduce_dimension(?coll4, \"t\", \"last\") AS ?coll5) .\n"
                 + "BIND (openeo:reduce_dimension(?coll2, \"t\", \"min\") AS ?coll6) .\n"
                 + "BIND (openeo:reduce_dimension(?coll2, \"t\", \"max\") AS ?coll7) .\n"
@@ -481,11 +483,12 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (openeo:merge_cubes(?coll7, ?coll6, \"subtract\") AS ?coll9) .\n"
                 + "BIND (openeo:merge_cubes(?coll8, ?coll9, \"divide\") AS ?coll10) .\n"
                 + "BIND (openeo:reduce_dimension(?coll2, \"t\", \"mean\") AS ?coll11) .\n"
-                + "BIND (openeo:apply(10 * log(?coll11, 10)) AS ?coll12) .\n"
+                + "BIND (openeo:apply(10 * openeo:log(?coll11, 10)) AS ?coll12) .\n"
                 + "BIND (openeo:filter_bands(?coll12, \"VV\") AS ?coll13) .\n"
                 //Alternatively use a process for gt, lt, or
-                + "BIND (openeo:apply(((?coll13 > -6) | (?coll13 < -17))) AS ?coll14) .\n"
-                + "BIND (openeo:filter_bands(?coll10, ?coll14) AS ?mask) .\n"
+                //+ "BIND (openeo:apply(((?coll13 > -6) || (?coll13 < -17))) AS ?coll14) .\n"
+                + "BIND (openeo:apply(?coll13 <= -6) AS ?coll14) .\n"
+                + "BIND (openeo:apply(?coll14 >= -17) AS ?v) .\n"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of());

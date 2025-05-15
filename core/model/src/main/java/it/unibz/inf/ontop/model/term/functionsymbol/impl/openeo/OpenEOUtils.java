@@ -85,7 +85,7 @@ public class OpenEOUtils {
             return "lt";
         } else if (term.getFunctionSymbol().getName().equals("SP_GT")) {
             return "gt";
-        } else if (term.getFunctionSymbol().getName().equals("SP_EQ")) {
+        } else if (term.getFunctionSymbol().getName().equals("SP_EQ") || term.getFunctionSymbol().getName().equals("SP_NON_STRICT_EQ")) {
             return "eq";
         } else if (term.getFunctionSymbol().getName().equals("SP_NOT")) {
             ImmutableTerm subTerm = term.getTerms().get(0);
@@ -94,7 +94,7 @@ public class OpenEOUtils {
                 return "gte";
             } else if (secondOperator.equals("SP_GT")) {
                 return "lte";
-            } else if (secondOperator.equals("SP_EQ")) {
+            } else if (secondOperator.equals("SP_EQ") || secondOperator.equals("SP_NON_STRICT_EQ")) {
                 return "neq";
             }
         } else {

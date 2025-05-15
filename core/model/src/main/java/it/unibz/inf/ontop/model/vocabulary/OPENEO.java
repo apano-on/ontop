@@ -71,7 +71,7 @@ public class OPENEO {
         MERGE_CUBES_N = factory.createIRI(PREFIX + "merge_cubes");
         SAR_BACKSCATTER = factory.createIRI(PREFIX + "sar_backscatter");
         RENAME_LABELS = factory.createIRI(PREFIX + "rename_labels");
-        TO_SCL_DILATION_MASK = factory.createIRI(PREFIX + "to_scl_distillation_mask");
+        TO_SCL_DILATION_MASK = factory.createIRI(PREFIX + "to_scl_dilation_mask");
         APPLY_NEIGHBORHOOD = factory.createIRI(PREFIX + "apply_neighborhood");
         LINEAR_SCALE_RANGE = factory.createIRI(PREFIX + "linear_scale_range");
         AGGREGATE_TEMPORAL_PERIOD = factory.createIRI(PREFIX + "aggregate_temporal_period");

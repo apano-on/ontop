@@ -11,7 +11,7 @@ public class OpenEOApplyNeighborhoodFunctionSymbolImpl extends AbstractOpenEOFun
     public OpenEOApplyNeighborhoodFunctionSymbolImpl(@Nonnull String functionSymbolName, @Nonnull IRI functionIRI,
                                                            RDFDatatype xsdStringDatatype) {
         super(functionSymbolName, functionIRI,
-                ImmutableList.of(xsdStringDatatype, xsdStringDatatype), xsdStringDatatype);
+                ImmutableList.of(xsdStringDatatype, xsdStringDatatype, xsdStringDatatype), xsdStringDatatype);
     }
 
     @Override
