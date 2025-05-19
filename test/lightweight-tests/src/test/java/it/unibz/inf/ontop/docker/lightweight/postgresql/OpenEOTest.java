@@ -484,11 +484,12 @@ public class OpenEOTest extends AbstractDockerRDF4JTest {
                 + "BIND (openeo:merge_cubes(?coll8, ?coll9, \"divide\") AS ?coll10) .\n"
                 + "BIND (openeo:reduce_dimension(?coll2, \"t\", \"mean\") AS ?coll11) .\n"
                 + "BIND (openeo:apply(10 * openeo:log(?coll11, 10)) AS ?coll12) .\n"
-                + "BIND (openeo:filter_bands(?coll12, \"VV\") AS ?coll13) .\n"
+                //+ "BIND (openeo:filter_bands(?coll12, \"VV\") AS ?coll13) .\n"
                 //Alternatively use a process for gt, lt, or
                 //+ "BIND (openeo:apply(((?coll13 > -6) || (?coll13 < -17))) AS ?coll14) .\n"
-                + "BIND (openeo:apply(?coll13 <= -6) AS ?coll14) .\n"
-                + "BIND (openeo:apply(?coll14 >= -17) AS ?v) .\n"
+                + "BIND (openeo:apply(?coll12 <= -6) AS ?coll13) .\n"
+                + "BIND (openeo:apply(?coll13 >= -17) AS ?coll14) .\n"
+                + "BIND (openeo:mask(?coll10, ?coll14) AS ?v) .\n"
                 + "}\n";
 
         executeAndCompareValues(query, ImmutableList.of());
