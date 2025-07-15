@@ -1,0 +1,53 @@
+rules = [
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :firstNameLength ?len .
+    } WHERE {
+        ?e :firstName ?fn .
+        BIND(STRLEN(?fn) AS ?len)
+    }
+    """,
+
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :fullNameUpper ?upper .
+    } WHERE {
+        ?e :firstName ?fn ;
+           :lastName  ?ln .
+        BIND(UCASE(CONCAT(?fn, " ", ?ln)) AS ?upper)
+    }
+    """,
+
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :lastNameLower ?lower .
+    } WHERE {
+        ?e :lastName ?ln .
+        BIND(LCASE(?ln) AS ?lower)
+    }
+    """,
+
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :initials ?init .
+    } WHERE {
+        ?e :firstName ?fn ; :lastName ?ln .
+        BIND(CONCAT(UCASE(SUBSTR(?fn,1,1)), ".", UCASE(SUBSTR(?ln,1,1)), ".") AS ?init)
+    }
+    """,
+
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :email ?mail .
+    } WHERE {
+        ?e :firstName ?fn ; :lastName ?ln .
+        BIND(CONCAT(LCASE(?fn), ".", LCASE(?ln), "@company.com") AS ?mail)
+    }
+    """
+
+]
