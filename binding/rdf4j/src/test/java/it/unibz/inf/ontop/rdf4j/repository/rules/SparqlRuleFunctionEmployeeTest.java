@@ -1,6 +1,5 @@
 package it.unibz.inf.ontop.rdf4j.repository.rules;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import it.unibz.inf.ontop.rdf4j.repository.AbstractRDF4JTest;
 import org.junit.AfterClass;
@@ -10,8 +9,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import it.unibz.inf.ontop.query.translation.shacl.ShaclAfRegistryHolder;
 
 public class SparqlRuleFunctionEmployeeTest extends AbstractRDF4JTest {
 
@@ -21,6 +19,7 @@ public class SparqlRuleFunctionEmployeeTest extends AbstractRDF4JTest {
 
     @BeforeClass
     public static void before() throws IOException, SQLException {
+        ShaclAfRegistryHolder.initFromTomlClasspath(SPARQL_RULES);
         initOBDA(SQL_SCRIPT, OBDA_FILE, null, null, null, null, SPARQL_RULES);
     }
 
@@ -65,6 +64,18 @@ public class SparqlRuleFunctionEmployeeTest extends AbstractRDF4JTest {
     public void testEmail() {
         String q = "PREFIX : <http://employee.example.org/voc#>\n" +
                 "SELECT ?v WHERE { ?e :email ?v }";
+        runQueryAndCompare(q, ImmutableSet.of(
+                "roger.smith@company.com",
+                "anna.gross@company.com"));
+    }
+
+    @Test
+    public void testMakeEmailFunctionBind() {
+        String q = "PREFIX : <http://employee.example.org/voc#>\n" +
+                "SELECT ?v WHERE {\n" +
+                "  ?e :firstName ?fn ; :lastName ?ln .\n" +
+                "  BIND(:makeEmail(?fn, ?ln) AS ?v)\n" +
+                "}";
         runQueryAndCompare(q, ImmutableSet.of(
                 "roger.smith@company.com",
                 "anna.gross@company.com"));

@@ -38,6 +38,9 @@ import org.eclipse.rdf4j.query.parser.ParsedUpdate;
 import org.eclipse.rdf4j.query.parser.sparql.aggregate.CustomAggregateFunctionRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import it.unibz.inf.ontop.query.translation.shacl.FunctionMacroRewriter;
+import it.unibz.inf.ontop.query.translation.shacl.ShaclAfRegistryHolder;
+import org.eclipse.rdf4j.query.algebra.TupleExpr;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -95,7 +98,8 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
 
         ImmutableMap<Variable, GroundTerm> externalBindings = convertExternalBindings(bindings);
 
-        IQTree tree = getTranslator(externalBindings, pq.getDataset(), true).getTree(pq.getTupleExpr());
+        TupleExpr te = FunctionMacroRewriter.rewrite(pq.getTupleExpr(), ShaclAfRegistryHolder.get());
+        IQTree tree = getTranslator(externalBindings, pq.getDataset(), true).getTree(te);
 
         ImmutableSet<Variable> vars = tree.getVariables();
 
@@ -133,7 +137,8 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
 
         ImmutableMap<Variable, GroundTerm> externalBindings = convertExternalBindings(bindings);
 
-        IQTree tree = getTranslator(externalBindings, pq.getDataset(), true).getTree(pq.getTupleExpr());
+        TupleExpr te = FunctionMacroRewriter.rewrite(pq.getTupleExpr(), ShaclAfRegistryHolder.get());
+        IQTree tree = getTranslator(externalBindings, pq.getDataset(), true).getTree(te);
 
         if (IS_DEBUG_ENABLED)
             LOGGER.debug("IQTree (before normalization):\n{}", tree);
@@ -170,7 +175,8 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
 
         IQTree whereTree = expression.getWhereExpr() == null
                 ? iqFactory.createTrueNode()
-                : getTranslator(ImmutableMap.of(), dataset, true).getTree(expression.getWhereExpr());
+                : getTranslator(ImmutableMap.of(), dataset, true)
+                .getTree(FunctionMacroRewriter.rewrite(expression.getWhereExpr(), ShaclAfRegistryHolder.get()));
 
         @Nullable Dataset insertDataset;
         if (dataset != null) {
@@ -183,7 +189,8 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
         else
             insertDataset = null;
 
-        IQTree insertTree = getTranslator(ImmutableMap.of(), insertDataset, false).getTree(expression.getInsertExpr());
+        TupleExpr insertTe = FunctionMacroRewriter.rewrite(expression.getInsertExpr(), ShaclAfRegistryHolder.get());
+        IQTree insertTree = getTranslator(ImmutableMap.of(), insertDataset, false).getTree(insertTe);
 
         ImmutableSet.Builder<IQ> iqsBuilder = ImmutableSet.builder();
         ImmutableSet<IntensionalDataNode> dataNodes = extractIntensionalDataNodesFromHead(insertTree);
