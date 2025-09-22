@@ -44,6 +44,12 @@ public class AbstractDockerRDF4JTest {
     protected static void initOBDA(String obdaRelativePath, @Nullable String ontologyRelativePath,
                                    String propertyFile, @Nullable String lensesFile,
                                    @Nullable String dbMetadataFile) {
+        initOBDA(obdaRelativePath, ontologyRelativePath, propertyFile, lensesFile, dbMetadataFile, null);
+    }
+
+    protected static void initOBDA(String obdaRelativePath, @Nullable String ontologyRelativePath,
+                                   String propertyFile, @Nullable String lensesFile,
+                                   @Nullable String dbMetadataFile, @Nullable String sparqlRulesRelativePath) {
 
         String propertyFilePath = AbstractDockerRDF4JTest.class.getResource(propertyFile).getPath();
 
@@ -62,6 +68,9 @@ public class AbstractDockerRDF4JTest {
 
         if (dbMetadataFile != null)
             builder.dbMetadataFile(AbstractDockerRDF4JTest.class.getResource(dbMetadataFile).getPath());
+
+        if (sparqlRulesRelativePath != null)
+            builder.sparqlRulesFile(AbstractDockerRDF4JTest.class.getResource(sparqlRulesRelativePath).getPath());
 
         OntopSQLOWLAPIConfiguration config = builder.build();
 

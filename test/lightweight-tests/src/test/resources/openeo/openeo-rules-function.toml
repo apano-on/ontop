@@ -1,0 +1,32 @@
+rules = [ ]
+
+[shacl_af]
+shapes_graph = '''
+@prefix :        <http://www.unibz-openeo.org#> .
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix geo:     <http://www.opengis.net/ont/geosparql#> .
+@prefix openeo:  <http://www.openeo-ontop.org#> .
+
+openeo:meanTemperature a sh:SPARQLFunction ;
+    sh:parameter [ sh:path :satellite ; sh:datatype xsd:string ] ;
+    sh:parameter [ sh:path :geometry  ; sh:datatype geo:wktLiteral ] ;
+    sh:parameter [ sh:path :start     ; sh:datatype xsd:dateTime ] ;
+    sh:parameter [ sh:path :end       ; sh:datatype xsd:dateTime ] ;
+    sh:parameter [ sh:path :band      ; sh:datatype xsd:string ] ;
+    sh:message "Load a collection, reduce the time dimension, and spatially aggregate in one call." ;
+    sh:select """
+        SELECT ?result WHERE {
+          BIND(
+            openeo:aggregate_spatial(
+              openeo:reduce_dimension(
+                openeo:load_collection(?satellite, ?geometry, ?start, ?end, ?band),
+                "t","mean"
+              ),
+              ?geometry,
+              "mean"
+            ) AS ?result
+          )
+        }
+    """ .
+'''
