@@ -62,7 +62,7 @@ public final class ShaclAfFunctionRegistry {
                     .orElseThrow(() -> new IllegalArgumentException("sh:select missing for " + fnIri));
 
             // parse and obtain the first projected expression (<expr> AS ?result)
-            ValueExpr expr = extractFirstProjectionExpr(select);
+            ValueExpr expr = extractFirstProjectionExpr(select, m);
 
             // try to read params via sh:parameter + sh:path (ordered by sh:order)
             List<String> paramNames = readParamNamesFromModel(m, fnIri);
@@ -83,9 +83,22 @@ public final class ShaclAfFunctionRegistry {
     }
 
     // ---- helpers ----
-
-    private static ValueExpr extractFirstProjectionExpr(String select) {
-        ParsedQuery pq = new SPARQLParser().parseQuery(select, null);
+    private static ValueExpr extractFirstProjectionExpr(String select, Model model) {
+        // Extract prefixes from the model and prepend them to the select string
+        StringBuilder prefixBuilder = new StringBuilder();
+        if (model != null) {
+            Map<String, String> prefixMap = model.getNamespaces().stream()
+                    .collect(Collectors.toMap(Namespace::getPrefix, Namespace::getName));
+            for (Map.Entry<String, String> entry : prefixMap.entrySet()) {
+                if (entry.getKey() != null && !entry.getKey().isEmpty()) {
+                    prefixBuilder.append("PREFIX ")
+                            .append(entry.getKey()).append(": <")
+                            .append(entry.getValue()).append(">\n");
+                }
+            }
+        }
+        String selectWithPrefixes = prefixBuilder.toString() + select;
+        ParsedQuery pq = new SPARQLParser().parseQuery(selectWithPrefixes, null);
         TupleExpr te = pq.getTupleExpr();
 
         final ValueExpr[] holder = new ValueExpr[1];
