@@ -1,0 +1,76 @@
+rules = [
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :firstNameLength ?len .
+    } WHERE {
+        ?e :firstName ?fn .
+        BIND(STRLEN(?fn) AS ?len)
+    }
+    """,
+
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :fullNameUpper ?upper .
+    } WHERE {
+        ?e :firstName ?fn ;
+           :lastName  ?ln .
+        BIND(UCASE(CONCAT(?fn, " ", ?ln)) AS ?upper)
+    }
+    """,
+
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :lastNameLower ?lower .
+    } WHERE {
+        ?e :lastName ?ln .
+        BIND(LCASE(?ln) AS ?lower)
+    }
+    """,
+
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :initials ?init .
+    } WHERE {
+        ?e :firstName ?fn ; :lastName ?ln .
+        BIND(CONCAT(UCASE(SUBSTR(?fn,1,1)), ".", UCASE(SUBSTR(?ln,1,1)), ".") AS ?init)
+    }
+    """,
+
+    """
+    PREFIX : <http://employee.example.org/voc#>
+    INSERT {
+        ?e :email ?mail .
+    } WHERE {
+        ?e :firstName ?fn ; :lastName ?ln .
+        BIND(CONCAT(LCASE(?fn), ".", LCASE(?ln), "@company.com") AS ?mail)
+    }
+    """
+
+]
+
+[shacl_af]
+shapes_graph = '''
+@prefix :   <http://employee.example.org/voc#> .
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:makeEmail a sh:SPARQLFunction ;
+  sh:parameter [
+    sh:path :firstName ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:parameter [
+    sh:path :lastName ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:message "Generates an email from first and last name." ;
+  sh:select """
+    SELECT (CONCAT(LCASE(?firstName), ".", LCASE(?lastName), "@company.com") AS ?result)
+    WHERE {
+    }
+  """ .
+'''

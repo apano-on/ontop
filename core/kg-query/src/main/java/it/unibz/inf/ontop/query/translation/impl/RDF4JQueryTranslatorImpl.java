@@ -3,6 +3,7 @@ package it.unibz.inf.ontop.query.translation.impl;
 import com.google.common.collect.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unibz.inf.ontop.injection.CoreSingletons;
 import it.unibz.inf.ontop.injection.OntopKGQuerySettings;
 import it.unibz.inf.ontop.iq.impl.IQTreeTools;
 import it.unibz.inf.ontop.model.atom.AtomPredicate;
@@ -21,7 +22,6 @@ import it.unibz.inf.ontop.iq.UnaryIQTree;
 import it.unibz.inf.ontop.iq.node.*;
 import it.unibz.inf.ontop.model.atom.AtomFactory;
 import it.unibz.inf.ontop.model.term.*;
-import it.unibz.inf.ontop.model.term.functionsymbol.FunctionSymbolFactory;
 import it.unibz.inf.ontop.model.type.TypeFactory;
 import it.unibz.inf.ontop.substitution.*;
 import it.unibz.inf.ontop.utils.CoreUtilsFactory;
@@ -38,6 +38,9 @@ import org.eclipse.rdf4j.query.parser.ParsedUpdate;
 import org.eclipse.rdf4j.query.parser.sparql.aggregate.CustomAggregateFunctionRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import it.unibz.inf.ontop.query.translation.shacl.FunctionMacroRewriter;
+import it.unibz.inf.ontop.query.translation.shacl.ShaclAfRegistryHolder;
+import org.eclipse.rdf4j.query.algebra.TupleExpr;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -45,6 +48,7 @@ import java.util.*;
 @Singleton
 public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
 
+    private final CoreSingletons coreSingletons;
     private final CoreUtilsFactory coreUtilsFactory;
     private final TermFactory termFactory;
     private final SubstitutionFactory substitutionFactory;
@@ -52,7 +56,6 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
     private final IntermediateQueryFactory iqFactory;
     private final AtomFactory atomFactory;
     private final RDF rdfFactory;
-    private final FunctionSymbolFactory functionSymbolFactory;
     private final InsertClauseNormalizer insertClauseNormalizer;
 
     private final IQTreeTools iqTreeTools;
@@ -61,18 +64,19 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
     private static final boolean IS_DEBUG_ENABLED = LOGGER.isDebugEnabled();
 
     @Inject
-    public RDF4JQueryTranslatorImpl(CoreUtilsFactory coreUtilsFactory, TermFactory termFactory, SubstitutionFactory substitutionFactory,
-                                    TypeFactory typeFactory, IntermediateQueryFactory iqFactory, AtomFactory atomFactory, RDF rdfFactory,
-                                    FunctionSymbolFactory functionSymbolFactory,
-                                    InsertClauseNormalizer insertClauseNormalizer, IQTreeTools iqTreeTools, OntopKGQuerySettings settings) {
-        this.coreUtilsFactory = coreUtilsFactory;
-        this.termFactory = termFactory;
-        this.substitutionFactory = substitutionFactory;
-        this.typeFactory = typeFactory;
-        this.iqFactory = iqFactory;
-        this.atomFactory = atomFactory;
+    public RDF4JQueryTranslatorImpl(CoreSingletons coreSingletons,
+                                    RDF rdfFactory,
+                                    InsertClauseNormalizer insertClauseNormalizer,
+                                    IQTreeTools iqTreeTools,
+                                    OntopKGQuerySettings settings) {
+        this.coreSingletons = coreSingletons;
+        this.coreUtilsFactory = coreSingletons.getCoreUtilsFactory();
+        this.termFactory = coreSingletons.getTermFactory();
+        this.substitutionFactory = coreSingletons.getSubstitutionFactory();
+        this.typeFactory = coreSingletons.getTypeFactory();
+        this.iqFactory = coreSingletons.getIQFactory();
+        this.atomFactory = coreSingletons.getAtomFactory();
         this.rdfFactory = rdfFactory;
-        this.functionSymbolFactory = functionSymbolFactory;
         this.insertClauseNormalizer = insertClauseNormalizer;
         this.iqTreeTools = iqTreeTools;
         if(settings.isCustomSPARQLFunctionRegistrationEnabled()) {
@@ -94,7 +98,8 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
 
         ImmutableMap<Variable, GroundTerm> externalBindings = convertExternalBindings(bindings);
 
-        IQTree tree = getTranslator(externalBindings, pq.getDataset(), true).getTree(pq.getTupleExpr());
+        TupleExpr te = FunctionMacroRewriter.rewrite(pq.getTupleExpr(), ShaclAfRegistryHolder.get());
+        IQTree tree = getTranslator(externalBindings, pq.getDataset(), true).getTree(te);
 
         ImmutableSet<Variable> vars = tree.getVariables();
 
@@ -132,7 +137,8 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
 
         ImmutableMap<Variable, GroundTerm> externalBindings = convertExternalBindings(bindings);
 
-        IQTree tree = getTranslator(externalBindings, pq.getDataset(), true).getTree(pq.getTupleExpr());
+        TupleExpr te = FunctionMacroRewriter.rewrite(pq.getTupleExpr(), ShaclAfRegistryHolder.get());
+        IQTree tree = getTranslator(externalBindings, pq.getDataset(), true).getTree(te);
 
         if (IS_DEBUG_ENABLED)
             LOGGER.debug("IQTree (before normalization):\n{}", tree);
@@ -169,7 +175,8 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
 
         IQTree whereTree = expression.getWhereExpr() == null
                 ? iqFactory.createTrueNode()
-                : getTranslator(ImmutableMap.of(), dataset, true).getTree(expression.getWhereExpr());
+                : getTranslator(ImmutableMap.of(), dataset, true)
+                .getTree(FunctionMacroRewriter.rewrite(expression.getWhereExpr(), ShaclAfRegistryHolder.get()));
 
         @Nullable Dataset insertDataset;
         if (dataset != null) {
@@ -182,7 +189,8 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
         else
             insertDataset = null;
 
-        IQTree insertTree = getTranslator(ImmutableMap.of(), insertDataset, false).getTree(expression.getInsertExpr());
+        TupleExpr insertTe = FunctionMacroRewriter.rewrite(expression.getInsertExpr(), ShaclAfRegistryHolder.get());
+        IQTree insertTree = getTranslator(ImmutableMap.of(), insertDataset, false).getTree(insertTe);
 
         ImmutableSet.Builder<IQ> iqsBuilder = ImmutableSet.builder();
         ImmutableSet<IntensionalDataNode> dataNodes = extractIntensionalDataNodesFromHead(insertTree);
@@ -267,7 +275,7 @@ public class RDF4JQueryTranslatorImpl implements RDF4JQueryTranslator {
     }
 
     private RDF4JTupleExprTranslator getTranslator(ImmutableMap<Variable, GroundTerm> externalBindings, @Nullable Dataset dataset, boolean treatBNodeAsVariable) {
-        return new RDF4JTupleExprTranslator(externalBindings, dataset, treatBNodeAsVariable, coreUtilsFactory, substitutionFactory, iqFactory, atomFactory, termFactory, functionSymbolFactory, rdfFactory, typeFactory, iqTreeTools);
+        return new RDF4JTupleExprTranslator(externalBindings, dataset, treatBNodeAsVariable, coreSingletons, rdfFactory, iqTreeTools);
     }
 
     private RDF4JValueTranslator getValueTranslator() {

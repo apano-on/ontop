@@ -7,20 +7,15 @@ import it.unibz.inf.ontop.exception.MinorOntopInternalBugException;
 import it.unibz.inf.ontop.injection.IntermediateQueryFactory;
 import it.unibz.inf.ontop.iq.exception.InvalidIntermediateQueryException;
 import it.unibz.inf.ontop.iq.exception.QueryNodeSubstitutionException;
-import it.unibz.inf.ontop.iq.exception.QueryNodeTransformationException;
 import it.unibz.inf.ontop.iq.impl.IQTreeTools;
 import it.unibz.inf.ontop.iq.node.*;
 import it.unibz.inf.ontop.iq.node.normalization.NotRequiredVariableRemover;
 import it.unibz.inf.ontop.iq.request.FunctionalDependencies;
 import it.unibz.inf.ontop.iq.request.VariableNonRequirement;
-import it.unibz.inf.ontop.iq.transform.IQTreeExtendedTransformer;
-import it.unibz.inf.ontop.iq.transform.IQTreeVisitingTransformer;
-import it.unibz.inf.ontop.iq.visit.IQVisitor;
 import it.unibz.inf.ontop.model.term.*;
 import it.unibz.inf.ontop.model.term.functionsymbol.FunctionSymbol;
 import it.unibz.inf.ontop.substitution.*;
 import it.unibz.inf.ontop.iq.*;
-import it.unibz.inf.ontop.iq.transform.node.HomogeneousQueryNodeTransformer;
 import it.unibz.inf.ontop.utils.CoreUtilsFactory;
 import it.unibz.inf.ontop.utils.ImmutableCollectors;
 import it.unibz.inf.ontop.utils.VariableGenerator;
@@ -53,20 +48,10 @@ public class UnionNodeImpl extends CompositeQueryNodeImpl implements UnionNode {
     }
 
     @Override
-    public void acceptVisitor(QueryNodeVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    @Override
-    public UnionNode acceptNodeTransformer(HomogeneousQueryNodeTransformer transformer)
-            throws QueryNodeTransformationException {
-        return transformer.transform(this);
-    }
-
-    @Override
     public ImmutableSet<Substitution<NonVariableTerm>> getPossibleVariableDefinitions(ImmutableList<IQTree> children) {
         return children.stream()
                 .flatMap(c -> c.getPossibleVariableDefinitions().stream())
+                // Preventive: in principle the children should only project the union variables
                 .map(s -> s.restrictDomainTo(projectedVariables))
                 .collect(ImmutableCollectors.toSet());
     }
@@ -276,22 +261,6 @@ public class UnionNodeImpl extends CompositeQueryNodeImpl implements UnionNode {
     }
 
     @Override
-    public IQTree acceptTransformer(IQTree tree, IQTreeVisitingTransformer transformer, ImmutableList<IQTree> children) {
-        return transformer.transformUnion(tree,this, children);
-    }
-
-    @Override
-    public <T> IQTree acceptTransformer(IQTree tree, IQTreeExtendedTransformer<T> transformer,
-                                    ImmutableList<IQTree> children, T context) {
-        return transformer.transformUnion(tree,this, children, context);
-    }
-
-    @Override
-    public <T> T acceptVisitor(IQVisitor<T> visitor, ImmutableList<IQTree> children) {
-        return visitor.visitUnion(this, children);
-    }
-
-    @Override
     public void validateNode(ImmutableList<IQTree> children) throws InvalidIntermediateQueryException {
         if (children.size() < 2) {
             throw new InvalidIntermediateQueryException("UNION node " + this
@@ -338,21 +307,30 @@ public class UnionNodeImpl extends CompositeQueryNodeImpl implements UnionNode {
                         .allMatch(c -> c.inferUniqueConstraints().contains(uc)))
                 .collect(ImmutableCollectors.partitioningBy(uc -> areDisjoint(children, uc)));
 
-        if (ucsPartitionedByDisjointness.get(false).isEmpty())
-            return ImmutableSet.copyOf(ucsPartitionedByDisjointness.get(true));
+        var nonDisjointUcs = Optional.ofNullable(ucsPartitionedByDisjointness.get(false))
+                .orElseGet(ImmutableList::of);
+        var disjointUcs = Optional.ofNullable(ucsPartitionedByDisjointness.get(true))
+                .orElseGet(ImmutableList::of);
 
-        // By definition not parts of the non-disjoint UCs
-        var disjointVariables = firstChild.getVariables().stream()
-                .filter(v -> areDisjoint(children, ImmutableSet.of(v)))
-                .filter(v -> ucsPartitionedByDisjointness.get(true).stream().noneMatch(set -> set.size() == 1 && set.stream().findFirst().get().equals(v)))
+        if (nonDisjointUcs.isEmpty())
+            return ImmutableSet.copyOf(disjointUcs);
+
+        var singleVariableDisjointUcs = disjointUcs.stream()
+                .filter(uc -> uc.size() == 1)
+                .flatMap(Collection::stream)
                 .collect(ImmutableCollectors.toSet());
 
-        return Stream.concat(
-                ucsPartitionedByDisjointness.get(true).stream(),
-                ucsPartitionedByDisjointness.get(false).stream()
-                        .flatMap(uc -> disjointVariables.stream()
-                                        .map(v -> Sets.union(uc, ImmutableSet.of(v)).immutableCopy()))
-                ).collect(ImmutableCollectors.toSet());
+        var additionalVariablesToConsider = Sets.difference(getVariables(), singleVariableDisjointUcs);
+
+        // At the moment, we are only considering one extra variable
+        var extendedUcStream = nonDisjointUcs.stream()
+                .flatMap(uc -> additionalVariablesToConsider.stream()
+                        .filter(v -> !uc.contains(v))
+                        .map(v -> Sets.union(uc, ImmutableSet.of(v)).immutableCopy())
+                        .filter(extendedUc -> areDisjoint(children, extendedUc)));
+
+        return Stream.concat(disjointUcs.stream(), extendedUcStream)
+                .collect(ImmutableCollectors.toSet());
     }
 
     @Override
@@ -407,11 +385,11 @@ public class UnionNodeImpl extends CompositeQueryNodeImpl implements UnionNode {
     }
 
 
-    private boolean areDisjoint(ImmutableList<IQTree> children, ImmutableSet<Variable> uc) {
+    private boolean areDisjoint(ImmutableList<IQTree> children, ImmutableSet<Variable> vars) {
         int childrenCount = children.size();
         return IntStream.range(0, childrenCount)
                 .allMatch(i -> IntStream.range(i + 1, childrenCount)
-                        .allMatch(j -> areDisjoint(children.get(i), children.get(j), uc)));
+                        .allMatch(j -> areDisjoint(children.get(i), children.get(j), vars)));
     }
 
     /**

@@ -56,6 +56,7 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
     private final SPARQLFunctionSymbol iriNoBaseFunctionSymbol;
 
     private final FunctionSymbol identityFunctionSymbol;
+    private final SPARQLFunctionSymbol bnodeTolerantSPARQLStrFunctionSymbol;
 
     /**
      * Created in init()
@@ -105,10 +106,15 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
         this.notYetTypedEqualityFunctionSymbol = new NotYetTypedEqualityFunctionSymbolImpl(
                 dbTypeFactory.getAbstractRootDBType(), dbBooleanType);
 
-        this.iriNoBaseFunctionSymbol = new IriSPARQLFunctionSymbolImpl(typeFactory.getAbstractRDFTermType(),
-                typeFactory.getXsdStringDatatype(), typeFactory.getIRITermType());
-        this.extractLexicalTermFunctionSymbol = new ExtractLexicalTermFunctionSymbolImpl(typeFactory.getAbstractRDFTermType(), dbStringType);
+        var xsdStringType = typeFactory.getXsdStringDatatype();
+        var abstractRDFType = typeFactory.getAbstractRDFTermType();
+
+        this.iriNoBaseFunctionSymbol = new IriSPARQLFunctionSymbolImpl(abstractRDFType,
+                xsdStringType, typeFactory.getIRITermType());
+        this.extractLexicalTermFunctionSymbol = new ExtractLexicalTermFunctionSymbolImpl(abstractRDFType, dbStringType);
         this.identityFunctionSymbol = new IdentityFunctionSymbol(dbTypeFactory.getAbstractRootDBType());
+
+        this.bnodeTolerantSPARQLStrFunctionSymbol = new BNodeTolerantStrSPARQLFunctionSymbolImpl(abstractRDFType, xsdStringType);
     }
 
     @Inject
@@ -772,4 +778,8 @@ public class FunctionSymbolFactoryImpl implements FunctionSymbolFactory {
         return identityFunctionSymbol;
     }
 
+    @Override
+    public SPARQLFunctionSymbol getBNodeTolerantSPARQLStrFunctionSymbol() {
+        return bnodeTolerantSPARQLStrFunctionSymbol;
+    }
 }

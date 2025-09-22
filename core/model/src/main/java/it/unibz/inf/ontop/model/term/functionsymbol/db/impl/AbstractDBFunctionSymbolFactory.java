@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbolFactory {
 
     private static final String BNODE_PREFIX = "ontop-bnode-";
-    private static final String PLACEHOLDER = "{}";
 
     /**
      * Name (in the DB dialect), arity -> predefined REGULAR DBFunctionSymbol
@@ -1007,6 +1006,12 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     }
 
     @Override
+    public ImmutableSet<ObjectStringTemplateFunctionSymbol> getObjectTemplates() {
+        return Stream.concat(bnodeTemplateMap.values().stream(), iriTemplateMap.values().stream())
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    @Override
     public Optional<DBFunctionSymbol> getFloor(DBTermType dbTermType) {
         DBFunctionSymbol existingFunctionSymbol = floorMap.get(dbTermType);
         if (existingFunctionSymbol != null)
@@ -1405,7 +1410,6 @@ public abstract class AbstractDBFunctionSymbolFactory implements DBFunctionSymbo
     protected abstract DBTypeConversionFunctionSymbol createHexBinaryNormFunctionSymbol(DBTermType binaryType);
     protected abstract DBTypeConversionFunctionSymbol createDateTimeDenormFunctionSymbol(DBTermType timestampType);
     protected abstract DBTypeConversionFunctionSymbol createBooleanDenormFunctionSymbol();
-    protected abstract DBTypeConversionFunctionSymbol createGeometryNormFunctionSymbol(DBTermType geoType);
     protected abstract DBTypeConversionFunctionSymbol createHexBinaryDenormFunctionSymbol(DBTermType binaryType);
 
     protected DBBooleanFunctionSymbol createLikeFunctionSymbol() {

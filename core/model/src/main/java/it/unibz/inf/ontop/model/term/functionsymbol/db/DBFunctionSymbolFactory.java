@@ -1,6 +1,7 @@
 package it.unibz.inf.ontop.model.term.functionsymbol.db;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import it.unibz.inf.ontop.model.template.Template;
 import it.unibz.inf.ontop.model.term.functionsymbol.FunctionSymbol;
 import it.unibz.inf.ontop.model.term.functionsymbol.InequalityLabel;
@@ -435,4 +436,7 @@ public interface DBFunctionSymbolFactory {
     DBFunctionSymbol getOpenEOMin();
     DBFunctionSymbol getOpenEOAgg();
     DBFunctionSymbol getOpenEOProcessGraph(int arity);
+
+    ImmutableSet<ObjectStringTemplateFunctionSymbol> getObjectTemplates();
+
 }
