@@ -1,8 +1,6 @@
 package it.unibz.inf.ontop.dbschema.impl;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import it.unibz.inf.ontop.dbschema.*;
 import it.unibz.inf.ontop.exception.InvalidQueryException;
 import it.unibz.inf.ontop.exception.MetadataExtractionException;
@@ -11,18 +9,13 @@ import it.unibz.inf.ontop.exception.RelationNotFoundInMetadataException;
 import it.unibz.inf.ontop.injection.CoreSingletons;
 import it.unibz.inf.ontop.injection.OntopModelSettings;
 import it.unibz.inf.ontop.injection.OntopOBDASettings;
-import it.unibz.inf.ontop.model.term.ImmutableTerm;
 import it.unibz.inf.ontop.model.type.DBTermType;
 import it.unibz.inf.ontop.model.type.DBTypeFactory;
 import it.unibz.inf.ontop.spec.sqlparser.ApproximateSelectQueryAttributeExtractor;
 import it.unibz.inf.ontop.spec.sqlparser.DefaultSelectQueryAttributeExtractor;
-import it.unibz.inf.ontop.spec.sqlparser.JSqlParserTools;
-import it.unibz.inf.ontop.spec.sqlparser.ParserViewDefinition;
+import it.unibz.inf.ontop.spec.sqlparser.exception.QueryParseException;
 import it.unibz.inf.ontop.spec.sqlparser.exception.UnsupportedSelectQueryException;
 import it.unibz.inf.ontop.utils.ImmutableCollectors;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.TokenMgrException;
-import net.sf.jsqlparser.statement.select.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +24,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
@@ -183,13 +174,15 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
             }
             LOGGER.debug("[DB-METADATA] Column info extracted in {} ms/column", logOperation.getAverageDuration());
 
-            if (relations.size() == 1) {
-                Map.Entry<RelationID, RelationDefinition.AttributeListBuilder> r = relations.entrySet().iterator().next();
-                return new DatabaseTableDefinition(getAllIDs(r.getKey()), r.getValue());
+            switch (relations.size()) {
+                case 0:
+                    throw new RelationNotFoundInMetadataException(id, getRelationIDs());
+                case 1:
+                    Map.Entry<RelationID, RelationDefinition.AttributeListBuilder> r = relations.entrySet().iterator().next();
+                    return new DatabaseTableDefinition(getAllIDs(r.getKey()), r.getValue());
+                default:
+                    throw new MetadataExtractionException("Cannot resolve ambiguous relation id: " + id + ": " + relations.keySet());
             }
-            throw relations.isEmpty()
-                    ? new RelationNotFoundInMetadataException(id, getRelationIDs())
-                    : new MetadataExtractionException("Cannot resolve ambiguous relation id: " + id + ": " + relations.keySet());
         }
         catch (SQLException e) {
             throw new MetadataExtractionException(e);
@@ -571,7 +564,29 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
                 : extractBlackBoxViewWithoutConnectingToDB(query);
     }
 
-    protected RelationDefinition extractBlackBoxViewByConnectingToDB(String query) throws MetadataExtractionException {
+    protected final BlackBoxViewDefinition extractBlackBoxViewByConnectingToDB(String query) throws MetadataExtractionException {
+        try {
+            RelationDefinition.AttributeListBuilder builder = retrieveAttributeListByConnectingToDB("(" + query + ")");
+            return new BlackBoxViewDefinition(builder, query);
+        }
+        catch (SQLException e) {
+            throw new MetadataExtractionException("Cannot extract metadata for a black-box view. " + e.getMessage(), e);
+        }
+    }
+
+    protected final NamedRelationDefinition extractFileBasedTableByConnectingToDB(RelationID id) throws MetadataExtractionException {
+        try {
+            LOGGER.debug("Connecting to DB to extract metadata for {}", id);
+            String query = id.getSQLRendering();
+            RelationDefinition.AttributeListBuilder builder = retrieveAttributeListByConnectingToDB(query);
+            return new FileBasedNamedRelationDefinition(ImmutableList.of(id), builder);
+        }
+        catch (SQLException e) {
+            throw new FileBasedRelationNotFoundInMetadataException(id, getRelationIDs());
+        }
+    }
+
+    protected final RelationDefinition.AttributeListBuilder retrieveAttributeListByConnectingToDB(String query) throws SQLException {
         try (Statement st = connection.createStatement();
              ResultSet resultSet = st.executeQuery(makeQueryMinimizeResultSet(query))) {
 
@@ -580,7 +595,7 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
 
             RelationDefinition.AttributeListBuilder builder = AbstractRelationDefinition.attributeListBuilder();
 
-            for (int i=1; i <= columnCount; i++) {
+            for (int i = 1; i <= columnCount; i++) {
                 final int index = i;
 
                 QuotedID attributeId = rawIdFactory.createAttributeID(resultSetMetadata.getColumnName(index));
@@ -594,10 +609,7 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
 
                 builder.addAttribute(attributeId, termType, sqlTypeName, true);
             }
-            return new ParserViewDefinition(builder, query);
-
-        } catch (SQLException e) {
-            throw new MetadataExtractionException("Cannot extract metadata for a black-box view. " + e.getMessage(), e);
+            return builder;
         }
     }
 
@@ -605,19 +617,17 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
      * Can be overridden
      */
     protected String makeQueryMinimizeResultSet(String query) {
-        return String.format("SELECT * FROM (%s) subQ LIMIT 1", query);
+        return String.format("SELECT * FROM %s subQ LIMIT 1", query);
     }
 
-    protected RelationDefinition extractBlackBoxViewWithoutConnectingToDB(String query) throws InvalidQueryException {
+    protected final BlackBoxViewDefinition extractBlackBoxViewWithoutConnectingToDB(String query) throws InvalidQueryException {
         ImmutableList<QuotedID> attributes;
         try {
             DefaultSelectQueryAttributeExtractor sqae = new DefaultSelectQueryAttributeExtractor(this, coreSingletons);
-            Select select = JSqlParserTools.parse(query, !getQuotedIDFactory().supportsSquareBracketQuotation());
-            ImmutableMap<QuotedID, ImmutableTerm> attrs = sqae.getRAExpressionAttributes(select).getUnqualifiedAttributes();
-            attributes = ImmutableList.copyOf(attrs.keySet());
+            attributes = sqae.getRAExpressionAttributes(query);
         }
-        catch (JSQLParserException e) {
-            LOGGER.info("FAILED TO PARSE: {} {}", query, getJSQLParserErrorMessage(query, e));
+        catch (QueryParseException e) {
+            LOGGER.info("FAILED TO PARSE: {} {}", query, e.getMessage());
 
             ApproximateSelectQueryAttributeExtractor sqae = new ApproximateSelectQueryAttributeExtractor(getQuotedIDFactory());
             attributes = sqae.getAttributes(query);
@@ -626,36 +636,15 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
             ApproximateSelectQueryAttributeExtractor sqae = new ApproximateSelectQueryAttributeExtractor(getQuotedIDFactory());
             attributes = sqae.getAttributes(query);
         }
-        return new ParserViewDefinition(attributes, query, dbTypeFactory);
+
+        RelationDefinition.AttributeListBuilder builder = AbstractRelationDefinition.attributeListBuilder();
+        for (QuotedID id : attributes) {
+            builder.addAttribute(id, dbTypeFactory.getAbstractRootDBType(), null, true);
+        }
+
+        return new BlackBoxViewDefinition(builder, query);
     }
 
-    private static String getJSQLParserErrorMessage(String sourceQuery, JSQLParserException e) {
-        try {
-            // net.sf.jsqlparser.parser.TokenMgrException: Lexical error at line 1, column 165.
-            if (e.getCause() instanceof TokenMgrException) {
-                Pattern pattern = Pattern.compile("at line (\\d+), column (\\d+)");
-                Matcher matcher = pattern.matcher(e.getCause().getMessage());
-                if (matcher.find()) {
-                    int line = Integer.parseInt(matcher.group(1));
-                    int col = Integer.parseInt(matcher.group(2));
-                    String sourceQueryLine = sourceQuery.split("\n")[line - 1];
-                    final int MAX_LENGTH = 40;
-                    if (sourceQueryLine.length() > MAX_LENGTH) {
-                        sourceQueryLine = sourceQueryLine.substring(sourceQueryLine.length() - MAX_LENGTH);
-                        if (sourceQueryLine.length() > 2 * MAX_LENGTH)
-                            sourceQueryLine = sourceQueryLine.substring(0, 2 * MAX_LENGTH);
-                        col = MAX_LENGTH;
-                    }
-                    return "FAILED TO PARSE: " + sourceQueryLine + "\n" +
-                            Strings.repeat(" ", "FAILED TO PARSE: ".length() + col - 2) + "^\n" + e.getCause();
-                }
-            }
-        }
-        catch (Exception e1) {
-            // NOP
-        }
-        return e.getCause().toString();
-    }
 
     protected abstract RelationID getCanonicalRelationId(RelationID id) throws MetadataExtractionException;
 
@@ -692,5 +681,4 @@ public abstract class AbstractDBMetadataProvider implements DBMetadataProvider {
             return (endTime - startTime)/ count;
         }
     }
-
 }
