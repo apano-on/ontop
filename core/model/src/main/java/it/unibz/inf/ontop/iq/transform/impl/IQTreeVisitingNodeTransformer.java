@@ -95,6 +95,11 @@ public final class IQTreeVisitingNodeTransformer extends DefaultIQTreeVisitingTr
     }
 
     @Override
+    public IQTree transformLateralJoin(NaryIQTree tree, LateralJoinNode rootNode, ImmutableList<IQTree> children) {
+        return transformNaryNonCommutativeNode(tree, nodeTransformer.transform(rootNode, tree), children);
+    }
+
+    @Override
     public IQTree transformUnion(NaryIQTree tree, UnionNode rootNode, ImmutableList<IQTree> children) {
         return transformNaryCommutativeNode(tree, nodeTransformer.transform(rootNode, tree), children);
     }
@@ -129,5 +134,15 @@ public final class IQTreeVisitingNodeTransformer extends DefaultIQTreeVisitingTr
         return (newLeftChild == leftChild && newRightChild == rightChild && newNode.equals(tree.getRootNode()))
                 ? tree
                 : iqFactory.createBinaryNonCommutativeIQTree(newNode,  newLeftChild, newRightChild);
+    }
+
+    @Override
+    protected IQTree transformNaryNonCommutativeNode(NaryIQTree tree, NaryOperatorNode newNode, ImmutableList<IQTree> children) {
+        ImmutableList<IQTree> newChildren = NaryIQTreeTools.transformChildren(children, this::transform);
+        return IntStream.range(0, children.size())
+                .allMatch(i -> newChildren.get(i) == children.get(i)
+                        && newNode.equals(tree.getRootNode()))
+                ? tree
+                : iqFactory.createNaryIQTree(newNode, newChildren);
     }
 }

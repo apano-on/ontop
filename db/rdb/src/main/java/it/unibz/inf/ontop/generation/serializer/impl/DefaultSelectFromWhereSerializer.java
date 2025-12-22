@@ -351,6 +351,12 @@ public class DefaultSelectFromWhereSerializer implements SelectFromWhereSerializ
             return visit(sqlLeftJoinExpression, "LEFT OUTER JOIN");
         }
 
+        @Override
+        public QuerySerialization visit(SQLLateralJoinExpression sqlInnerJoinLateralExpression) {
+            return visit(sqlInnerJoinLateralExpression, "LATERAL JOIN");
+        }
+
+
         /**
          * NB: the systematic use of ON conditions for inner and left joins saves us from putting parentheses.
          *

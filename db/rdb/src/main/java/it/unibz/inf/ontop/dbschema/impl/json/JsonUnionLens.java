@@ -62,8 +62,10 @@ public class JsonUnionLens extends JsonLens {
                          @JsonProperty("otherFunctionalDependencies") OtherFunctionalDependencies otherFunctionalDependencies,
                          @JsonProperty("foreignKeys") ForeignKeys foreignKeys,
                          @JsonProperty("nonNullConstraints") NonNullConstraints nonNullConstraints,
-                         @JsonProperty("iriSafeConstraints") IRISafeConstraints iriSafeConstraints) {
-        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints);
+                         @JsonProperty("iriSafeConstraints") IRISafeConstraints iriSafeConstraints,
+                         @JsonProperty("accessPatternConstraints") AccessPatternConstraints accessPatternConstraints) {
+        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints,
+                accessPatternConstraints);
         this.unionRelations = unionRelations;
         this.provenanceColumn = provenanceColumn;
         this.makeDistinct = makeDistinct;
@@ -104,6 +106,9 @@ public class JsonUnionLens extends JsonLens {
 
         if (foreignKeys != null)
             insertForeignKeys(relation, metadataLookupForFK, foreignKeys.added);
+
+        if (accessPatternConstraints != null)
+            insertAccessPatterns(relation, idFactory);
     }
 
     @Override

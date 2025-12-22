@@ -33,4 +33,6 @@ public interface IQTreeVisitor<T> {
 
     T transformInnerJoin(NaryIQTree tree, InnerJoinNode rootNode, ImmutableList<IQTree> children);
     T transformUnion(NaryIQTree tree, UnionNode rootNode, ImmutableList<IQTree> children);
+
+    T transformLateralJoin(NaryIQTree tree, LateralJoinNode rootNode, ImmutableList<IQTree> children);
 }

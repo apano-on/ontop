@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.*;
 import it.unibz.inf.ontop.dbschema.*;
 import it.unibz.inf.ontop.dbschema.impl.AbstractRelationDefinition;
+import it.unibz.inf.ontop.dbschema.impl.AccessPatternConstraintImpl;
 import it.unibz.inf.ontop.dbschema.impl.RawQuotedIDFactory;
 import it.unibz.inf.ontop.exception.MetadataExtractionException;
 import it.unibz.inf.ontop.injection.CoreSingletons;
@@ -61,16 +62,21 @@ public abstract class JsonLens extends JsonOpenObject {
     @Nullable
     public final IRISafeConstraints iriSafeConstraints;
 
+    @Nullable
+    public final AccessPatternConstraints accessPatternConstraints;
+
     public JsonLens(List<String> name, @Nullable UniqueConstraints uniqueConstraints,
                     @Nullable OtherFunctionalDependencies otherFunctionalDependencies, @Nullable ForeignKeys foreignKeys,
                     @Nullable NonNullConstraints nonNullConstraints,
-                    @Nullable IRISafeConstraints iriSafeConstraints) {
+                    @Nullable IRISafeConstraints iriSafeConstraints,
+                    @Nullable AccessPatternConstraints accessPatternConstraints) {
         this.name = name;
         this.uniqueConstraints = uniqueConstraints;
         this.otherFunctionalDependencies = otherFunctionalDependencies;
         this.foreignKeys = foreignKeys;
         this.nonNullConstraints = nonNullConstraints;
         this.iriSafeConstraints = iriSafeConstraints;
+        this.accessPatternConstraints = accessPatternConstraints;
     }
 
     public abstract Lens createViewDefinition(DBParameters dbParameters, MetadataLookup parentCacheMetadataLookup)
@@ -467,4 +473,87 @@ public abstract class JsonLens extends JsonOpenObject {
             this.added = added;
         }
     }
+
+    protected static class AccessPatternConstraints extends JsonOpenObject {
+        @Nonnull
+        public final List<AddAccessPattern> added;
+
+        @JsonCreator
+        public AccessPatternConstraints(@JsonProperty("added") List<AddAccessPattern> added) {
+            this.added = added;
+        }
+    }
+
+    protected static class AddAccessPattern extends JsonOpenObject {
+        @Nonnull
+        public final List<String> inputs;
+        @Nonnull
+        public final List<String> outputs;
+
+        public AddAccessPattern(@JsonProperty("inputs") List<String> inputs,
+                                       @JsonProperty("outputs") List<String> outputs) {
+            this.inputs = inputs;
+            this.outputs = outputs;
+        }
+
+        /*
+         * Override equals method to ensure we can check for object equality
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            AddAccessPattern other = (AddAccessPattern) obj;
+            return Objects.equals(ImmutableMap.of(inputs, outputs),
+                    ImmutableMap.of(other.inputs, other.outputs));
+        }
+
+        /*
+         * Override hashCode method to ensure we can check for object equality
+         */
+        @Override
+        public int hashCode() {
+            return Objects.hash(ImmutableMap.of(inputs, outputs));
+        }
+    }
+
+    protected void insertAccessPatterns(
+            NamedRelationDefinition relation,
+            QuotedIDFactory quotedIdFactory) throws MetadataExtractionException {
+
+        if (accessPatternConstraints == null)
+            return;
+
+        for (AddAccessPattern ap : accessPatternConstraints.added) {
+            try {
+                var builder = AccessPatternConstraintImpl.builder(relation);
+
+                for (String input : ap.inputs) {
+                    builder.addInput(quotedIdFactory.createAttributeID(input));
+                }
+
+                for (String output : ap.outputs) {
+                    builder.addOutput(quotedIdFactory.createAttributeID(output));
+                }
+
+                builder.build();
+            }
+            catch (AttributeNotFoundException e) {
+                throw new MetadataExtractionException(
+                        String.format(
+                                "Invalid access pattern on lens %s: attribute not found.",
+                                relation.getID()),
+                        e);
+            }
+        }
+    }
+
+
 }

@@ -71,9 +71,11 @@ public class JsonFlattenLens extends JsonBasicOrJoinOrNestedLens {
             @JsonProperty("otherFunctionalDependencies") OtherFunctionalDependencies otherFunctionalDependencies,
             @JsonProperty("foreignKeys") ForeignKeys foreignKeys,
             @JsonProperty("nonNullConstraints") NonNullConstraints nonNullConstraints,
-            @JsonProperty("iriSafeConstraints") IRISafeConstraints iriSafeConstraints
+            @JsonProperty("iriSafeConstraints") IRISafeConstraints iriSafeConstraints,
+            @JsonProperty("accessPatternConstraints") AccessPatternConstraints accessPatternConstraints
     ) {
-        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints);
+        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints,
+                accessPatternConstraints);
         this.columns = columns;
         this.baseRelation = baseRelation;
         this.flattenedColumn = flattenedColumn;
@@ -280,6 +282,8 @@ public class JsonFlattenLens extends JsonBasicOrJoinOrNestedLens {
                         .collect(ImmutableCollectors.toList()),
                 baseRelations,
                 dbParameters.getCoreSingletons());
+
+        insertAccessPatterns(relation, idFactory);
     }
 
     private ImmutableList<AddForeignKey> inferForeignKeysFromParentUCs(ImmutableSet<QuotedID> keptColumns, NamedRelationDefinition baseRelation) {

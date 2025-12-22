@@ -22,4 +22,8 @@ public interface NamedRelationDefinition extends RelationDefinition {
 	void addFunctionalDependency(FunctionalDependency constraint);
 
 	void addForeignKeyConstraint(ForeignKeyConstraint fk);
+
+	ImmutableSet<AccessPatternConstraint> getAccessPatterns();
+
+	void addAccessPattern(AccessPatternConstraint ap);
 }

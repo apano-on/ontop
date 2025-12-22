@@ -93,6 +93,11 @@ public abstract class DefaultIQTreeVisitingTransformer implements IQTreeVisitor<
     }
 
     @Override
+    public IQTree transformLateralJoin(NaryIQTree tree, LateralJoinNode rootNode, ImmutableList<IQTree> children) {
+        return transformNaryNonCommutativeNode(tree, rootNode, children);
+    }
+
+    @Override
     public IQTree transformUnion(NaryIQTree tree, UnionNode node, ImmutableList<IQTree> children) {
         return transformNaryCommutativeNode(tree, node, children);
     }
@@ -104,4 +109,6 @@ public abstract class DefaultIQTreeVisitingTransformer implements IQTreeVisitor<
     protected abstract IQTree transformNaryCommutativeNode(NaryIQTree tree, NaryOperatorNode node, ImmutableList<IQTree> children);
 
     protected abstract IQTree transformBinaryNonCommutativeNode(BinaryNonCommutativeIQTree tree, BinaryNonCommutativeOperatorNode node, IQTree leftChild, IQTree rightChild);
+
+    protected abstract IQTree transformNaryNonCommutativeNode(NaryIQTree tree, NaryOperatorNode node, ImmutableList<IQTree> children);
 }

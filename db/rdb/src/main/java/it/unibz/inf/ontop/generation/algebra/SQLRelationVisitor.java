@@ -21,4 +21,6 @@ public interface SQLRelationVisitor<T> {
 
     T visit(SQLFlattenExpression sqlFlattenExpression);
 
+    T visit(SQLLateralJoinExpression sqlLateralJoinExpression);
+
 }

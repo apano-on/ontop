@@ -136,6 +136,14 @@ public class IQTreeTools {
         return iqFactory.createNaryIQTree(iqFactory.createInnerJoinNode(), children);
     }
 
+    public NaryIQTree createInnerJoinLateralTree(Optional<ImmutableExpression> filter, ImmutableList<IQTree> children) {
+        return iqFactory.createNaryIQTree(iqFactory.createInnerJoinLateralNode(filter), children);
+    }
+
+    public NaryIQTree createInnerJoinLateralTree(ImmutableList<IQTree> children) {
+        return iqFactory.createNaryIQTree(iqFactory.createInnerJoinLateralNode(), children);
+    }
+
     public BinaryNonCommutativeIQTree createLeftJoinTree(Optional<ImmutableExpression> filter, IQTree leftChild, IQTree rightChild) {
         return iqFactory.createBinaryNonCommutativeIQTree(iqFactory.createLeftJoinNode(filter), leftChild, rightChild);
     }

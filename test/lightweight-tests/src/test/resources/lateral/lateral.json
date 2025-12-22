@@ -1,0 +1,26 @@
+{
+  "relations": [
+    {
+      "name": ["\"views\",\"latest_order_by_customer\""],
+
+      "baseRelation": ["\"public\"","\"orders\""],
+
+      "filterExpression": "\"order_date\" = (SELECT MAX(t.\"order_date\") FROM \"public\".\"orders\" t WHERE t.\"customer_id\" = \"customer_id\")",
+
+      "accessPatterns": {
+        "added": [
+          {
+            "inputs": ["\"customer_id\""],
+            "outputs": [
+              "\"order_id\"",
+              "\"order_date\"",
+              "\"amount\""
+            ]
+          }
+        ]
+      },
+
+      "type": "BasicLens"
+    }
+  ]
+}

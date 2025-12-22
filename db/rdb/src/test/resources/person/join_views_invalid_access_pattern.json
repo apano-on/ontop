@@ -1,0 +1,24 @@
+{
+  "relations": [
+    {
+      "name": ["\"views\"", "\"person_countries\""],
+      "join": {
+        "relations": [
+          ["\"person\""],
+          ["\"country\""]
+        ],
+        "columnPrefixes": ["", "c_"]
+      },
+      "filterExpression": "\"country\"=\"c_acronym\"",
+      "accessPatternConstraints": {
+        "added": [
+          {
+            "inputs": ["\"my_imaginary_col\""],
+            "outputs": ["\"country\"", "\"c_name\""]
+          }
+        ]
+      },
+      "type": "JoinViewDefinition"
+    }
+  ]
+}

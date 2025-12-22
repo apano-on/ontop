@@ -38,8 +38,10 @@ public abstract class JsonBasicOrJoinOrNestedLens extends JsonLens {
     protected JsonBasicOrJoinOrNestedLens(List<String> name, @Nullable UniqueConstraints uniqueConstraints,
                                           @Nullable OtherFunctionalDependencies otherFunctionalDependencies,
                                           @Nullable ForeignKeys foreignKeys, @Nullable NonNullConstraints nonNullConstraints,
-                                          @Nullable IRISafeConstraints iriSafeConstraints) {
-        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints);
+                                          @Nullable IRISafeConstraints iriSafeConstraints,
+                                          @Nullable AccessPatternConstraints accessPatternConstraints) {
+        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints,
+                accessPatternConstraints);
     }
 
     protected String normalizeAttributeName(String attributeName, QuotedIDFactory quotedIdFactory) {

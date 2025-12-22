@@ -18,6 +18,7 @@ public abstract class AbstractNamedRelationDefinition extends AbstractRelationDe
     private final List<UniqueConstraint> uniqueConstraints = new LinkedList<>();
     private final List<FunctionalDependency> otherFunctionalDependencies = new ArrayList<>();
     private final List<ForeignKeyConstraint> foreignKeys = new ArrayList<>();
+    private final List<AccessPatternConstraint> accessPatterns = new ArrayList<>();
 
     AbstractNamedRelationDefinition(ImmutableList<RelationID> allIds, AttributeListBuilder builder) {
         super(allIds.get(0).getSQLRendering(), builder);
@@ -95,6 +96,16 @@ public abstract class AbstractNamedRelationDefinition extends AbstractRelationDe
     @Override
     public ImmutableList<ForeignKeyConstraint> getForeignKeys() {
         return ImmutableList.copyOf(foreignKeys);
+    }
+
+    @Override
+    public void addAccessPattern(AccessPatternConstraint ap) {
+        accessPatterns.add(ap);
+    }
+
+    @Override
+    public ImmutableSet<AccessPatternConstraint> getAccessPatterns() {
+        return ImmutableSet.copyOf(accessPatterns);
     }
 
 }

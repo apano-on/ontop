@@ -46,8 +46,10 @@ public class JsonSQLLens extends JsonLens {
                        @JsonProperty("otherFunctionalDependencies") OtherFunctionalDependencies otherFunctionalDependencies,
                        @JsonProperty("foreignKeys") ForeignKeys foreignKeys,
                        @JsonProperty("nonNullConstraints") NonNullConstraints nonNullConstraints,
-                       @JsonProperty("iriSafeConstraints") IRISafeConstraints iriSafeConstraints) {
-        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints);
+                       @JsonProperty("iriSafeConstraints") IRISafeConstraints iriSafeConstraints,
+                       @JsonProperty("accessPatternConstraints") AccessPatternConstraints accessPatternConstraints) {
+        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints,
+                accessPatternConstraints);
         this.query = query;
     }
 
@@ -89,6 +91,8 @@ public class JsonSQLLens extends JsonLens {
         if (otherFunctionalDependencies != null)
             insertFunctionalDependencies(relation, idFactory, otherFunctionalDependencies.added, dbParameters.getCoreSingletons());
 
+        if (accessPatternConstraints != null)
+            insertAccessPatterns(relation, idFactory);
     }
 
     @Override

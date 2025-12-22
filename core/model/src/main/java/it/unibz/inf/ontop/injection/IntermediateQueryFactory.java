@@ -47,6 +47,15 @@ public interface IntermediateQueryFactory {
     LeftJoinNode createLeftJoinNode(ImmutableExpression joiningCondition);
     LeftJoinNode createLeftJoinNode(Optional<ImmutableExpression> joiningCondition);
 
+    LateralJoinNode createInnerJoinLateralNode();
+    LateralJoinNode createInnerJoinLateralNode(Optional<ImmutableExpression> optionalFilterCondition);
+    LateralJoinNode createInnerJoinLateralNode(ImmutableExpression joiningCondition);
+
+//    IQTree createInnerJoinLateralTree(Optional<ImmutableExpression> optionalFilterCondition,
+//                                      ImmutableList<IQTree> children);
+//
+//    IQTree createInnerJoinLateralTree(ImmutableList<IQTree> children);
+
     FilterNode createFilterNode(ImmutableExpression filterCondition);
 
     FlattenNode createFlattenNode(@Assisted("outputVariable") Variable outputVariable,

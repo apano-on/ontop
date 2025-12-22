@@ -49,8 +49,10 @@ public abstract class JsonBasicOrJoinLens extends JsonBasicOrJoinOrNestedLens {
                                   @Nullable NonNullConstraints nonNullConstraints,
                                   @Nullable IRISafeConstraints iriSafeConstraints,
                                   @Nullable Columns columns,
-                                  @Nullable String filterExpression) {
-        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints);
+                                  @Nullable String filterExpression,
+                                  @Nullable AccessPatternConstraints accessPatternConstraints) {
+        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints,
+                accessPatternConstraints);
         this.columns = columns == null ? new Columns(new ArrayList<>(), new ArrayList<>()) : columns;
         this.filterExpression = filterExpression == null ? "" : filterExpression;
     }
@@ -114,6 +116,8 @@ public abstract class JsonBasicOrJoinLens extends JsonBasicOrJoinOrNestedLens {
                 (foreignKeys != null) ? foreignKeys.added : ImmutableList.of(),
                 baseRelations,
                 coreSingletons);
+
+        insertAccessPatterns(relation, idFactory);
     }
 
     private IQ createIQ(RelationID relationId, ImmutableList<ParentDefinition> parentDefinitions, DBParameters dbParameters)

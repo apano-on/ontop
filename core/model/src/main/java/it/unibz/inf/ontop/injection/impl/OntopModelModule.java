@@ -72,6 +72,7 @@ public class OntopModelModule extends OntopAbstractModule {
         bindFromSettings(FilterNormalizer.class);
         bindFromSettings(FlattenNormalizer.class);
         bindFromSettings(InnerJoinNormalizer.class);
+        bindFromSettings(InnerJoinLateralNormalizer.class);
         bindFromSettings(LeftJoinNormalizer.class);
         bindFromSettings(OrderByNormalizer.class);
         bindFromSettings(DistinctNormalizer.class);
@@ -107,6 +108,7 @@ public class OntopModelModule extends OntopAbstractModule {
                 ConstructionNode.class,
                 UnionNode.class,
                 InnerJoinNode.class,
+                LateralJoinNode.class,
                 LeftJoinNode.class,
                 FilterNode.class,
                 FlattenNode.class,

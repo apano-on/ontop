@@ -1,0 +1,69 @@
+[PrefixDeclaration]
+:		http://www.unibz-lateral.org#
+owl:		http://www.w3.org/2002/07/owl#
+rdf:		http://www.w3.org/1999/02/22-rdf-syntax-ns#
+xml:		http://www.w3.org/XML/1998/namespace
+xsd:		http://www.w3.org/2001/XMLSchema#
+rdfs:		http://www.w3.org/2000/01/rdf-schema#
+geo:    http://www.opengis.net/ont/geosparql#
+
+[MappingDeclaration] @collection [[
+;mappingId	customers
+;target		:customer/{customer_id} a :Customer ; rdfs:label {name}^^xsd:string .
+;source		SELECT "customer_id", "name" FROM "customers"
+
+; Note: we DON'T expand items here. We just expose the jsonb 'items' column.
+;mappingId	orders
+;target		:order/{order_id} a :Order ; :date {order_date}^^xsd:date ; :amount {amount}^^xsd:double .
+;source		SELECT "order_id", "order_date", "amount" FROM "orders"
+
+;mappingId	customer has order
+;target		:customer/{customer_id} :hasOrder :order/{order_id}  .
+;source		SELECT "customer_id", "order_id" FROM "orders"
+
+mappingId	customer_with_orders_lateral
+target		:customer/{customer_id} a :Customer ; rdfs:label {name}^^xsd:string .
+            :order/{order_id} a :Order ; :date {order_date}^^xsd:date ; :amount {amount}^^xsd:double .
+            :customer/{customer_id} :hasOrder :order/{order_id}  .
+source		SELECT c."customer_id",
+                  c."name",
+                  o."order_id",
+                  o."order_date",
+                  o."amount"
+           FROM "customers" c
+           JOIN LATERAL (
+             SELECT "order_id","order_date","amount"
+             FROM "orders" o
+             WHERE o."customer_id" = c."customer_id"
+           ) o ON true
+
+
+mappingId   roads
+target     :road/{road_id} a :Road ;
+           :name {name}^^xsd:string ;
+           geo:hasGeometry :road/{road_id}/geom .
+source     SELECT road_id, name FROM "roads"
+
+mappingId   road-vertices
+target     :road/{road_id} :hasVertex :vertex/{road_id}/{path} .
+source     SELECT road_id, (dp).path[1] as path,
+                  ST_X((dp).geom) as lon, ST_Y((dp).geom) as lat
+           FROM "roads", ST_DumpPoints(geometry) AS dp;
+
+mappingId   vertex-coords
+target     :vertex/{road_id}/{path} a :Vertex ;
+           :longitude {lon}^^xsd:double ;
+           :latitude {lat}^^xsd:double ;
+           :sequence {path}^^xsd:integer .
+source     SELECT road_id, (dp).path[1] as path,
+                  ST_X((dp).geom) as lon, ST_Y((dp).geom) as lat
+           FROM "roads", ST_DumpPoints(geometry) AS dp;
+
+mappingId   documents
+target     :doc/{doc_id} a :Document ; :title {title}^^xsd:string .
+source     SELECT doc_id, title FROM "documents"
+
+mappingId   document-tags
+target     :doc/{doc_id} :hasTag {tag}^^xsd:string .
+source     SELECT doc_id, tag FROM "documents", unnest(tags) AS tag
+]]

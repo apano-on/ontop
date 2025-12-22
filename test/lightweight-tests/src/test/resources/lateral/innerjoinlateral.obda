@@ -1,0 +1,22 @@
+[PrefixDeclaration]
+:		http://www.unibz-lateral.org#
+owl:		http://www.w3.org/2002/07/owl#
+rdf:		http://www.w3.org/1999/02/22-rdf-syntax-ns#
+xml:		http://www.w3.org/XML/1998/namespace
+xsd:		http://www.w3.org/2001/XMLSchema#
+rdfs:		http://www.w3.org/2000/01/rdf-schema#
+geo:    http://www.opengis.net/ont/geosparql#
+
+[MappingDeclaration] @collection [[
+mappingId	customers
+target		:customer/{customer_id} a :Customer ; rdfs:label {name}^^xsd:string .
+source		SELECT "customer_id", "name" FROM "customers"
+
+mappingId	orders
+target		:order/{order_id} a :Order ; :date {order_date}^^xsd:date ; :amount {amount}^^xsd:double .
+source		SELECT "order_id", "order_date", "amount" FROM "views"."latest_order_by_customer"
+
+mappingId	customer has order
+target		:customer/{customer_id} :hasOrder :order/{order_id}  .
+source		SELECT "customer_id", "order_id" FROM "views"."latest_order_by_customer"
+]]

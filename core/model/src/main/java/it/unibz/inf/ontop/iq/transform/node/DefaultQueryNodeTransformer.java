@@ -51,6 +51,11 @@ public class DefaultQueryNodeTransformer implements QueryNodeTransformer {
     }
 
     @Override
+    public LateralJoinNode transform(LateralJoinNode innerJoinNode, NaryIQTree tree) {
+        return innerJoinNode;
+    }
+
+    @Override
     public ConstructionNode transform(ConstructionNode constructionNode, UnaryIQTree tree) {
         return constructionNode;
     }

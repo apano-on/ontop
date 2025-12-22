@@ -27,8 +27,10 @@ public class JsonBasicLens extends JsonBasicOrJoinLens {
                          @JsonProperty("otherFunctionalDependencies") OtherFunctionalDependencies otherFunctionalDependencies,
                          @JsonProperty("foreignKeys") ForeignKeys foreignKeys,
                          @JsonProperty("nonNullConstraints") NonNullConstraints nonNullConstraints,
-                         @JsonProperty("iriSafeConstraints") IRISafeConstraints iriSafeConstraints) {
-        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints, columns, filterExpression);
+                         @JsonProperty("iriSafeConstraints") IRISafeConstraints iriSafeConstraints,
+                         @JsonProperty("accessPatternConstraints") AccessPatternConstraints accessPatternConstraints) {
+        super(name, uniqueConstraints, otherFunctionalDependencies, foreignKeys, nonNullConstraints, iriSafeConstraints,
+                columns, filterExpression, accessPatternConstraints);
         this.baseRelation = baseRelation;
     }
 

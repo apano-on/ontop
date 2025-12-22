@@ -36,4 +36,5 @@ public interface QueryNodeTransformer {
 
     UnionNode transform(UnionNode unionNode, NaryIQTree tree);
     InnerJoinNode transform(InnerJoinNode innerJoinNode, NaryIQTree tree);
+    LateralJoinNode transform(LateralJoinNode innerJoinNode, NaryIQTree tree);
 }

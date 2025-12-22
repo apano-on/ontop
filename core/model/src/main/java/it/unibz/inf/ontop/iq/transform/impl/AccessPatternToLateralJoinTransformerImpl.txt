@@ -1,0 +1,240 @@
+package it.unibz.inf.ontop.iq.transform.impl;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import it.unibz.inf.ontop.dbschema.AccessPatternConstraint;
+import it.unibz.inf.ontop.dbschema.Attribute;
+import it.unibz.inf.ontop.dbschema.NamedRelationDefinition;
+import it.unibz.inf.ontop.injection.IntermediateQueryFactory;
+import it.unibz.inf.ontop.iq.IQTree;
+import it.unibz.inf.ontop.iq.node.ExtensionalDataNode;
+import it.unibz.inf.ontop.iq.node.InnerJoinNode;
+import it.unibz.inf.ontop.iq.node.LateralJoinNode;
+import it.unibz.inf.ontop.model.term.Variable;
+import it.unibz.inf.ontop.model.term.VariableOrGroundTerm;
+import it.unibz.inf.ontop.utils.ImmutableCollectors;
+import it.unibz.inf.ontop.utils.VariableGenerator;
+import it.unibz.inf.ontop.iq.transform.impl.DefaultRecursiveIQTreeVisitingTransformer;
+
+import java.util.*;
+
+/**
+ * Transforms InnerJoinNodes into LateralJoinNodes when necessary to satisfy
+ * access pattern constraints.
+ *
+ * This transformation:
+ * 1. Analyzes each join to see if any child has access patterns
+ * 2. Checks if required input variables are bound from previous children
+ * 3. Converts n-ary inner joins into a left-deep tree of lateral joins when needed
+ *
+ * Example:
+ *   JOIN(table1, table2_with_access_pattern(needs: table1.id))
+ *
+ * Becomes:
+ *   LATERAL_JOIN(table1, table2_with_access_pattern)
+ */
+public class AccessPatternToLateralJoinTransformer extends DefaultRecursiveIQTreeVisitingTransformer {
+
+    private final IntermediateQueryFactory iqFactory;
+
+    public AccessPatternToLateralJoinTransformer(IntermediateQueryFactory iqFactory) {
+        super(iqFactory.getCoreUtilsFactory());
+        this.iqFactory = iqFactory;
+    }
+
+    @Override
+    public IQTree transformInnerJoin(IQTree tree, InnerJoinNode node, ImmutableList<IQTree> children) {
+        // First, recursively transform children
+        ImmutableList<IQTree> transformedChildren = children.stream()
+                .map(c -> c.acceptTransformer(this))
+                .collect(ImmutableCollectors.toList());
+
+        // Check if any child has access patterns that require lateral semantics
+        if (!hasAccessPatterns(transformedChildren)) {
+            // No access patterns, keep as regular inner join
+            return iqFactory.createNaryIQTree(node, transformedChildren);
+        }
+
+        // Reorder children to satisfy access patterns and convert to lateral joins
+        return convertToLateralJoinTree(node, transformedChildren);
+    }
+
+    /**
+     * Checks if any child has access patterns
+     */
+    private boolean hasAccessPatterns(ImmutableList<IQTree> children) {
+        return children.stream()
+                .anyMatch(this::hasAccessPattern);
+    }
+
+    private boolean hasAccessPattern(IQTree tree) {
+        if (!(tree.getRootNode() instanceof ExtensionalDataNode)) {
+            return false;
+        }
+        ExtensionalDataNode node = (ExtensionalDataNode) tree.getRootNode();
+        NamedRelationDefinition relation = node.getRelationDefinition();
+        return !relation.getAccessPatterns().isEmpty();
+    }
+
+    /**
+     * Converts an n-ary inner join into a left-deep tree of lateral joins
+     * when access patterns require it.
+     */
+    private IQTree convertToLateralJoinTree(InnerJoinNode originalNode,
+                                            ImmutableList<IQTree> children) {
+
+        // Reorder children to satisfy access patterns
+        ImmutableList<IQTree> orderedChildren = reorderForAccessPatterns(children);
+
+        // Build left-deep tree
+        IQTree result = orderedChildren.get(0);
+        ImmutableSet<Variable> boundVariables = result.getVariables();
+
+        for (int i = 1; i < orderedChildren.size(); i++) {
+            IQTree rightChild = orderedChildren.get(i);
+
+            boolean needsLateral = needsLateralJoin(rightChild, boundVariables);
+
+            if (needsLateral) {
+                // Create LATERAL JOIN
+                result = iqFactory.createBinaryNonCommutativeIQTree(
+                        iqFactory.createInnerJoinLateralNode(),
+                        result,
+                        rightChild);
+            } else {
+                // Regular inner join is sufficient
+                result = iqFactory.createNaryIQTree(
+                        originalNode,
+                        ImmutableList.of(result, rightChild));
+            }
+
+            boundVariables = ImmutableSet.<Variable>builder()
+                    .addAll(boundVariables)
+                    .addAll(rightChild.getVariables())
+                    .build();
+        }
+
+        // Apply the original join condition if any
+        if (originalNode.getOptionalFilterCondition().isPresent()) {
+            result = iqFactory.createUnaryIQTree(
+                    iqFactory.createFilterNode(originalNode.getOptionalFilterCondition().get()),
+                    result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Reorders children so that:
+     * 1. Children without access patterns come first
+     * 2. Children with access patterns come after their required inputs
+     */
+    private ImmutableList<IQTree> reorderForAccessPatterns(ImmutableList<IQTree> children) {
+        List<IQTree> result = new ArrayList<>();
+        Set<IQTree> remaining = new LinkedHashSet<>(children);
+        ImmutableSet<Variable> boundVariables = ImmutableSet.of();
+
+        while (!remaining.isEmpty()) {
+            IQTree next = null;
+
+            // First, try to find a child with no access patterns
+            for (IQTree child : remaining) {
+                if (!hasAccessPattern(child)) {
+                    next = child;
+                    break;
+                }
+            }
+
+            // If all remaining have access patterns, find one we can satisfy
+            if (next == null) {
+                for (IQTree child : remaining) {
+                    if (canAccessPatternBeSatisfied(child, boundVariables)) {
+                        next = child;
+                        break;
+                    }
+                }
+            }
+
+            if (next == null) {
+                throw new IllegalArgumentException(
+                        "Cannot reorder joins to satisfy access patterns. " +
+                                "Required input variables are not available.");
+            }
+
+            result.add(next);
+            remaining.remove(next);
+            boundVariables = ImmutableSet.<Variable>builder()
+                    .addAll(boundVariables)
+                    .addAll(next.getVariables())
+                    .build();
+        }
+
+        return ImmutableList.copyOf(result);
+    }
+
+    /**
+     * Checks if this child needs lateral join semantics given the bound variables
+     */
+    private boolean needsLateralJoin(IQTree child, ImmutableSet<Variable> boundVariables) {
+        if (!(child.getRootNode() instanceof ExtensionalDataNode)) {
+            return false;
+        }
+
+        ExtensionalDataNode node = (ExtensionalDataNode) child.getRootNode();
+        NamedRelationDefinition relation = node.getRelationDefinition();
+        ImmutableSet<AccessPatternConstraint> patterns = relation.getAccessPatterns();
+
+        if (patterns.isEmpty()) {
+            return false;
+        }
+
+        // Check if at least one pattern can be satisfied
+        for (AccessPatternConstraint pattern : patterns) {
+            if (isPatternSatisfied(node, pattern, boundVariables)) {
+                // Pattern can be satisfied, so we need lateral join
+                return true;
+            }
+        }
+
+        // No pattern can be satisfied - this should have been caught earlier
+        return false;
+    }
+
+    private boolean canAccessPatternBeSatisfied(IQTree child, ImmutableSet<Variable> boundVariables) {
+        if (!(child.getRootNode() instanceof ExtensionalDataNode)) {
+            return true; // Not a data node, no access pattern to check
+        }
+
+        ExtensionalDataNode node = (ExtensionalDataNode) child.getRootNode();
+        NamedRelationDefinition relation = node.getRelationDefinition();
+        ImmutableSet<AccessPatternConstraint> patterns = relation.getAccessPatterns();
+
+        if (patterns.isEmpty()) {
+            return true; // No access patterns to satisfy
+        }
+
+        // Check if at least one pattern can be satisfied
+        return patterns.stream()
+                .anyMatch(pattern -> isPatternSatisfied(node, pattern, boundVariables));
+    }
+
+    private boolean isPatternSatisfied(ExtensionalDataNode node,
+                                       AccessPatternConstraint pattern,
+                                       ImmutableSet<Variable> boundVariables) {
+        ImmutableSet<Attribute> requiredInputs = pattern.getInputs();
+
+        for (Attribute inputAttr : requiredInputs) {
+            VariableOrGroundTerm term = node.getArgumentMap().get(inputAttr.getIndex() - 1);
+
+            if (term instanceof Variable) {
+                Variable var = (Variable) term;
+                if (!boundVariables.contains(var)) {
+                    return false; // Required input not bound
+                }
+            }
+            // Ground terms are always "bound"
+        }
+
+        return true; // All required inputs are bound
+    }
+}

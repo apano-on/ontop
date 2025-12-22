@@ -97,6 +97,11 @@ public abstract class AbstractIQTreeGenericVisitingTransformer<T> implements IQT
     }
 
     @Override
+    public T transformLateralJoin(NaryIQTree tree, LateralJoinNode rootNode, ImmutableList<IQTree> children) {
+        return done();
+    }
+
+    @Override
     public T transformUnion(NaryIQTree tree, UnionNode rootNode, ImmutableList<IQTree> children) {
         return done();
     }

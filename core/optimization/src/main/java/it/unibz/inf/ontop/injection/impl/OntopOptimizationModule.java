@@ -48,6 +48,7 @@ public class OntopOptimizationModule extends OntopAbstractModule {
         bindFromSettings(QueryPlanner.class);
         bindFromSettings(RequiredExtensionalDataNodeExtractor.class);
         bindFromSettings(LensUnfolder.class);
+        bindFromSettings(AccessPatternEnforcementOptimizer.class); // must be after lens unfolder? does order matter?
         bindFromSettings(AggregationSplitter.class);
         bindFromSettings(FlattenLifter.class);
         bindFromSettings(BasicFlattenLifter.class);

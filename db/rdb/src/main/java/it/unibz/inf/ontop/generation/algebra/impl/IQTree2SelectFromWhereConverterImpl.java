@@ -221,6 +221,15 @@ public class IQTree2SelectFromWhereConverterImpl implements IQTree2SelectFromWhe
             }
 
             @Override
+            public SQLExpression transformLateralJoin(NaryIQTree tree, LateralJoinNode rootNode, ImmutableList<IQTree> children) {
+                ImmutableList<SQLExpression> joinedExpressions = NaryIQTreeTools.transformChildren(
+                        tree.getChildren(),
+                        c -> convertIntoFromExpression(c));
+
+                return sqlAlgebraFactory.createSQLNaryJoinExpression(joinedExpressions);
+            }
+
+            @Override
             public SQLExpression transformUnion(NaryIQTree tree, UnionNode unionNode, ImmutableList<IQTree> children) {
                 ImmutableSortedSet<Variable> signature = getSignature(tree);
                 ImmutableList<SQLExpression> subExpressions = NaryIQTreeTools.transformChildren(
